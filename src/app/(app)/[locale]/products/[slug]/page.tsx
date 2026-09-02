@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return buildPageMetadata({
-    description: `Shop the ${title} from MODULIV. Tool-free assembly flat-pack furniture.`,
+    description: `Shop the ${title} from The Flat Set. Tool-free assembly flat-pack furniture.`,
     locale,
     pathname: `/products/${slug}`,
     title,
@@ -80,14 +80,17 @@ export default async function ProductPage({ params }: Props) {
         joineryType: doc.joineryType,
         price: doc.priceInUSD || 699,
         slug: doc.slug,
+        specifications: doc.specifications,
+        subtitle: doc.subtitle,
         title: doc.title,
       }
     : {
         assemblyMinutes: 15,
-        boxCount: 3,
+        boxCount: 2,
         joineryType: 'Tool-Free Japandi Mortise & Tenon',
         price: 699,
         slug: 'modusofa',
+        subtitle: 'Tool-free Japandi sofa engineered for deep comfort and tool-free disassembly.',
         title: 'ModuSofa 3-Seater',
       }
 

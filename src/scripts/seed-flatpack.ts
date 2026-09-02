@@ -27,7 +27,7 @@ const richText = (...paragraphs: string[]) => ({
 })
 
 export async function seedFlatpack(payload: Payload) {
-  payload.logger.info('Seeding MODULIV / The Flat Set whole-home commerce content…')
+  payload.logger.info('Seeding The Flat Set whole-home commerce content…')
 
   const upsertBySlug = async (collection: any, slug: string, data: Record<string, unknown>, locale?: string) => {
     const existing = await payload.find({
@@ -57,26 +57,34 @@ export async function seedFlatpack(payload: Payload) {
   }
 
   // 1. Seed Default Admin User
+  const adminEmail = process.env.INITIAL_ADMIN_EMAIL || 'admin@theflatset.com'
+  const adminPassword = process.env.INITIAL_ADMIN_PASSWORD || 'flatset_admin_2026'
+
   const existingAdmin = await payload.find({
     collection: 'users',
     depth: 0,
     limit: 1,
     overrideAccess: true,
-    where: { email: { equals: 'admin@moduliv.studio' } },
+    where: {
+      or: [
+        { email: { equals: adminEmail } },
+        { email: { equals: 'admin@moduliv.studio' } },
+      ],
+    },
   })
 
   if (!existingAdmin.docs[0]) {
     await payload.create({
       collection: 'users',
       data: {
-        email: 'admin@moduliv.studio',
-        name: 'MODULIV Admin',
-        password: 'moduliv_admin_2026',
+        email: adminEmail,
+        name: 'The Flat Set Admin',
+        password: adminPassword,
         roles: ['admin'],
       },
       overrideAccess: true,
     })
-    payload.logger.info('Created default admin: admin@moduliv.studio')
+    payload.logger.info(`Created default admin: ${adminEmail}`)
   }
 
   // 2. Seed Spaces

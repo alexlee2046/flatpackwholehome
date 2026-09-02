@@ -2,10 +2,13 @@
 
 import { Link } from '@/i18n/navigation'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { useTranslations } from 'next-intl'
 import React, { useState, useEffect } from 'react'
 
 export function ModulivHeader() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const tNav = useTranslations('Navigation')
+  const tFooter = useTranslations('Footer')
 
   // Lock body scroll when drawer is open
   useEffect(() => {
@@ -45,6 +48,10 @@ export function ModulivHeader() {
   const openPolicyModal = (modalId: string) => {
     setIsDrawerOpen(false)
     setTimeout(() => {
+      if (typeof window !== 'undefined' && (window as unknown as { modulivOpenPolicy?: (id: string) => void }).modulivOpenPolicy) {
+        (window as unknown as { modulivOpenPolicy: (id: string) => void }).modulivOpenPolicy(modalId)
+        return
+      }
       const modal = document.getElementById(modalId)
       if (modal) {
         modal.style.display = 'flex'
@@ -99,31 +106,31 @@ export function ModulivHeader() {
               className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
               href="/1-bedroom-kit-builder"
             >
-              Move-In Bundles
+              {tNav('kitBuilder')}
             </Link>
             <Link
               className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
               href="/products/modusofa"
             >
-              ModuSofa
+              {tNav('modusofa')}
             </Link>
             <Link
               className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
               href="/how-it-works-craft-logistics"
             >
-              How It Works
+              {tNav('howItWorks')}
             </Link>
             <Link
               className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
               href="/free-swatch-box-material-discovery"
             >
-              Free Swatch Box
+              {tNav('swatchBox')}
             </Link>
             <Link
               className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
               href="/faq"
             >
-              FAQ
+              {tNav('faq')}
             </Link>
           </nav>
 
@@ -216,7 +223,7 @@ export function ModulivHeader() {
                 className="w-full flex items-center gap-3 px-4 py-2.5 rounded-full bg-surface-container-lowest dark:bg-surface-container border border-outline-variant/40 text-on-surface-variant text-sm font-label-md hover:border-primary transition-colors text-left"
               >
                 <span className="material-symbols-outlined text-[20px] text-primary">search</span>
-                <span>Search furniture, kits, FAQs...</span>
+                <span>{tNav('searchPlaceholder')}</span>
               </button>
             </div>
 
@@ -230,7 +237,7 @@ export function ModulivHeader() {
                 onClick={() => setIsDrawerOpen(false)}
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
-                <span>Move-In Bundles</span>
+                <span>{tNav('kitBuilder')}</span>
                 <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
               </Link>
               <Link
@@ -238,7 +245,7 @@ export function ModulivHeader() {
                 onClick={() => setIsDrawerOpen(false)}
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
-                <span>ModuSofa (Modular 3-Seater)</span>
+                <span>{tNav('modusofa')}</span>
                 <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
               </Link>
               <Link
@@ -246,7 +253,7 @@ export function ModulivHeader() {
                 onClick={() => setIsDrawerOpen(false)}
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
-                <span>Craft & Logistics</span>
+                <span>{tNav('howItWorks')}</span>
                 <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
               </Link>
               <Link
@@ -254,7 +261,7 @@ export function ModulivHeader() {
                 onClick={() => setIsDrawerOpen(false)}
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
-                <span>Free Swatch Box</span>
+                <span>{tNav('swatchBox')}</span>
                 <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
               </Link>
               <Link
@@ -262,7 +269,7 @@ export function ModulivHeader() {
                 onClick={() => setIsDrawerOpen(false)}
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
-                <span>FAQ & Support</span>
+                <span>{tNav('faq')}</span>
                 <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
               </Link>
               <Link
@@ -270,7 +277,7 @@ export function ModulivHeader() {
                 onClick={() => setIsDrawerOpen(false)}
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
-                <span>Cart & Checkout</span>
+                <span>{tNav('cart')}</span>
                 <span
                   data-cart-badge
                   className="text-xs px-2 py-0.5 rounded-full bg-primary text-on-primary font-sans font-bold"
@@ -311,7 +318,7 @@ export function ModulivHeader() {
                 onClick={() => openPolicyModal('moduliv-privacy-modal')}
                 className="hover:text-primary transition-colors cursor-pointer"
               >
-                Privacy Policy
+                {tFooter('privacyPolicy')}
               </button>
               <span>•</span>
               <button
@@ -319,7 +326,7 @@ export function ModulivHeader() {
                 onClick={() => openPolicyModal('moduliv-terms-modal')}
                 className="hover:text-primary transition-colors cursor-pointer"
               >
-                Terms & Conditions
+                {tFooter('termsOfService')}
               </button>
             </div>
             <div className="text-[11px] text-outline/80 text-center">

@@ -1,6 +1,7 @@
 'use client'
 
 import { Link, useRouter } from '@/i18n/navigation'
+import Image from 'next/image'
 import React, { useState } from 'react'
 
 type ProductDetailProps = {
@@ -18,6 +19,12 @@ type ProductDetailProps = {
     joineryType?: string | null
     price?: number
     slug?: string
+    specifications?: Array<{
+      id?: string | null
+      label?: string | null
+      value?: string | null
+    }> | null
+    subtitle?: string | null
     title?: string
   }
 }
@@ -31,15 +38,37 @@ const FABRICS = [
 
 export function ProductDetail({ product }: ProductDetailProps) {
   const router = useRouter()
+  const isSofa = !product?.slug || product.slug === 'modusofa'
   const [selectedFabric, setSelectedFabric] = useState(FABRICS[0].name)
-  const [selectedLeg, setSelectedLeg] = useState('Natural Oak')
+  const [selectedLeg, setSelectedLeg] = useState(isSofa ? 'Natural Oak' : 'Queen')
   const [qty, setQty] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
 
   const title = product?.title || 'ModuSofa 3-Seater'
   const price = product?.price || 699
-  const boxCount = product?.boxCount || 3
+  const boxCount = product?.boxCount || (isSofa ? 2 : 3)
   const assemblyMinutes = product?.assemblyMinutes || 15
+
+  const mainImage = isSofa
+    ? '/assets/modusofa-product-detail-page/e38c85e68d.png'
+    : '/assets/1-bedroom-kit-builder/da48e93272.png'
+
+  const thumbImages = isSofa
+    ? [
+        '/assets/modusofa-product-detail-page/0bbfa9bb39.png',
+        '/assets/modusofa-product-detail-page/07df972410.png',
+        '/assets/modusofa-product-detail-page/a56da1ec79.png',
+      ]
+    : [
+        '/assets/1-bedroom-kit-builder/d4a4793ee2.png',
+        '/assets/1-bedroom-kit-builder/d66ddc7ba1.png',
+        '/assets/1-bedroom-kit-builder/b4e5f4d8a0.png',
+      ]
+
+  const categoryName = isSofa ? 'Seating' : 'Bedroom'
+  const eyebrowText = isSofa
+    ? 'LIVING ROOM · TOOL-FREE SNAP ASSEMBLY'
+    : `${product?.joineryType || 'SOLID WOOD'} · TOOL-FREE LIVING SYSTEM`
 
   const handleAddToCart = () => {
     if (typeof window !== 'undefined' && (window as any).modulivCart) {
@@ -75,7 +104,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
         </Link>
         <span className="material-symbols-outlined text-[16px]">chevron_right</span>
         <Link className="hover:text-primary transition-colors" href="/1-bedroom-kit-builder">
-          Seating
+          {categoryName}
         </Link>
         <span className="material-symbols-outlined text-[16px]">chevron_right</span>
         <span className="text-on-surface font-medium">{title}</span>
@@ -85,33 +114,42 @@ export function ProductDetail({ product }: ProductDetailProps) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-section-gap items-start">
         {/* Left Column: Visuals */}
         <div className="lg:col-span-7 flex flex-col gap-4">
-          <div className="aspect-[4/3] w-full bg-surface-container rounded-xl overflow-hidden relative shadow-sm">
-            <img
+          <div className="relative aspect-[4/3] w-full bg-surface-container rounded-xl overflow-hidden shadow-sm">
+            <Image
               alt={title}
-              className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-              src="/assets/modusofa-product-detail-page/e38c85e68d.png"
+              className="object-cover transition-transform duration-700 hover:scale-105"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 55vw"
+              src={mainImage}
             />
           </div>
           <div className="grid grid-cols-3 gap-4">
-            <div className="aspect-square bg-surface-container rounded-lg overflow-hidden">
-              <img
-                alt="Angle view"
-                className="w-full h-full object-cover"
-                src="/assets/modusofa-product-detail-page/0bbfa9bb39.png"
+            <div className="relative aspect-square bg-surface-container rounded-lg overflow-hidden">
+              <Image
+                alt="Product angle view"
+                className="object-cover"
+                fill
+                sizes="(max-width: 1024px) 30vw, 15vw"
+                src={thumbImages[0]}
               />
             </div>
-            <div className="aspect-square bg-surface-container rounded-lg overflow-hidden">
-              <img
-                alt="Fabric detail"
-                className="w-full h-full object-cover"
-                src="/assets/modusofa-product-detail-page/07df972410.png"
+            <div className="relative aspect-square bg-surface-container rounded-lg overflow-hidden">
+              <Image
+                alt="Product detail view"
+                className="object-cover"
+                fill
+                sizes="(max-width: 1024px) 30vw, 15vw"
+                src={thumbImages[1]}
               />
             </div>
-            <div className="aspect-square bg-surface-container rounded-lg overflow-hidden">
-              <img
-                alt="Flat packaging"
-                className="w-full h-full object-cover"
-                src="/assets/modusofa-product-detail-page/a56da1ec79.png"
+            <div className="relative aspect-square bg-surface-container rounded-lg overflow-hidden">
+              <Image
+                alt="Packaging breakdown view"
+                className="object-cover"
+                fill
+                sizes="(max-width: 1024px) 30vw, 15vw"
+                src={thumbImages[2]}
               />
             </div>
           </div>
@@ -120,7 +158,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
         {/* Right Column: Details & Customizer */}
         <div className="lg:col-span-5 flex flex-col lg:pl-6">
           <span className="font-label-md text-label-md uppercase tracking-wider text-primary mb-2 block">
-            LIVING ROOM · TOOL-FREE SNAP ASSEMBLY
+            {eyebrowText}
           </span>
           <h1 className="font-display-lg text-[32px] md:text-[44px] leading-tight text-on-surface mb-3">
             {title}
@@ -167,8 +205,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
                     onClick={() => setSelectedFabric(fab.name)}
                     type="button"
                   >
-                    <div className="w-12 h-12 rounded-full overflow-hidden border border-outline-variant/30">
-                      <img alt={fab.name} className="w-full h-full object-cover" src={fab.img} />
+                    <div className="relative w-12 h-12 rounded-full overflow-hidden border border-outline-variant/30">
+                      <Image alt={fab.name} className="object-cover" fill sizes="48px" src={fab.img} />
                     </div>
                     <span className="font-body-md text-[11px] text-center leading-tight text-on-surface mt-1">
                       {fab.name}

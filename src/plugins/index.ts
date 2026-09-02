@@ -102,7 +102,7 @@ const payloadAddressCountries = [
 ]
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | MODULIV` : 'MODULIV — Your Entire Home. Delivered in 6 Flat Boxes.'
+  return doc?.title ? `${doc.title} | The Flat Set` : 'The Flat Set — Your Entire Home. Delivered in 6 Flat Boxes.'
 }
 
 const generateURL: GenerateURL<Product | Page> = ({ collectionSlug, doc, locale }) => {

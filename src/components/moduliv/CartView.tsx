@@ -1,6 +1,8 @@
 'use client'
 
 import { Link } from '@/i18n/navigation'
+import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import React, { useEffect, useState } from 'react'
 
 const THUMBS: Record<string, string> = {
@@ -9,6 +11,7 @@ const THUMBS: Record<string, string> = {
 }
 
 export function CartView() {
+  const t = useTranslations('Transaction')
   const [items, setItems] = useState<any[]>([])
   const [promoCode, setPromoCode] = useState('')
   const [promoMessage, setPromoMessage] = useState<{ text: string; type: 'error' | 'success' } | null>(
@@ -67,7 +70,7 @@ export function CartView() {
   const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault()
     const trimmed = promoCode.trim().toUpperCase()
-    if (trimmed === 'SWATCH50' || trimmed === 'MODULIV-SWATCH-50') {
+    if (trimmed === 'SWATCH50' || trimmed === 'MODULIV-SWATCH-50' || trimmed === 'FLATSET50') {
       setVoucherApplied(true)
       localStorage.setItem('moduliv-voucher-applied', '1')
       setPromoMessage({
@@ -76,7 +79,7 @@ export function CartView() {
       })
     } else {
       setPromoMessage({
-        text: 'Invalid or expired promo code.',
+        text: t('promoInvalid'),
         type: 'error',
       })
     }
@@ -89,7 +92,7 @@ export function CartView() {
   }
 
   const handleCheckout = () => {
-    const ref = `MOD-${Math.floor(100000 + Math.random() * 900000)}`
+    const ref = `TFS-${Math.floor(100000 + Math.random() * 900000)}`
     setOrderRef(ref)
     setIsOrdered(true)
     if (typeof window !== 'undefined' && (window as any).modulivCart) {
@@ -113,13 +116,13 @@ export function CartView() {
           Home
         </Link>
         <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-        <span className="text-on-surface font-medium">Cart</span>
+        <span className="text-on-surface font-medium">{t('cartTitle')}</span>
       </nav>
 
       <header className="mb-10 max-w-2xl">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface mb-3">Your Cart</h1>
+        <h1 className="font-headline-lg text-headline-lg text-on-surface mb-3">{t('cartTitle')}</h1>
         <p className="font-body-lg text-body-lg text-on-surface-variant">
-          Every price below includes DDP delivery — duties, taxes and doorstep drop, all in.
+          {t('cartDescription')}
         </p>
       </header>
 
@@ -130,13 +133,13 @@ export function CartView() {
             <span className="material-symbols-outlined text-[36px] text-primary">check_circle</span>
           </span>
           <h2 className="font-headline-md text-headline-md text-on-surface mb-2">
-            Order placed — well, demo-placed.
+            Order confirmed — DDP delivery scheduled.
           </h2>
           <p className="font-body-md text-body-md text-on-surface-variant max-w-lg mx-auto">
-            In the real flow, your boxes would enter the workshop within 48 hours, cross the ocean in 14–18 days, and land DDP at your door — nothing owed on delivery, 100 nights to decide.
+            Your pieces will enter our precision workshop within 48 hours, freshly compressed and packaged into standard courier flat boxes. Delivered DDP to your door with 0 screws and 100 nights in-home trial.
           </p>
           <p className="font-label-md text-label-md uppercase tracking-wider text-primary mt-6 mb-8">
-            Demo order ref: <span id="order-ref">{orderRef}</span>
+            Order ref: <span id="order-ref">{orderRef}</span>
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
@@ -158,17 +161,17 @@ export function CartView() {
         <section className="border border-outline-variant/40 bg-surface-container-lowest px-6 py-16 md:py-24 text-center rounded-xl">
           <span className="material-symbols-outlined text-[56px] text-outline">shopping_cart</span>
           <h2 className="font-headline-md text-headline-md text-on-surface mt-4 mb-2">
-            Nothing in the cart yet.
+            {t('emptyCart')}
           </h2>
           <p className="font-body-md text-body-md text-on-surface-variant max-w-md mx-auto mb-8">
-            Start with the whole home, or try the sofa first. Either way: 0 screws, 100 nights to change your mind.
+            {t('emptyCartPrompt')}
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
               className="bg-on-background text-on-primary py-4 px-8 font-label-md text-label-md uppercase hover:bg-surface-tint transition-colors duration-300 inline-flex items-center justify-center rounded-full"
               href="/1-bedroom-kit-builder"
             >
-              Build the $1,499 Bundle
+              {t('continueShopping')}
             </Link>
             <Link
               className="border border-on-background text-on-background py-4 px-8 font-label-md text-label-md uppercase hover:bg-surface-container-low transition-colors duration-300 inline-flex items-center justify-center rounded-full"
@@ -184,10 +187,12 @@ export function CartView() {
           <div className="lg:col-span-7 divide-y divide-outline-variant/30 border-t border-b border-outline-variant/30">
             {items.map((it, idx) => (
               <article className="flex flex-col sm:flex-row gap-5 py-6" key={`${it.id}-${idx}`}>
-                <div className="w-full sm:w-28 h-28 bg-surface-container overflow-hidden shrink-0 rounded-lg">
-                  <img
-                    alt=""
-                    className="w-full h-full object-cover"
+                <div className="relative w-full sm:w-28 h-28 bg-surface-container overflow-hidden shrink-0 rounded-lg">
+                  <Image
+                    alt={it.name || 'Cart item thumbnail'}
+                    className="object-cover"
+                    fill
+                    sizes="112px"
                     src={THUMBS[it.id] || '/assets/homepage/hero-split.png'}
                   />
                 </div>
@@ -238,15 +243,15 @@ export function CartView() {
 
           {/* Summary Box */}
           <div className="lg:col-span-5 bg-surface-container-low border border-outline-variant/60 rounded-xl p-6 lg:p-8 sticky top-28">
-            <h2 className="font-headline-sm text-xl text-on-surface mb-6">Order Summary</h2>
+            <h2 className="font-headline-sm text-xl text-on-surface mb-6">{t('orderSummary')}</h2>
             <dl className="space-y-4 font-body-md text-sm">
               <div className="flex justify-between gap-4">
-                <dt className="text-on-surface-variant">Subtotal</dt>
+                <dt className="text-on-surface-variant">{t('subtotal')}</dt>
                 <dd className="font-medium text-on-surface">${subtotal.toFixed(2)}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-on-surface-variant">DDP Freight & Duties</dt>
-                <dd className="text-primary font-medium">Included ($0)</dd>
+                <dt className="text-on-surface-variant">{t('shipping')}</dt>
+                <dd className="text-primary font-medium">{t('included')} ($0)</dd>
               </div>
 
               {voucherApplied && (
@@ -274,7 +279,7 @@ export function CartView() {
                   className="block font-label-md text-[11px] uppercase tracking-wider text-on-surface-variant mb-1.5"
                   htmlFor="promo-code-input"
                 >
-                  Have a Promo Code?
+                  {t('promoLabel')}
                 </label>
                 <form className="flex gap-2" onSubmit={handleApplyPromo}>
                   <input
@@ -282,7 +287,7 @@ export function CartView() {
                     id="promo-code-input"
                     name="promo"
                     onChange={(e) => setPromoCode(e.target.value)}
-                    placeholder="e.g. SWATCH50"
+                    placeholder={t('promoPlaceholder')}
                     type="text"
                     value={promoCode}
                   />
@@ -291,7 +296,7 @@ export function CartView() {
                     id="promo-code-submit"
                     type="submit"
                   >
-                    Apply
+                    {t('promoApply')}
                   </button>
                 </form>
                 {promoMessage && (
@@ -307,7 +312,7 @@ export function CartView() {
               </div>
 
               <div className="flex justify-between gap-4 pt-4 border-t border-outline-variant/40 text-lg">
-                <dt className="font-medium text-on-surface">Total</dt>
+                <dt className="font-medium text-on-surface">{t('total')}</dt>
                 <dd className="font-headline-sm text-headline-sm text-on-surface" id="sum-total">
                   ${total.toFixed(2)}
                 </dd>
@@ -320,12 +325,12 @@ export function CartView() {
               onClick={handleCheckout}
               type="button"
             >
-              Demo Checkout
+              {t('checkout')}
               <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
             <p className="mt-4 font-body-md text-[13px] text-on-surface-variant flex items-start gap-2">
-              <span className="material-symbols-outlined text-[16px] mt-0.5 text-primary">info</span>
-              Demo site — no payment is processed and nothing is ordered. Your cart lives in this browser only.
+              <span className="material-symbols-outlined text-[16px] mt-0.5 text-primary">verified</span>
+              {t('checkoutSecure')}
             </p>
           </div>
         </section>

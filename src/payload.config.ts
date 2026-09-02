@@ -125,7 +125,14 @@ export default buildConfig({
     ],
   },
   plugins,
-  secret: process.env.PAYLOAD_SECRET || 'moduliv_payload_secret_84f93c0a21d58e3b1c97ef04',
+  secret: (() => {
+    const isProduction = process.env.NODE_ENV === 'production'
+    const secret = process.env.PAYLOAD_SECRET
+    if (isProduction && !secret) {
+      throw new Error('FATAL: PAYLOAD_SECRET environment variable is required in production.')
+    }
+    return secret || 'flatpack_dev_secret_84f93c0a21d58e3b1c97ef04'
+  })(),
   serverURL: publicServerURL,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),

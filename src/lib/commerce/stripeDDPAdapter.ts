@@ -149,7 +149,7 @@ async function resolveSellableItems({
 
     if (product.enableVariants) {
       if (!item.variant) {
-        throw new CheckoutItemUnavailableError('Choose a teak expression before checkout.')
+        throw new CheckoutItemUnavailableError('Choose a product variant before checkout.')
       }
 
       const variant = await req.payload.findByID({
@@ -169,11 +169,11 @@ async function resolveSellableItems({
       const variantProductID = relationshipID(variant?.product)
 
       if (!variant || variant._status !== 'published' || variantProductID !== item.product) {
-        throw new CheckoutItemUnavailableError('A selected teak expression is no longer available.')
+        throw new CheckoutItemUnavailableError('A selected product variant is no longer available.')
       }
       if (variant.priceInUSDEnabled !== true) {
         throw new CheckoutItemUnavailableError(
-          'A selected teak expression is not enabled for USD checkout.',
+          'A selected product variant is not enabled for USD checkout.',
         )
       }
 
@@ -326,7 +326,7 @@ async function lockInventoryRows(database: TransactionDatabase, items: Canonical
       sql`SELECT "id" FROM "variants" WHERE "id" = ${id} FOR UPDATE`,
     )
     if (result.rows.length !== 1) {
-      throw new CheckoutItemUnavailableError('A selected teak expression is no longer available.')
+      throw new CheckoutItemUnavailableError('A selected product variant is no longer available.')
     }
   }
 }

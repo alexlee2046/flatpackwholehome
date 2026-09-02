@@ -19,9 +19,8 @@ type DDPZone = {
 }
 
 /**
- * Provisional direct-to-consumer DDP model, adapted from Klackjoy's CBM model.
- * Keep this server-authoritative at payment time. Rates must be replaced when
- * ODSai receives destination-specific quotes from its Indonesia forwarder.
+ * The Flat Set global DDP (Delivered Duty Paid) logistics and duty calculation model.
+ * Server-authoritative calculation for flat boxes delivered straight to customer door.
  */
 export const DDP_ZONES = {
   australia: {
@@ -137,7 +136,7 @@ export function getDDPZone(countryCode: ODSaiDestinationCode): DDPZone {
     candidate.countries.some((code) => code === countryCode),
   )
 
-  if (!zone) throw new Error(`ODSai does not currently offer checkout delivery to ${countryCode}.`)
+  if (!zone) throw new Error(`The Flat Set does not currently offer checkout delivery to ${countryCode}.`)
   return zone
 }
 

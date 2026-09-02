@@ -182,6 +182,32 @@ flowchart TB
 
 网页继续用现成 `stitch/vendor/fonts`。包装/PPT 许可：Playfair Display 与 Plus Jakarta Sans 均为 OFL，可商用嵌入。
 
+## 多语言字体（三方 review 后改写，2026-09-03）
+
+审过：Impeccable / Codex taste / Claude frontend-design / agy Gemini 3.8 Flash。共识如下。**不再自托管 Noto CJK / Naskh。**
+
+字标 **The Flat Set** 永远英文 Playfair，不译、不换字。拉丁两套锁定。中日阿语走系统黑体，排在 Playfair / Jakarta 后面。
+
+```
+标题  "Playfair Display", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", Georgia, serif
+正文  "Plus Jakarta Sans", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", system-ui, sans-serif
+```
+
+| Locale | 本地字怎么来 | 注意 |
+| :--- | :--- | :--- |
+| en / de | Playfair + Jakarta | 已覆盖 |
+| ru | 标题 Playfair 西里尔；正文 Jakarta **无西里尔** | 仍要补一档西里尔无衬线，或先靠 system-ui |
+| zh / ja | 系统黑体（0kb） | 标题不用宋体；Windows YaHei 会偏冷，接受 |
+| ar | 系统阿语 + `dir=rtl` | 行高 1.8；不托管 Naskh |
+
+配套：
+
+- `[lang|=zh] / ja / ar` 的原生文案关掉 `uppercase` + `0.05em`；`BOX` / `DDP` / `$` 用 `.latin-meta` 保留 Jakarta 大写
+- 字标 SVG 必须描成 path，禁止靠网页字体
+- stitch 首页改挂 `fonts-7cdb80a7.css`，消灭假斜
+- Favicon **保持 6 条**，16px 用 1px 条 + 1px 隙对齐像素格；**不做四条减笔**（会变成第二套标）
+- 禁止把完整 Noto CJK 打进包（15MB+，打死 LCP）
+
 ## 应用（第一批要出的物料）
 
 1. **站点**：顶栏 Wordmark、favicon、页脚、OG 图标题、邮件 From 名。

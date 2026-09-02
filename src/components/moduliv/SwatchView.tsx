@@ -13,21 +13,41 @@ export function SwatchView() {
     room: '',
   })
   const [isSuccess, setIsSuccess] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.name || !formData.email || !formData.address || !formData.city || !formData.postal) {
       setErrorMsg('Please complete all required fields.')
       return
     }
     setErrorMsg('')
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('moduliv-swatch-ordered', '1')
-      } catch (err) {}
+    setIsLoading(true)
+
+    try {
+      const res = await fetch('/api/enquiries/swatch', {
+        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Failed to submit swatch request.')
+      }
+
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('moduliv-swatch-ordered', '1')
+        } catch (err) {}
+      }
+      setIsSuccess(true)
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Something went wrong. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
-    setIsSuccess(true)
   }
 
   return (
@@ -207,13 +227,14 @@ export function SwatchView() {
                 </div>
 
                 <button
-                  className="bg-on-background text-on-primary font-label-md text-label-md uppercase tracking-wider px-8 py-4 rounded-full hover:bg-primary transition-colors mt-2 cursor-pointer"
+                  disabled={isLoading}
+                  className="bg-on-background text-on-primary font-label-md text-label-md uppercase tracking-wider px-8 py-4 rounded-full hover:bg-primary transition-colors mt-2 cursor-pointer disabled:opacity-50"
                   type="submit"
                 >
-                  Order My Free Swatch Box — $5 Shipping
+                  {isLoading ? 'Processing Request...' : 'Order My Free Swatch Box — Free DDP Delivery'}
                 </button>
                 <p className="font-body-md text-[13px] text-on-surface-variant">
-                  Demo build — nothing is charged; your details stay in this browser only.
+                  Delivered straight to your door with 4 curated fabrics and a $50 voucher card inside.
                 </p>
               </form>
             )}

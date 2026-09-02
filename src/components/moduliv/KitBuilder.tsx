@@ -1,6 +1,8 @@
 'use client'
 
 import { Link, useRouter } from '@/i18n/navigation'
+import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
 type SpaceKey = 'full' | 'living' | 'bedroom'
@@ -53,6 +55,8 @@ const BOX_LIST = [
 
 export function KitBuilder() {
   const router = useRouter()
+  const tKit = useTranslations('Pages.KitBuilder')
+  const tCommon = useTranslations('Common')
   const [space, setSpace] = useState<SpaceKey>('full')
   const [bed, setBed] = useState<'queen' | 'king'>('queen')
   const [fabric, setFabric] = useState('Caramel Corduroy')
@@ -77,7 +81,7 @@ export function KitBuilder() {
     if (typeof window !== 'undefined' && (window as any).modulivCart) {
       ;(window as any).modulivCart.add(1, {
         id: 'bundle-1bed',
-        name: `Move-In ${currentSpace.cta} (${currentSpace.boxes.length} Boxes)`,
+        name: `The Flat Set 1-Bedroom (${currentSpace.cta})`,
         price: total,
         qty: 1,
         variant: variantParts.join(' · '),
@@ -103,7 +107,7 @@ export function KitBuilder() {
             Home
           </Link>
           <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-          <span className="text-on-surface font-medium">1-Bedroom Full Home Builder</span>
+          <span className="text-on-surface font-medium">{tKit('title')}</span>
         </nav>
 
         {/* Header */}
@@ -112,10 +116,10 @@ export function KitBuilder() {
             FURNISH YOUR WHOLE HOME IN ONE CLICK
           </span>
           <h1 className="font-display-lg text-[36px] leading-[1.15] md:text-[64px] md:leading-[1.1] text-on-surface mb-6">
-            The 1-Bedroom Full Apartment Kit
+            {tKit('title')}
           </h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant">
-            6 flat boxes. 60 minutes. 0 tools. Curate your perfect space with our premium, sustainably crafted modular pieces designed for modern living.
+            {tKit('subtitle')}
           </p>
         </header>
 
@@ -124,16 +128,19 @@ export function KitBuilder() {
           {/* Left Column: Interactive Render */}
           <div className="lg:col-span-7 lg:sticky top-32 flex flex-col gap-6 w-full z-10">
             <div className="w-full aspect-[4/3] md:aspect-video bg-surface-container-low rounded-xl overflow-hidden relative group shadow-sm transition-all duration-500">
-              <img
+              <Image
                 alt={currentSpace.alt}
-                className="w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
+                className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
                 id="kit-hero-render"
                 src={currentSpace.img}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 55vw"
               />
               {/* Space Toggles */}
               <div
                 aria-label="Room view"
-                className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md rounded-full p-1.5 flex shadow-sm border border-outline-variant/30"
+                className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md rounded-full p-1.5 flex shadow-sm border border-outline-variant/30 z-10"
                 role="group"
               >
                 {(['full', 'living', 'bedroom'] as const).map((sKey) => {
@@ -176,11 +183,13 @@ export function KitBuilder() {
                       }`}
                       key={b.id}
                     >
-                      <div className="aspect-square bg-surface-container rounded-lg overflow-hidden border border-transparent group-hover:border-outline-variant transition-colors flex items-center justify-center p-4">
-                        <img
+                      <div className="relative aspect-square w-full bg-surface-container rounded-lg overflow-hidden border border-transparent group-hover:border-outline-variant transition-colors flex items-center justify-center p-4">
+                        <Image
                           alt={b.name}
-                          className="w-full h-auto object-contain mix-blend-multiply opacity-80"
+                          className="object-contain mix-blend-multiply opacity-80 p-2"
                           src={b.img}
+                          fill
+                          sizes="120px"
                         />
                       </div>
                       <div className="flex flex-col">
@@ -454,8 +463,8 @@ export function KitBuilder() {
             >
               <span>
                 {isAdded
-                  ? '✓ Added — Opening Cart…'
-                  : `Add ${currentSpace.cta} to Cart (${currentSpace.boxes.length} Boxes)`}
+                  ? `✓ ${tCommon('added')} — Opening Cart…`
+                  : `${tCommon('addToCart')} · ${currentSpace.cta} (${currentSpace.boxes.length} Boxes)`}
               </span>
               <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>

@@ -120,54 +120,75 @@
     /* ==========================================================================
        2. GLOBAL SEARCH MODAL
        ========================================================================== */
+    function getLocalizedUrl(path) {
+        var isStitch = typeof window !== 'undefined' && window.location.pathname.indexOf('stitch') !== -1;
+        if (isStitch) {
+            if (path === '/products/modusofa') return 'modusofa-product-detail-page.html';
+            if (path === '/1-bedroom-kit-builder') return '1-bedroom-kit-builder.html';
+            if (path === '/free-swatch-box-material-discovery') return 'free-swatch-box-material-discovery.html';
+            if (path === '/how-it-works-craft-logistics') return 'how-it-works-craft-logistics.html';
+            if (path.indexOf('/faq') === 0) return path.replace('/faq', 'faq.html');
+            return path;
+        }
+
+        var parts = window.location.pathname.split('/').filter(Boolean);
+        var firstSeg = parts[0] || '';
+        var supportedLocales = ['en', 'zh-CN', 'zh-TW', 'de', 'ja', 'ar', 'ru'];
+        var cleanPath = path.startsWith('/') ? path : '/' + path;
+        if (supportedLocales.indexOf(firstSeg) !== -1) {
+            return '/' + firstSeg + cleanPath;
+        }
+        return cleanPath;
+    }
+
     var SEARCH_INDEX = [
         {
             title: "The ModuSofa (3-Seater)",
             category: "Seating System",
             snippet: "The $699 snap-together modular 3-seater. Tool-free assembly in 5 minutes, FSC oak frame, 4 high-end fabrics.",
-            url: "modusofa-product-detail-page.html"
+            url: "/products/modusofa"
         },
         {
             title: "The 1-Bedroom Full Apartment Kit",
             category: "Move-In Bundles",
             snippet: "A full 1-bed home in 6 boxes for $1,499. Includes sofa, coffee table, TV console, bed frame, and 2 nightstands. Save $395.",
-            url: "1-bedroom-kit-builder.html"
+            url: "/1-bedroom-kit-builder"
         },
         {
             title: "Free Fabric Swatch Box & $50 Voucher",
             category: "Material Discovery",
             snippet: "Curated physical samples of Cream Bouclé, Caramel Corduroy, Olive Chenille, and Tech Grey + $50 credit.",
-            url: "free-swatch-box-material-discovery.html"
+            url: "/free-swatch-box-material-discovery"
         },
         {
             title: "How It Works & The DDP Journey",
             category: "Craft & Logistics",
             snippet: "Fresh-pressed on-demand foam, zero-screw Snap-Lock joints, and carbon-offset 14–18 day DDP ocean delivery.",
-            url: "how-it-works-craft-logistics.html"
+            url: "/how-it-works-craft-logistics"
         },
         {
             title: "Frequently Asked Questions (FAQ)",
             category: "Support & Policy",
             snippet: "100-night in-home trial, zero customs duties guaranteed, tool-free assembly breakdown, and donation-over-return.",
-            url: "faq.html"
+            url: "/faq"
         },
         {
             title: "Design Lab: 3D Snap-Joint Study",
             category: "WebGL Interactive",
             snippet: "Interactive 3D real-time simulation of our patented precision-milled interlocking snap joint.",
-            url: "three-js.html"
+            url: "/three-js"
         },
         {
             title: "100-Night In-Home Trial Policy",
             category: "Customer Promise",
             snippet: "Live with your furniture for 100 nights. If you don't love it, we arrange free pickup and a 100% refund.",
-            url: "faq.html#returns"
+            url: "/faq#returns"
         },
         {
             title: "Zero-Duty DDP Delivery Guarantee",
             category: "Logistics",
             snippet: "Delivered Duty Paid — customs, brokerage, taxes and doorstep drop are 100% included with zero surprise fees.",
-            url: "faq.html#ddp"
+            url: "/faq#ddp"
         }
     ];
 
@@ -233,7 +254,7 @@
             var html = '';
             for (var i = 0; i < matches.length; i++) {
                 var it = matches[i];
-                html += '<a href="' + it.url + '" class="block p-3 rounded-xl hover:bg-white transition-colors group">' +
+                html += '<a href="' + getLocalizedUrl(it.url) + '" class="block p-3 rounded-xl hover:bg-white transition-colors group">' +
                         '  <div class="flex items-center justify-between text-xs font-label-md uppercase tracking-wider text-[#8a4725] mb-1">' +
                         '    <span>' + it.category + '</span>' +
                         '    <span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>' +
@@ -399,22 +420,22 @@
        ========================================================================== */
     var PRIVACY_CONTENT = 
         '<div class="space-y-4 text-sm font-body-md text-[#54433c]">' +
-        '  <p class="font-medium text-[#1a1c1d]">Effective Date: January 1, 2025 · Compliant with GDPR, CCPA, and Global Consumer Protection Standards.</p>' +
+        '  <p class="font-medium text-[#1a1c1d]">Effective Date: January 1, 2026 · Compliant with GDPR, CCPA, and Global Consumer Protection Standards.</p>' +
         '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">1. Plain-Language Data Promise</h4>' +
-        '  <p>MODULIV collects only the information required to build, ship, and deliver your flat-pack living system to your door. We will never sell, rent, or trade your personal data to data brokers or advertising networks.</p>' +
+        '  <p>The Flat Set collects only the information required to build, ship, and deliver your flat-pack living system to your door. We will never sell, rent, or trade your personal data to data brokers or advertising networks.</p>' +
         '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">2. What We Collect</h4>' +
         '  <p>• Delivery Coordinates: Physical address and contact telephone number required exclusively for DDP customs clearing and FedEx/UPS doorstep parcel drops.<br>' +
         '     • Order Configuration: Fabric selections, module dimensions, and room preferences stored locally to facilitate seamless assembly support.<br>' +
-        '     • Payment Security: All live payments are processed via end-to-end PCI-DSS Level 1 certified gateways. MODULIV never stores raw credit card numbers.</p>' +
+        '     • Payment Security: All live payments are processed via end-to-end PCI-DSS Level 1 certified gateways. The Flat Set never stores raw credit card numbers.</p>' +
         '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">3. 100-Night Return Anonymity</h4>' +
         '  <p>Should you utilize our donation-over-return protocol, donation receipts from our local verified charity partners are processed privately with zero public disclosure.</p>' +
         '</div>';
 
     var TERMS_CONTENT = 
         '<div class="space-y-4 text-sm font-body-md text-[#54433c]">' +
-        '  <p class="font-medium text-[#1a1c1d]">MODULIV Global Customer Agreement · Whole-Home Flat-Pack Systems</p>' +
+        '  <p class="font-medium text-[#1a1c1d]">The Flat Set Global Customer Agreement · Whole-Home Flat-Pack Systems</p>' +
         '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">1. Zero-Surprise DDP Delivery Guarantee</h4>' +
-        '  <p>Every price listed on MODULIV is Delivered Duty Paid (DDP). All import taxes, ocean freight, customs clearance tariffs, and final-mile doorstep delivery are paid in full by MODULIV. No freight fees or broker bills will ever be owed at delivery.</p>' +
+        '  <p>Every price listed on The Flat Set is Delivered Duty Paid (DDP). All import taxes, ocean freight, customs clearance tariffs, and final-mile doorstep delivery are paid in full by The Flat Set. No freight fees or broker bills will ever be owed at delivery.</p>' +
         '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">2. 100-Night In-Home Trial & Donation Guarantee</h4>' +
         '  <p>From the date your 6 boxes arrive, you have 100 nights to live with the furniture. If you decide it does not suit your space, notify our concierge team. We coordinate free pickup by an accredited local housing charity and issue a 100% full refund upon donation confirmation.</p>' +
         '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">3. 5-Year Solid Oak Frame Warranty</h4>' +
@@ -422,6 +443,28 @@
         '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">4. 60-Minute Assembly & Free Replacement Parts</h4>' +
         '  <p>Our pieces require 0 screws, 0 Allen keys, and 0 frustration. If any module, bracket, or fabric component sustains shipping wear, replacement parts dispatch via express air within 48 hours free of charge.</p>' +
         '</div>';
+
+    function openPolicyModalById(modalId) {
+        if (!document.getElementById('moduliv-privacy-modal') || !document.getElementById('moduliv-terms-modal')) {
+            createPolicyModal('moduliv-privacy-modal', 'Privacy Policy', PRIVACY_CONTENT);
+            createPolicyModal('moduliv-terms-modal', 'Terms of Service & Guarantees', TERMS_CONTENT);
+        }
+        var modal = document.getElementById(modalId);
+        if (!modal) return;
+        var container = modal.firstElementChild;
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+        setTimeout(function () {
+            modal.classList.remove('opacity-0');
+            if (container) {
+                container.classList.remove('scale-95');
+                container.classList.add('scale-100');
+            }
+        }, 10);
+        document.body.style.overflow = 'hidden';
+    }
+
+    window.modulivOpenPolicy = openPolicyModalById;
 
     function createPolicyModal(id, title, bodyHtml) {
         if (document.getElementById(id)) return;

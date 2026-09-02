@@ -1,6 +1,8 @@
 'use client'
 
 import { Link } from '@/i18n/navigation'
+import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import React from 'react'
 
 type ModulivHomepageProps = {
@@ -12,12 +14,18 @@ type ModulivHomepageProps = {
 }
 
 export function ModulivHomepage({
-  heroEyebrow = 'THE WHOLE-HOME FLAT-PACK SYSTEM',
-  heroHeadline = 'Your Entire Home. Delivered in 6 Flat Boxes.',
-  heroBody = 'From empty room to designer sanctuary in under 60 minutes. 100% tool-free snap assembly, freshly crafted on-demand, and shipped DDP right to your door.',
+  heroEyebrow,
+  heroHeadline,
+  heroBody,
   heroImage = '/assets/homepage/hero-split.png',
   announcement = 'Global DDP Doorstep Delivery (All Duties & Taxes Included) | Free Fabric Swatch Box With $50 Voucher | 100-Night In-Home Trial',
 }: ModulivHomepageProps) {
+  const tHome = useTranslations('Pages.Home')
+
+  const resolvedEyebrow = heroEyebrow || tHome('heroEyebrow')
+  const resolvedHeadline = heroHeadline || tHome('heroHeadline')
+  const resolvedBody = heroBody || tHome('heroBody')
+
   return (
     <>
       <a href="#main" className="skip-link">
@@ -45,35 +53,40 @@ export function ModulivHomepage({
         <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-24 flex flex-col-reverse md:flex-row gap-gutter md:gap-16 items-center">
           <div className="flex-1 space-y-6 max-w-xl reveal">
             <p className="font-label-md text-label-md uppercase tracking-wider text-surface-tint">
-              {heroEyebrow}
+              {resolvedEyebrow}
             </p>
             <h1 className="font-display-lg text-[40px] leading-[1.12] md:text-[64px] md:leading-[1.1] text-on-surface">
-              {heroHeadline}
+              {resolvedHeadline}
             </h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant">
-              {heroBody}
+              {resolvedBody}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link
                 className="inline-block text-center bg-on-background text-on-primary py-4 px-8 font-label-md text-label-md uppercase rounded-full hover:bg-primary transition-colors duration-300"
                 href="/1-bedroom-kit-builder"
               >
-                Explore Move-In Bundles (Save $395)
+                {tHome('ctaExplore')} (Save $395)
               </Link>
               <Link
                 className="inline-block text-center border border-on-background text-on-background py-4 px-8 font-label-md text-label-md uppercase rounded-full hover:bg-on-background hover:text-on-primary transition-colors duration-300"
                 href="/free-swatch-box-material-discovery"
               >
-                Order Free Swatch Box ($0)
+                {tHome('ctaSwatch')} ($0)
               </Link>
             </div>
           </div>
           <div className="flex-1 w-full relative reveal" style={{ transitionDelay: '.1s' }}>
-            <img
-              alt="Six flat-pack MODULIV boxes beside the same room fully furnished in warm minimalist style"
-              className="w-full h-auto aspect-[16/10] md:aspect-[16/9] object-cover rounded-xl shadow-sm"
-              src={heroImage}
-            />
+            <div className="relative w-full aspect-[16/10] md:aspect-[16/9] overflow-hidden rounded-xl shadow-sm">
+              <Image
+                alt="Six flat-pack The Flat Set boxes beside the same room fully furnished in warm minimalist style"
+                className="object-cover"
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+                src={heroImage}
+              />
+            </div>
           </div>
         </section>
 
@@ -145,7 +158,7 @@ export function ModulivHomepage({
         <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
           <div className="max-w-2xl mb-12">
             <span className="font-label-md text-label-md uppercase tracking-wider text-surface-tint block mb-4">
-              WHY MODULIV
+              WHY THE FLAT SET
             </span>
             <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">
               Flat-Pack, Without the Flat-Pack Compromise.
@@ -160,7 +173,7 @@ export function ModulivHomepage({
                 <tr className="border-b border-outline-variant/50">
                   <th className="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant py-5 px-6 w-[22%]"></th>
                   <th className="font-label-md text-label-md uppercase tracking-wider text-primary py-5 px-6 bg-primary-fixed/20">
-                    MODULIV Flat-Pack
+                    The Flat Set Flat-Pack
                   </th>
                   <th className="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant py-5 px-6">
                     Traditional Showroom Furniture
@@ -231,11 +244,13 @@ export function ModulivHomepage({
                 </Link>
               </div>
             </div>
-            <div className="w-full lg:max-w-lg aspect-video rounded-xl overflow-hidden shadow-sm">
-              <img
+            <div className="relative w-full lg:max-w-lg aspect-video rounded-xl overflow-hidden shadow-sm">
+              <Image
                 src="/assets/1-bedroom-kit-builder/b4e5f4d8a0.png"
                 alt="1-Bedroom kit rendered"
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 1024px) 100vw, 40vw"
+                className="object-cover"
               />
             </div>
           </div>
