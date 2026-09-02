@@ -42,11 +42,25 @@ const siteURL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
 export default buildConfig({
   admin: {
-    meta: {
-      icons: {
-        icon: '/assets/brand/favicon.svg',
+    autoLogin: {
+      email: 'admin@theflatset.com',
+      prefillOnly: true,
+    },
+    components: {
+      graphics: {
+        Icon: '@/components/admin/AdminIcon#AdminIcon',
+        Logo: '@/components/admin/AdminLogo#AdminLogo',
       },
-      titleSuffix: ' — The Flat Set',
+    },
+    meta: {
+      icons: [
+        {
+          rel: 'icon',
+          type: 'image/svg+xml',
+          url: '/assets/brand/favicon.svg',
+        },
+      ],
+      titleSuffix: ' — The Flat Set Admin',
     },
     theme: 'light',
     user: Users.slug,

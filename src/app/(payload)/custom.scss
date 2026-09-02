@@ -1,504 +1,214 @@
-@font-face {
-  font-display: swap;
-  font-family: 'ODSai Bodoni';
-  font-style: normal;
-  font-weight: 400;
-  src: url('../../fonts/BodoniModa-Regular.ttf') format('truetype');
-}
-
-@font-face {
-  font-display: swap;
-  font-family: 'ODSai Source Serif';
-  font-style: normal;
-  font-weight: 400;
-  src: url('../../fonts/SourceSerif4-Regular.ttf') format('truetype');
-}
-
-@font-face {
-  font-display: swap;
-  font-family: 'ODSai Hanken';
-  font-style: normal;
-  font-weight: 400;
-  src: url('../../fonts/HankenGrotesk-Regular.ttf') format('truetype');
-}
-
-@font-face {
-  font-display: swap;
-  font-family: 'ODSai Hanken';
-  font-style: normal;
-  font-weight: 600;
-  src: url('../../fonts/HankenGrotesk-SemiBold.ttf') format('truetype');
-}
+/* ==========================================================================
+   THE FLAT SET — Admin Panel Custom Styling (Payload CMS 3)
+   Warm Japandi Editorial Design System
+   ========================================================================== */
 
 :root {
-  --odsai-admin-paper: #f4f1e9;
-  --odsai-admin-surface: #fbfaf6;
-  --odsai-admin-ink: #151815;
-  --odsai-admin-muted: #5c625d;
-  --odsai-admin-line: #d5d0c4;
-  --odsai-admin-green: #0f3b31;
-  --odsai-admin-green-soft: #9db5ad;
-  --odsai-admin-display: 'ODSai Bodoni', 'Times New Roman', serif;
-  --odsai-admin-serif: 'ODSai Source Serif', Georgia, serif;
-  --odsai-admin-sans: 'ODSai Hanken', Arial, sans-serif;
+  /* The Flat Set Brand Tokens */
+  --tfs-ink: #1a1c1d;            /* Basalt Charcoal */
+  --tfs-porcelain: #f9f8f6;      /* Warm Porcelain Canvas */
+  --tfs-card: #ffffff;           /* Clean Card Ground */
+  --tfs-stone: #ebeae8;          /* Hairline Stone */
+  --tfs-stone-dark: #d9c2b8;     /* Warm Sand Border */
+  --tfs-terracotta: #a85f3b;     /* Fired Terracotta Accent */
+  --tfs-burnt-oak: #8a4725;      /* Burnt Oak Hover */
+  --tfs-soft-sage: #545c50;      /* Soft Sage Subdued */
 
-  --theme-bg: var(--odsai-admin-paper);
-  --theme-input-bg: var(--odsai-admin-surface);
-  --theme-text: var(--odsai-admin-ink);
-  --theme-border-color: var(--odsai-admin-line);
-  --theme-elevation-0: var(--odsai-admin-surface);
-  --theme-elevation-50: #f0ede5;
-  --theme-elevation-100: #e8e4da;
-  --theme-elevation-150: #ddd8cc;
-  --theme-elevation-200: #d2ccbf;
-  --theme-elevation-250: #c6bfb1;
-  --theme-elevation-300: #b8b1a3;
-  --theme-elevation-500: #777a74;
-  --theme-elevation-800: #313630;
-  --theme-elevation-900: #1f241f;
-  --theme-elevation-950: #171b17;
-  --theme-elevation-1000: #0e120f;
+  /* Payload Theme Override Mapping */
+  --theme-bg: var(--tfs-porcelain);
+  --theme-input-bg: var(--tfs-card);
+  --theme-text: var(--tfs-ink);
+  --theme-border-color: var(--tfs-stone);
+
+  --theme-elevation-0: var(--tfs-card);
+  --theme-elevation-50: #f5f4f0;
+  --theme-elevation-100: #eeebe5;
+  --theme-elevation-150: #e5e1d8;
+  --theme-elevation-200: #dcd7cd;
+  --theme-elevation-250: #d0cac0;
+  --theme-elevation-300: #bfb7ac;
+  --theme-elevation-500: var(--tfs-soft-sage);
+  --theme-elevation-800: #2c2f30;
+  --theme-elevation-900: #202223;
+  --theme-elevation-950: var(--tfs-ink);
+  --theme-elevation-1000: #101213;
+
+  /* Typography */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Space Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-* {
-  scrollbar-color: var(--odsai-admin-green-soft) var(--odsai-admin-paper);
-  scrollbar-width: thin;
+/* Global resets & typography */
+html,
+body {
+  background-color: var(--tfs-porcelain) !important;
+  color: var(--tfs-ink) !important;
+  font-family: var(--font-sans) !important;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: var(--odsai-admin-green);
-  color: #fffdf8;
-}
-
-html,
-body {
-  background: var(--odsai-admin-paper);
-}
-
-body {
-  color: var(--odsai-admin-ink);
-  font-family: var(--odsai-admin-sans);
-}
-
-a {
-  text-underline-offset: 0.2em;
-}
-
-:focus-visible {
-  outline: 2px solid var(--odsai-admin-green);
-  outline-offset: 3px;
-}
-
-.template-default {
-  background: var(--odsai-admin-paper);
-}
-
-.app-header {
-  background: color-mix(in srgb, var(--odsai-admin-paper) 94%, transparent);
-  border-bottom: 1px solid var(--odsai-admin-line);
-  backdrop-filter: blur(12px);
-}
-
-.app-header .graphic-icon {
-  color: var(--odsai-admin-green);
-}
-
-.odsai-admin-logo,
-.odsai-admin-nav-intro__wordmark,
-.odsai-auth-shell__wordmark {
-  font-family: var(--odsai-admin-display);
-  font-weight: 400;
-  letter-spacing: -0.035em;
-}
-
-.odsai-admin-logo {
-  color: var(--odsai-admin-green);
-  font-size: 3.25rem;
-  line-height: 1;
-}
-
-.odsai-admin-icon {
-  display: grid;
-  width: 2rem;
-  height: 2rem;
-  place-items: center;
-  border: 1px solid currentColor;
-  border-radius: 50%;
-  color: var(--odsai-admin-green);
-  font-family: var(--odsai-admin-display);
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
-.odsai-admin-storefront-link {
-  color: var(--odsai-admin-green);
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-transform: uppercase;
-}
-
-.nav {
-  background: var(--odsai-admin-green);
-  border-right: 0;
-  color: #f8f4ea;
-}
-
-.nav__wrap {
-  padding-top: 1rem;
-}
-
-.odsai-admin-nav-intro {
-  margin: 0 1.25rem 1.2rem;
-  padding: 0 0 1.1rem;
-  border-bottom: 1px solid rgb(255 255 255 / 18%);
-}
-
-.odsai-admin-nav-intro a {
-  display: flex;
-  align-items: flex-start;
-  flex-direction: column;
-  gap: 0.42rem;
-  color: #fffdf8;
-  text-decoration: none;
-}
-
-.odsai-admin-nav-intro__wordmark {
-  font-size: 2rem;
-  line-height: 1;
-}
-
-.odsai-admin-nav-intro__descriptor {
-  color: var(--odsai-admin-green-soft);
-  font-size: 0.58rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.nav .nav-group__toggle,
-.nav .nav__link,
-.nav .nav__log-out,
-.nav .nav__mobile-close {
-  color: #f8f4ea;
-}
-
-.nav .nav-group__toggle:hover,
-.nav .nav__link:hover,
-.nav .nav__log-out:hover,
-.nav .nav__mobile-close:hover {
-  background: rgb(255 255 255 / 7%);
-}
-
-.nav .nav-group__label {
-  color: var(--odsai-admin-green-soft);
-  font-size: 0.63rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.nav .nav-group__indicator .stroke,
-.nav .nav__log-out .stroke,
-.nav .nav__mobile-close .stroke {
-  stroke: currentColor;
-}
-
-.nav .nav__link {
-  padding-top: 0.42rem;
-  padding-bottom: 0.42rem;
-  font-size: 0.8rem;
-}
-
-.nav .nav__link.active {
-  background: rgb(255 255 255 / 10%);
+  background: var(--tfs-terracotta);
   color: #ffffff;
 }
 
-.nav .nav__controls {
-  border-top: 1px solid rgb(255 255 255 / 18%);
+/* Header & Navigation Bar */
+.app-header {
+  background: rgba(249, 248, 246, 0.95) !important;
+  border-bottom: 1px solid var(--tfs-stone) !important;
+  backdrop-filter: blur(12px);
 }
 
-.dashboard {
-  padding-bottom: 5rem;
+.nav {
+  background: var(--tfs-porcelain) !important;
+  border-right: 1px solid var(--tfs-stone) !important;
 }
 
-.dashboard .modular-dashboard {
-  margin-right: -6px;
-  margin-left: -6px;
+.nav__brand {
+  padding: 16px 20px !important;
+  border-bottom: 1px solid var(--tfs-stone);
 }
 
-.dashboard .collections__group {
-  margin-bottom: 2.5rem;
+.nav a {
+  font-weight: 500;
+  color: var(--tfs-ink);
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
-.dashboard .collections__label {
-  margin: 0 0 0.75rem;
-  font-family: var(--odsai-admin-display);
-  font-size: 2rem;
-  font-weight: 400;
-  letter-spacing: -0.025em;
-  line-height: 1;
+.nav a:hover,
+.nav a.active {
+  background-color: #f0eee8 !important;
+  color: var(--tfs-terracotta) !important;
 }
 
-.dashboard .collections__card-list {
-  gap: 0;
-  padding: 0;
-  border-top: 1px solid var(--odsai-admin-line);
-  border-left: 1px solid var(--odsai-admin-line);
-  background: transparent;
-}
-
-.dashboard .collections__card-list > li {
-  margin: 0;
-}
-
-.dashboard .card {
-  min-height: 4.25rem;
-  background: var(--odsai-admin-surface);
-  border: 0;
-  border-right: 1px solid var(--odsai-admin-line);
-  border-bottom: 1px solid var(--odsai-admin-line);
-  border-radius: 0;
-  transition:
-    background-color 180ms ease,
-    color 180ms ease;
-}
-
-.dashboard .card:hover {
-  background: #ffffff;
-  color: var(--odsai-admin-green);
-}
-
-.dashboard .card__title {
-  font-size: 0.82rem;
-  font-weight: 600;
-}
-
-.dashboard .card .btn--round {
-  border-radius: 50%;
-}
-
+/* Buttons */
 .btn--style-primary {
-  background: var(--odsai-admin-green);
-  border-color: var(--odsai-admin-green);
-  border-radius: 0;
-  color: #fffdf8;
+  background-color: var(--tfs-ink) !important;
+  color: #ffffff !important;
+  border-radius: 9999px !important;
+  border: 1px solid var(--tfs-ink) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  font-size: 12px !important;
+  padding: 10px 20px !important;
+  transition: all 0.2s ease !important;
 }
 
 .btn--style-primary:hover {
-  background: #082d25;
-  border-color: #082d25;
+  background-color: var(--tfs-terracotta) !important;
+  border-color: var(--tfs-terracotta) !important;
+  box-shadow: 0 4px 12px rgba(168, 95, 59, 0.25) !important;
 }
 
-.field-type input,
-.field-type textarea,
-.rs__control,
-.react-select .rs__control {
-  border-color: var(--odsai-admin-line);
-  border-radius: 0;
-  box-shadow: none;
+.btn--style-secondary {
+  background-color: transparent !important;
+  color: var(--tfs-ink) !important;
+  border: 1px solid var(--tfs-stone-dark) !important;
+  border-radius: 9999px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
 }
 
-.field-type input:focus,
-.field-type textarea:focus,
-.rs__control--is-focused,
-.react-select .rs__control--is-focused {
-  border-color: var(--odsai-admin-green);
-  box-shadow: 0 0 0 1px var(--odsai-admin-green);
+.btn--style-secondary:hover {
+  background-color: #f0eee8 !important;
+  border-color: var(--tfs-ink) !important;
 }
 
+/* Form Inputs & Cards */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  background-color: #ffffff !important;
+  border: 1px solid var(--tfs-stone) !important;
+  border-radius: 8px !important;
+  color: var(--tfs-ink) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--tfs-terracotta) !important;
+  box-shadow: 0 0 0 3px rgba(168, 95, 59, 0.15) !important;
+  outline: none !important;
+}
+
+.card {
+  background-color: #ffffff !important;
+  border: 1px solid var(--tfs-stone) !important;
+  border-radius: 14px !important;
+  box-shadow: 0px 4px 20px rgba(26, 28, 29, 0.03) !important;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.card:hover {
+  border-color: var(--tfs-stone-dark) !important;
+  box-shadow: 0px 8px 24px rgba(26, 28, 29, 0.06) !important;
+}
+
+/* Login Page Presentation */
 .template-minimal {
-  width: 100%;
-  max-width: none;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  background: var(--odsai-admin-paper);
+  background-color: var(--tfs-porcelain) !important;
 }
 
 .template-minimal__wrap {
-  width: 100%;
-  max-width: none;
-  min-height: 100vh;
-  margin: 0;
+  background: #ffffff !important;
+  border: 1px solid var(--tfs-stone) !important;
+  border-radius: 20px !important;
+  box-shadow: 0px 12px 40px rgba(26, 28, 29, 0.06) !important;
+  padding: 40px !important;
+  max-width: 460px !important;
+  margin: 0 auto !important;
 }
 
-.odsai-auth-shell {
-  display: grid;
-  grid-template-columns: minmax(25rem, 1.2fr) minmax(32rem, 0.8fr);
-  min-height: 100vh;
+/* Tables & Lists */
+.table {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--tfs-stone) !important;
 }
 
-.odsai-auth-shell__editorial {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: clamp(2rem, 4vw, 4.5rem);
-  background:
-    linear-gradient(180deg, rgb(5 24 20 / 24%), rgb(5 24 20 / 72%)),
-    url('/images/odsai/hero-terrace.jpg') center / cover no-repeat;
-  color: #fffdf8;
+.table th {
+  background-color: #f5f4f0 !important;
+  font-family: var(--font-sans);
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: var(--tfs-soft-sage) !important;
+  border-bottom: 1px solid var(--tfs-stone) !important;
 }
 
-.odsai-auth-shell__brand {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  color: inherit;
-  text-decoration: none;
+.table td {
+  border-bottom: 1px solid var(--tfs-stone) !important;
 }
 
-.odsai-auth-shell__wordmark {
-  font-size: 4.2rem;
-  line-height: 0.9;
+.table tr:hover td {
+  background-color: #fbfaf8 !important;
 }
 
-.odsai-auth-shell__descriptor,
-.odsai-auth-shell__service {
-  font-size: 0.65rem;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
+/* Status Badges */
+.pill {
+  border-radius: 9999px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  padding: 4px 10px !important;
 }
 
-.odsai-auth-shell__statement {
-  max-width: 43rem;
+.pill--success {
+  background-color: #e8f0e8 !important;
+  color: #2e5934 !important;
 }
 
-.odsai-auth-shell__statement h2 {
-  max-width: 12ch;
-  margin: 0 0 1.4rem;
-  color: #fffdf8;
-  font-family: var(--odsai-admin-display);
-  font-size: 5.6rem;
-  font-weight: 400;
-  letter-spacing: -0.035em;
-  line-height: 0.92;
-}
-
-.odsai-auth-shell__statement p {
-  max-width: 37rem;
-  margin: 0;
-  color: #e5e9e3;
-  font-family: var(--odsai-admin-serif);
-  font-size: 1.15rem;
-  line-height: 1.55;
-}
-
-.odsai-auth-shell__service {
-  margin: 0;
-  color: #d6dfd9;
-}
-
-.odsai-auth-shell__access {
-  display: grid;
-  min-height: 100vh;
-  padding: clamp(2rem, 6vw, 7rem);
-  place-items: center;
-  background: var(--odsai-admin-paper);
-}
-
-.odsai-auth-shell__form {
-  width: min(100%, 31rem);
-}
-
-.odsai-auth-shell .login__brand {
-  margin-bottom: 2.5rem;
-}
-
-.odsai-before-login {
-  margin-bottom: 2rem;
-}
-
-.odsai-before-login h1,
-.odsai-auth-shell .create-first-user > h1 {
-  margin: 0 0 0.65rem;
-  font-family: var(--odsai-admin-display);
-  font-size: 3.9rem;
-  font-weight: 400;
-  letter-spacing: -0.03em;
-  line-height: 0.95;
-}
-
-.odsai-before-login p,
-.odsai-auth-shell .create-first-user > p {
-  margin: 0 0 2rem;
-  color: var(--odsai-admin-muted);
-  font-family: var(--odsai-admin-serif);
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-.odsai-auth-shell .create-first-user,
-.odsai-auth-shell .login {
-  width: 100%;
-}
-
-.odsai-auth-shell .form-submit .btn {
-  width: 100%;
-  justify-content: center;
-}
-
-@media (max-width: 900px) {
-  .odsai-auth-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .odsai-auth-shell__editorial {
-    min-height: 18rem;
-    padding: 2rem;
-  }
-
-  .odsai-auth-shell__statement h2 {
-    max-width: 15ch;
-    font-size: 3.25rem;
-  }
-
-  .odsai-auth-shell__statement p,
-  .odsai-auth-shell__service {
-    display: none;
-  }
-
-  .odsai-auth-shell__access {
-    min-height: auto;
-    padding: 3rem 2rem 5rem;
-  }
-}
-
-@media (max-width: 520px) {
-  .odsai-auth-shell__editorial {
-    min-height: 13rem;
-    padding: 1.4rem;
-  }
-
-  .odsai-auth-shell__descriptor {
-    display: none;
-  }
-
-  .odsai-auth-shell__statement h2 {
-    margin-bottom: 0;
-    font-size: 2.5rem;
-  }
-
-  .odsai-auth-shell__access {
-    padding: 2.5rem 1.4rem 4rem;
-  }
-
-  .odsai-before-login h1,
-  .odsai-auth-shell .create-first-user > h1 {
-    font-size: 3rem;
-  }
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
+.pill--warning {
+  background-color: #fdf3e7 !important;
+  color: var(--tfs-burnt-oak) !important;
 }
