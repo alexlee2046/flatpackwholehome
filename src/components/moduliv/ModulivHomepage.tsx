@@ -39,7 +39,9 @@ export function ModulivHomepage({
     (typeof heroImage === 'object' && heroImage?.url) ||
     (typeof heroImage === 'string' && heroImage) ||
     '/assets/homepage/hero-split.png'
-  const heroSrc = rawHeroUrl.replace(/^\/api\/media\/file\//, '/media/')
+  const heroSrc = rawHeroUrl
+    .replace(/^https?:\/\/[^/]+/, '')
+    .replace(/^\/api\/media\/file\//, '/media/')
   const heroAlt =
     (typeof heroImage === 'object' && heroImage?.alt) ||
     'Six flat-pack The Flat Set boxes beside the same room fully furnished in warm minimalist style'

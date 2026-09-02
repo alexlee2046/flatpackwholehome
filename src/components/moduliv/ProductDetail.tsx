@@ -62,7 +62,9 @@ export function ProductDetail({ product }: ProductDetailProps) {
   // Resolve Payload gallery images or static fallbacks
   const normalizeUrl = (url?: string | null) => {
     if (!url) return null
-    return url.replace(/^\/api\/media\/file\//, '/media/')
+    return url
+      .replace(/^https?:\/\/[^/]+/, '')
+      .replace(/^\/api\/media\/file\//, '/media/')
   }
 
   const galleryUrls = (product?.gallery || [])

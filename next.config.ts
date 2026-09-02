@@ -34,13 +34,33 @@ const nextConfig: NextConfig = {
       },
     ],
     remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'theflatset.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'flatpack.dev.canbee.cn',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
       ...[NEXT_PUBLIC_SERVER_URL].map((item) => {
-        const url = new URL(item)
-        return {
-          hostname: url.hostname,
-          pathname: '/api/media/file/**',
-          port: url.port,
-          protocol: url.protocol.replace(':', '') as 'http' | 'https',
+        try {
+          const url = new URL(item)
+          return {
+            hostname: url.hostname,
+            pathname: '/**',
+            port: url.port,
+            protocol: url.protocol.replace(':', '') as 'http' | 'https',
+          }
+        } catch {
+          return {
+            hostname: 'localhost',
+            pathname: '/**',
+            protocol: 'http' as const,
+          }
         }
       }),
     ],
