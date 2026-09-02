@@ -34,16 +34,16 @@
 
 ## 4. 目录与文档导航 (Documentation Navigation)
 
-```
-flatpackwholehome/
-├── README.md                                         # 本项目总览索引
-└── docs/
-    ├── 01-brand-strategy-and-positioning.md          # 全屋平装战略定位与全景商业模型
-    ├── 02-brand-copywriting-master-guide.md          # 独立站全站英文文案、标语、PDP与EDM
-    ├── 03-ddp-direct-ship-and-competitor-matrix.md      # DDP 门到门竞品对标与零退货风控
-    ├── 04-global-dtc-logistics-and-market-strategy.md   # 全球各大区市场特征与单件经济模型
-    └── 05-stitch-ui-and-design-system.md             # Stitch UI 设计系统 (Warm Japandi) 与页面详情
-```
+* 📄 [README.md](README.md) — 本项目总览索引
+* 📋 **战略规划与品牌审查**：
+  * [PLAN-001 对外品牌名与主域名规划](.plans/PLAN-001-brand-and-domain.md) — 域名排查、商标防撞、The Flat Set / Kitdwell 选型
+  * [PLAN-002 全站 UI/UX 深度治理计划](.plans/PLAN-002-full-site-review-and-dead-link-elimination.md) — 全站链路闭环、消除死链与死内容
+* 📚 **系统架构文档库**：
+  * [docs/01 全屋平装战略定位与全景商业模型](docs/01-brand-strategy-and-positioning.md) — 5 大平装产品线与自锁五金架构
+  * [docs/02 独立站全站英文文案与标语主指南](docs/02-brand-copywriting-master-guide.md) — 品牌宣言、PDP 转化文案与邮件营销 (EDM)
+  * [docs/03 DDP 门到门竞品对标与零退货风控](docs/03-ddp-direct-ship-and-competitor-matrix.md) — 全球竞品矩阵与“以捐代退”风控
+  * [docs/04 全球各大区市场特征与单件经济模型](docs/04-global-dtc-logistics-and-market-strategy.md) — 美欧中东大区特征与单箱成本测算
+  * [docs/05 Stitch UI 设计系统与页面规范](docs/05-stitch-ui-and-design-system.md) — Warm Japandi 设计 Tokens 与页面结构规范
 
 ---
 
@@ -52,12 +52,18 @@ flatpackwholehome/
 * **Stitch Project ID**：`1318977181840355780`
 * **Stitch Project Name**：`MODULIV — Whole-Home Flat-Pack Living System`
 * **设计系统风格**：`Warm Minimalist Editorial (Japandi 侘寂与北欧极简社论风)`
-* **包含页面**：
-  1. `Homepage (Desktop)` —— 首页 Hero、全屋 6 箱蜕变视觉、对比矩阵与 ASMR 开箱视频流；
-  2. `Move-In Bundles Builder` —— 一室一厅 $1,499 全屋一键入住套餐定制页；
-  3. `PDP: The ModuSofa` —— 3人位模块沙发多色选配与 3D 内部透视商详页；
-  4. `Free Fabric Swatch Box Landing Page` —— 免费面料小样盒与 $50 抵扣券申领页；
-  5. `How It Works & The DDP Journey` —— 工坊现做、0 工具五金与 5 阶段跨洋物流解密页。
+* **设计画廊总览**：[stitch/gallery.html](stitch/gallery.html) (本地高保真页面与素材总览)
+* **核心页面入口**：
+  1. [Homepage (Desktop)](stitch/index.html) —— 首页 Hero、全屋 6 箱蜕变视觉、对比矩阵与开箱流
+  2. [Move-In Bundles Builder](stitch/1-bedroom-kit-builder.html) —— 一室一厅 $1,499 全屋一键入住套餐定制页
+  3. [PDP: The ModuSofa](stitch/modusofa-product-detail-page.html) —— 3人位模块沙发多色选配与 3D 透视商详页
+  4. [Free Fabric Swatch Box](stitch/free-swatch-box-material-discovery.html) —— 免费面料小样盒与 $50 抵扣券申领页
+  5. [How It Works & The DDP Journey](stitch/how-it-works-craft-logistics.html) —— 工坊现做、0 工具五金与 5 阶段跨洋物流解密页
+  6. [Your Cart & Checkout](stitch/cart.html) —— 购物车明细、DDP 运费包税核算、优惠券核销与 Demo 结账
+  7. [Frequently Asked Questions (FAQ)](stitch/faq.html) —— 8 大常见疑虑解答与实时搜索过滤
+  8. [Design Lab: 3D Snap-Joint](stitch/three-js.html) —— 3D WebGL 机械卡扣动态交互实验
+  9. [Design Lab: Shader Flow](stitch/shader.html) —— 艺术流体着色器实验页
+  10. [404 Error Page](stitch/404.html) —— 友好的页面未找到引导与快速导航恢复
 
 ---
 *Created by AI Strategy Engine for MODULIV Global DTC.*

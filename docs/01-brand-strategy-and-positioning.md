@@ -21,7 +21,7 @@
 3. **[第三部分：通用免工具五金与材料架构 (Universal Snap Architecture)](#第三部分通用免工具五金与材料架构-universal-snap-architecture)**
    - 极简自锁卡扣与榫卯技术标准
    - 统一设计语言与材料调色盘 (Japandi / Modern Minimalist)
-4. **[第四部分：全屋套装 (Move-In Bundles) 与高客单 AOV 运营策略](#第四部分全屋套装-move-in-bundles-与高客单-aov-运营策略)**
+4. **[第四部分：全屋套餐 (Move-In Bundles) 与高客单 AOV 运营策略](#第四部分全屋套餐-move-in-bundles-与高客单-aov-运营策略)**
    - 4 套一键搬家全屋套餐设计 ($899 ~ $2,499)
    - 连带加购与跨品类增购漏斗
 5. **[第五部分：独立站全站全屋化升级文案库 (Website Copywriting Kit)](#第五部分独立站全站全屋化升级文案库-website-copywriting-kit)**

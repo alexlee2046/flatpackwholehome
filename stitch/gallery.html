@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MODULIV — Stitch 设计稿本地预览</title>
+<script src="vendor/tailwind.js"></script>
+<link href="vendor/fonts/fonts-7cdb80a7.css" rel="stylesheet"/>
+<link href="vendor/fonts/fonts-a39f5c6f.css" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: { extend: {
+    colors: { primary: '#8a4725', surface: '#f9f9fa', 'surface-container': '#eeeeef', outline: '#86736b' },
+    fontFamily: { display: ['"Playfair Display"','serif'], body: ['"Plus Jakarta Sans"','sans-serif'] }
+  } }
+}
+</script>
+<style>body{font-family:'Plus Jakarta Sans',sans-serif}</style>
+</head>
+<body class="bg-surface text-[#1a1c1d]">
+<main class="max-w-6xl mx-auto px-8 py-14">
+  <p class="uppercase tracking-[0.3em] text-xs text-primary font-semibold mb-3">Stitch · Local Preview</p>
+  <h1 class="font-display text-5xl mb-3">MODULIV — Whole-Home Flat-Pack Living System</h1>
+  <p class="text-[#5d6559] mb-10">项目 ID <code class="bg-surface-container px-2 py-0.5 rounded">1318977181840355780</code> · 5 个页面 + 4 张素材图 · 拉取自 Stitch API</p>
+
+  <h2 class="font-display text-2xl mb-5 border-b border-outline/30 pb-2">页面（HTML）</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-14">
+    <a href="index.html" class="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition border border-outline/10">
+      <img src="screenshots/homepage.png" alt="Homepage" class="w-full h-44 object-cover object-top"/>
+      <div class="p-4"><h3 class="font-display text-lg group-hover:text-primary transition">Homepage</h3><p class="text-sm text-[#5d6559]">首页 Hero · 6 箱蜕变 · 对比矩阵</p></div>
+    </a>
+    <a href="1-bedroom-kit-builder.html" class="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition border border-outline/10">
+      <img src="screenshots/1-bedroom-kit-builder.png" alt="Kit Builder" class="w-full h-44 object-cover object-top"/>
+      <div class="p-4"><h3 class="font-display text-lg group-hover:text-primary transition">Move-In Bundles Builder</h3><p class="text-sm text-[#5d6559]">一室一厅 $1,499 全屋套餐定制</p></div>
+    </a>
+    <a href="modusofa-product-detail-page.html" class="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition border border-outline/10">
+      <img src="screenshots/modusofa-product-detail-page.png" alt="ModuSofa PDP" class="w-full h-44 object-cover object-top"/>
+      <div class="p-4"><h3 class="font-display text-lg group-hover:text-primary transition">PDP: The ModuSofa</h3><p class="text-sm text-[#5d6559]">模块沙发多色选配商详页</p></div>
+    </a>
+    <a href="free-swatch-box-material-discovery.html" class="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition border border-outline/10">
+      <img src="screenshots/free-swatch-box-material-discovery.png" alt="Free Swatch Box" class="w-full h-44 object-cover object-top"/>
+      <div class="p-4"><h3 class="font-display text-lg group-hover:text-primary transition">Free Fabric Swatch Box</h3><p class="text-sm text-[#5d6559]">免费面料小样盒 + $50 抵扣券</p></div>
+    </a>
+    <a href="how-it-works-craft-logistics.html" class="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition border border-outline/10">
+      <img src="screenshots/how-it-works-craft-logistics.png" alt="How It Works" class="w-full h-44 object-cover object-top"/>
+      <div class="p-4"><h3 class="font-display text-lg group-hover:text-primary transition">How It Works &amp; DDP Journey</h3><p class="text-sm text-[#5d6559]">工坊现做 · 0 工具 · 5 阶段物流</p></div>
+    </a>
+    <a href="three-js.html" class="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition border border-outline/10">
+      <div class="w-full h-44 bg-[#2f3132] flex items-center justify-center"><span class="text-white/60 text-sm">Three.js 实验</span></div>
+      <div class="p-4"><h3 class="font-display text-lg group-hover:text-primary transition">Three.js (实验)</h3><p class="text-sm text-[#5d6559]">3D WebGL 实验页</p></div>
+    </a>
+    <a href="shader.html" class="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition border border-outline/10">
+      <div class="w-full h-44 bg-[#2f3132] flex items-center justify-center"><span class="text-white/60 text-sm">Shader 实验</span></div>
+      <div class="p-4"><h3 class="font-display text-lg group-hover:text-primary transition">Shader (实验)</h3><p class="text-sm text-[#5d6559]">着色器实验页</p></div>
+    </a>
+    <a href="cart.html" class="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition border border-outline/10">
+      <div class="w-full h-44 bg-[#e8e8e9] flex items-center justify-center"><span class="material-symbols-outlined text-4xl text-primary">shopping_bag</span></div>
+      <div class="p-4"><h3 class="font-display text-lg group-hover:text-primary transition">Cart &amp; Checkout</h3><p class="text-sm text-[#5d6559]">购物车明细 · 优惠码 · Demo结账</p></div>
+    </a>
+    <a href="faq.html" class="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition border border-outline/10">
+      <div class="w-full h-44 bg-[#f3f3f4] flex items-center justify-center"><span class="material-symbols-outlined text-4xl text-primary">help</span></div>
+      <div class="p-4"><h3 class="font-display text-lg group-hover:text-primary transition">FAQ</h3><p class="text-sm text-[#5d6559]">物流装配 · 8大疑问与实时过滤</p></div>
+    </a>
+    <a href="404.html" class="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition border border-outline/10">
+      <div class="w-full h-44 bg-[#e2e2e3] flex items-center justify-center"><span class="font-display text-4xl text-outline">404</span></div>
+      <div class="p-4"><h3 class="font-display text-lg group-hover:text-primary transition">404 Error</h3><p class="text-sm text-[#5d6559]">未找到页面与回退引导</p></div>
+    </a>
+  </div>
+
+  <h2 class="font-display text-2xl mb-5 border-b border-outline/30 pb-2">素材图（AI 生成）</h2>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+    <figure><img src="screenshots/asset-boxes-to-room-split.png" class="rounded-lg w-full h-40 object-cover" alt=""/><figcaption class="text-xs text-[#5d6559] mt-2">箱子 → 全屋 分屏视觉</figcaption></figure>
+    <figure><img src="screenshots/asset-snap-joint-exploded.png" class="rounded-lg w-full h-40 object-cover" alt=""/><figcaption class="text-xs text-[#5d6559] mt-2">卡扣榫卯爆炸图</figcaption></figure>
+    <figure><img src="screenshots/asset-swatch-box-hero.png" class="rounded-lg w-full h-40 object-cover" alt=""/><figcaption class="text-xs text-[#5d6559] mt-2">面料小样盒 Hero</figcaption></figure>
+    <figure><img src="screenshots/asset-swatch-box-closeup.png" class="rounded-lg w-full h-40 object-cover" alt=""/><figcaption class="text-xs text-[#5d6559] mt-2">小样盒特写</figcaption></figure>
+  </div>
+
+  <footer class="mt-14 text-xs text-[#6e5d55]">HTML 由本地 vendor/ 资源驱动 · 完全离线可用 · Stitch 设计主题: Playfair Display / Plus Jakarta Sans / #8a4725</footer>
+</main>
+</body>
+</html>

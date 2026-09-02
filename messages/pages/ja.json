@@ -1,0 +1,40 @@
+{
+  "Home": {
+    "metadataTitle": "MODULIV | Your Entire Home. Delivered in 6 Flat Boxes.",
+    "metadataDescription": "Furnish your whole home from 6 flat boxes — tool-free 60-minute assembly, free swatch box with $50 voucher, DDP duties included.",
+    "heroEyebrow": "JAPANDI WHOLE-HOME SYSTEM",
+    "heroHeadline": "Your entire home. Delivered in 6 flat boxes.",
+    "heroBody": "Solid FSC-certified oak and walnut furniture engineered for tool-free assembly, zero-hassle shipping, and lifetime modularity.",
+    "ctaExplore": "Configure 1-Bedroom Kit",
+    "ctaSwatch": "Order Free Swatch Box",
+    "stat1Number": "6",
+    "stat1Label": "Boxes for Whole Home",
+    "stat2Number": "60",
+    "stat2Label": "Minutes Tool-Free Assembly",
+    "stat3Number": "100",
+    "stat3Label": "Night In-Home Trial"
+  },
+  "KitBuilder": {
+    "title": "1-Bedroom Kit Builder",
+    "subtitle": "Select your living configuration. Watch boxes and specs update instantly.",
+    "fullHome": "Full Bundle",
+    "living": "Living Set",
+    "bedroom": "Bedroom Set"
+  },
+  "FAQ": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Shipping times, assembly, returns, materials, duties, and your $50 swatch voucher — answered without a sales call."
+  },
+  "Cart": {
+    "title": "Your Cart",
+    "subtitle": "Every price below includes DDP delivery — duties, taxes and doorstep drop, all in."
+  },
+  "Swatch": {
+    "title": "Free Curated Swatch Box",
+    "subtitle": "Feel the fabrics, inspect foam densities and solid oak chips in your living light before purchasing."
+  },
+  "HowItWorks": {
+    "title": "How Precision Engineering Meets Ocean Express",
+    "subtitle": "From CNC-cut solid white oak in our zero-waste workshop to your living room in 14–18 days."
+  }
+}

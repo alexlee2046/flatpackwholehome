@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<title>MODULIV — Design Lab: 3D Snap-Joint Study</title>
+<script src="vendor/tailwind.js"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- Design Lab minimal overlay -->
+<div class="fixed top-4 left-4 z-50 flex flex-wrap gap-2">
+<a class="bg-black/60 text-white text-[12px] font-semibold tracking-[0.05em] px-4 py-2 rounded-full backdrop-blur-sm border border-white/20" href="index.html">← MODULIV</a>
+<a class="bg-black/60 text-white text-[12px] font-semibold tracking-[0.05em] px-4 py-2 rounded-full backdrop-blur-sm border border-white/20" href="shader.html">Shader Study</a>
+</div>
+<!-- STITCH_THREEJS_START:ANIMATION_14 class="fixed inset-0 w-full h-full bg-transparent" -->
+<div class="fixed inset-0 w-full h-full bg-transparent" style="display:block;">
+<script src="vendor/three.min.js"></script>
+<div id="threejs-container-ANIMATION_14" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_14');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  const width = container.clientWidth || window.innerWidth;
+const height = container.clientHeight || window.innerHeight;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+} catch (e) {
+  container.innerHTML = '<p style="padding:24px;color:#54433c">3D preview unavailable on this device.</p>';
+  return;
+}
+renderer.setSize(width, height);
+renderer.setPixelRatio(window.devicePixelRatio);
+container.appendChild(renderer.domElement);
+
+// Materials
+const woodMaterial = new THREE.MeshPhongMaterial({ color: 0xd2b48c }); // Light Oak
+const steelMaterial = new THREE.MeshPhongMaterial({ color: 0xaaaaaa, specular: 0xffffff, shininess: 100 });
+
+// Geometry
+const woodPartGeo = new THREE.BoxGeometry(1, 4, 1);
+const steelPartGeo = new THREE.BoxGeometry(1.2, 0.4, 1.2);
+
+const woodPart = new THREE.Mesh(woodPartGeo, woodMaterial);
+const steelPart = new THREE.Mesh(steelPartGeo, steelMaterial);
+
+woodPart.position.y = 1.5;
+steelPart.position.y = -1.5;
+
+const group = new THREE.Group();
+group.add(woodPart);
+group.add(steelPart);
+scene.add(group);
+
+// Lighting
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+scene.add(ambientLight);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+directionalLight.position.set(5, 5, 5);
+scene.add(directionalLight);
+
+camera.position.z = 8;
+
+function frame() {
+  // Interaction animation: snapping together
+  const time = Date.now() * 0.002;
+  const offset = Math.sin(time) * 1.5;
+  
+  woodPart.position.y = 1.5 + Math.max(0, offset);
+  steelPart.position.y = -1.5 - Math.max(0, offset);
+  
+  group.rotation.y += 0.005;
+  
+  renderer.render(scene, camera);
+}
+
+window.addEventListener('resize', () => {
+  const w = container.clientWidth || window.innerWidth;
+  const h = container.clientHeight || window.innerHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+});
+
+/* Pause rAF when tab hidden or canvas offscreen; static frame under reduced motion */
+const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+let raf = null;
+function loop(t) { frame(t); raf = requestAnimationFrame(loop); }
+function start() { if (raf === null && !document.hidden) raf = requestAnimationFrame(loop); }
+function stop() { if (raf !== null) { cancelAnimationFrame(raf); raf = null; } }
+new IntersectionObserver(e => e[0].isIntersecting ? start() : stop()).observe(container);
+document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
+if (reduced.addEventListener) reduced.addEventListener('change', () => reduced.matches ? (stop(), frame(0)) : start());
+reduced.matches ? frame(0) : start();
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_14 -->
+</body>
+</html>

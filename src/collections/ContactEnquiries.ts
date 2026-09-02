@@ -1,0 +1,26 @@
+import { adminOnly } from '@/access/adminOnly'
+import type { CollectionConfig } from 'payload'
+
+export const ContactEnquiries: CollectionConfig = {
+  slug: 'contact-enquiries',
+  access: {
+    create: () => true,
+    delete: adminOnly,
+    read: adminOnly,
+    update: adminOnly,
+  },
+  admin: { group: 'Leads', useAsTitle: 'email' },
+  fields: [
+    { name: 'name', type: 'text', required: true },
+    { name: 'email', type: 'email', index: true, required: true },
+    { name: 'subject', type: 'text', required: true },
+    { name: 'message', type: 'textarea', required: true },
+    {
+      name: 'status',
+      type: 'select',
+      defaultValue: 'new',
+      options: ['new', 'reviewing', 'replied', 'closed'],
+      required: true,
+    },
+  ],
+}

@@ -1,0 +1,91 @@
+import { ModulivFooter } from '@/components/moduliv/ModulivFooter'
+import { ModulivHeader } from '@/components/moduliv/ModulivHeader'
+import { ProductDetail } from '@/components/moduliv/ProductDetail'
+import { getPayloadLocale } from '@/i18n/getPayloadLocale'
+import { buildPageMetadata } from '@/i18n/pageMetadata'
+import configPromise from '@payload-config'
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { getPayload } from 'payload'
+import React from 'react'
+
+type Props = {
+  params: Promise<{ locale: string; slug: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params
+  const locale = await getPayloadLocale()
+  const payload = await getPayload({ config: configPromise })
+
+  const productResult = await payload.find({
+    collection: 'products',
+    depth: 1,
+    limit: 1,
+    locale,
+    overrideAccess: true,
+    where: {
+      slug: { equals: slug },
+    },
+  })
+
+  const product = productResult.docs[0]
+  const title = product?.title || 'ModuSofa 3-Seater'
+
+  return buildPageMetadata({
+    description: `Shop the ${title} from MODULIV. Tool-free assembly flat-pack furniture.`,
+    locale,
+    pathname: `/products/${slug}`,
+    title,
+  })
+}
+
+export default async function ProductPage({ params }: Props) {
+  const { slug } = await params
+  const locale = await getPayloadLocale()
+  const payload = await getPayload({ config: configPromise })
+
+  const productResult = await payload.find({
+    collection: 'products',
+    depth: 1,
+    limit: 1,
+    locale,
+    overrideAccess: true,
+    where: {
+      slug: { equals: slug },
+    },
+  })
+
+  const doc = productResult.docs[0]
+  if (!doc && slug !== 'modusofa') {
+    notFound()
+  }
+
+  const productData = doc
+    ? {
+        assemblyMinutes: doc.assemblyMinutes,
+        boxBreakdown: doc.boxBreakdown as any,
+        boxCount: doc.boxCount,
+        id: doc.id,
+        joineryType: doc.joineryType,
+        price: doc.priceInUSD || 699,
+        slug: doc.slug,
+        title: doc.title,
+      }
+    : {
+        assemblyMinutes: 15,
+        boxCount: 3,
+        joineryType: 'Tool-Free Japandi Mortise & Tenon',
+        price: 699,
+        slug: 'modusofa',
+        title: 'ModuSofa 3-Seater',
+      }
+
+  return (
+    <>
+      <ModulivHeader />
+      <ProductDetail product={productData} />
+      <ModulivFooter />
+    </>
+  )
+}

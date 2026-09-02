@@ -1,0 +1,66 @@
+{
+  "Metadata": {
+    "defaultTitle": "MODULIV | 全屋整装·6箱到家",
+    "description": "MODULIV 6箱实现整屋配齐——免螺丝60分钟极简榫卯拼装，免费领取面料木样板箱附赠50美元抵用券，DDP关税全包，100天无忧试睡。整套1,499美元起。",
+    "homeTitle": "MODULIV — 扁平化整装全屋家具",
+    "openGraphDescription": "6箱配齐一个家，免工具装配，全球DDP关税全包送货进屋。"
+  },
+  "Navigation": {
+    "brand": "MODULIV",
+    "kitBuilder": "一居室套装定制",
+    "modusofa": "ModuSofa 模块沙发",
+    "howItWorks": "装配与物流工艺",
+    "swatchBox": "免费领样板箱",
+    "faq": "常见问题",
+    "cart": "购物车",
+    "search": "全站搜索",
+    "searchPlaceholder": "搜索家具、空间方案、实木材质...",
+    "currency": "CNY"
+  },
+  "Announcement": {
+    "bar": "免费申领面料实木样板箱（附赠 $50 抵扣券）— 全球 DDP 关税与送货进屋全包",
+    "dismiss": "关闭"
+  },
+  "Transaction": {
+    "cartTitle": "我的购物车",
+    "cartDescription": "在提交订单前核对您选购的扁平化装配式家具配置与箱规。",
+    "cartEyebrow": "已选配置清单",
+    "emptyCart": "购物车暂无商品",
+    "emptyCartPrompt": "浏览一居室整屋全套装配方案，一站式配齐您的新家。",
+    "continueShopping": "浏览一居室方案",
+    "promoLabel": "我有优惠抵扣码",
+    "promoPlaceholder": "例如 SWATCH50",
+    "promoApply": "核销抵扣",
+    "promoSuccess": "优惠码 {code} 核销成功 (−${amount})",
+    "promoInvalid": "优惠码无效或已过有效期。",
+    "subtotal": "商品小计",
+    "shipping": "DDP 物流与海关关税",
+    "included": "全包免运费",
+    "total": "实付总计",
+    "checkout": "前往结算",
+    "checkoutSecure": "100天无忧试用 • DDP完税到门 • 配送送货进屋",
+    "orderSummary": "订单概要",
+    "itemCount": "{count} 个装配箱"
+  },
+  "Common": {
+    "addToCart": "加入购物车",
+    "added": "已加入",
+    "configure": "空间配置",
+    "viewDetails": "查看详情",
+    "claimSwatch": "免费申领样板箱",
+    "viewFaq": "查看常见解答",
+    "learnMore": "了解详情",
+    "minutes": "{count} 分钟",
+    "boxes": "{count} 箱",
+    "freeDelivery": "DDP 包邮包税"
+  },
+  "Footer": {
+    "tagline": "全屋整装，六箱到家。",
+    "description": "专为当代都市生活打造的日式极简 (Japandi) 全屋整装家具体系，免工具暗榫拼装，全球海运送货进屋。",
+    "privacyPolicy": "隐私保护政策",
+    "termsOfService": "服务条款",
+    "trial": "100天试用保障",
+    "warranty": "10年质保",
+    "copyright": "© 2026 MODULIV / The Flat Set Inc. 保留所有权利。"
+  }
+}

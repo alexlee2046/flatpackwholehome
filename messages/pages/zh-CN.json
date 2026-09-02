@@ -1,0 +1,40 @@
+{
+  "Home": {
+    "metadataTitle": "MODULIV | 6 个扁平包装箱装下你的整套家",
+    "metadataDescription": "MODULIV 6 个扁平箱装载全屋家具 — 零工具 60 分钟免钉拼装，免费样板盒送 $50 抵用券，DDP 完税包邮到门，100 天安心试用。",
+    "heroEyebrow": "日式北欧全屋模组系统",
+    "heroHeadline": "你的整套家，装在 6 个扁平包装箱中送达。",
+    "heroBody": "FSC 认证高品质白橡木与黑胡桃木打造，专为免工具组装、极简物流与终身模块化而设计。",
+    "ctaExplore": "定制一居室全屋套装",
+    "ctaSwatch": "免费申领面料样板盒",
+    "stat1Number": "6",
+    "stat1Label": "箱装下全屋家具",
+    "stat2Number": "60",
+    "stat2Label": "分钟免工具徒手拼装",
+    "stat3Number": "100",
+    "stat3Label": "天全屋试用退换保障"
+  },
+  "KitBuilder": {
+    "title": "一居室全套定制器",
+    "subtitle": "自由挑选空间配置，包装箱清单与参数实时联动更新。",
+    "fullHome": "全套一居室方案",
+    "living": "客厅套装",
+    "bedroom": "卧室套装"
+  },
+  "FAQ": {
+    "title": "常见问题解答",
+    "subtitle": "物流时效、免工具拼装、100 天退换、DDP 关税及 $50 抵用券使用规则完整解答。"
+  },
+  "Cart": {
+    "title": "购物车",
+    "subtitle": "所有标价均含 DDP 门到门完税交付 — 关税税费全包，送货上门无二次收费。"
+  },
+  "Swatch": {
+    "title": "免费面料样板盒",
+    "subtitle": "在家居真实光线下感受面料肌理、回弹海绵密度与实木色泽，内附 $50 购车抵用券。"
+  },
+  "HowItWorks": {
+    "title": "精密工艺与跨洋速递的融合",
+    "subtitle": "从零浪费工坊数控 CNC 雕琢白橡木，到 14-18 天直达您的客厅。"
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "id": "1c616d40952b4452a5d4a0077b209b3f",
+  "title": "A high-end, close-up editorial shot of an open minimalist kraft paper box from MODULIV. Inside the box are several neatly arranged, highly tactile upholstery swatches (Cream Bouclé, Caramel Corduroy, Olive Velvet, Tech Leather), two small squares of high-density white foam, and two small polished wood chips (Oak and Walnut). Resting on top is a sleek matte black $50 voucher card with the MODULIV logo in gold. Soft, warm natural sunlight creates gentle shadows. Minimalist Japandi aesthetic.",
+  "prompt": "A high-end, close-up editorial shot of an open minimalist kraft paper box from MODULIV. Inside the box are several neatly arranged, highly tactile upholstery swatches (Cream Bouclé, Caramel Corduroy, Olive Velvet, Tech Leather), two small squares of high-density white foam, and two small polished wood chips (Oak and Walnut). Resting on top is a sleek matte black $50 voucher card with the MODULIV logo in gold. Soft, warm natural sunlight creates gentle shadows. Minimalist Japandi aesthetic.",
+  "theme": {},
+  "screenMetadata": {
+    "agentType": "PRO_AGENT",
+    "status": "COMPLETE"
+  },
+  "width": "1376",
+  "height": "768",
+  "generatedBy": "interactive_ui_controller",
+  "screenType": "IMAGE",
+  "designSystem": {
+    "displayName": "Warm Minimalist Editorial",
+    "styleGuidelines": "## Brand & Style\n\nThe design system is rooted in the \"Japandi\" philosophy—a fusion of Japanese functionalism and Scandinavian minimalism. It targets a sophisticated, design-conscious audience seeking order, warmth, and high-end craftsmanship. The emotional response is one of tranquility, precision, and tactile quality.\n\nThe style is **Warm Minimalism** with an **Editorial** lens. It prioritizes heavy whitespace to evoke a sense of air and luxury, allowing product photography to serve as the primary visual driver. The UI avoids unnecessary ornamentation, relying instead on masterful typography and a restrained, earth-toned palette to communicate premium value.\n\n## Layout & Spacing\n\nThe layout is governed by a **fixed-width grid** on desktop (1440px max-width) and a **fluid grid** on mobile. The structure is inspired by *Shoji* screens—clean, rhythmic, and balanced.\n\n- **Grid:** 12-column system for desktop, 4-column for mobile.\n- **Rhythm:** All vertical spacing should be a multiple of 8px.\n- **Whitespace:** High-end appeal is achieved through \"wasteful\" whitespace. Content sections should have a minimum `section-gap` of 120px on desktop to allow the eye to rest between product categories.\n\n## Elevation & Depth\n\nTo maintain a minimalist aesthetic, depth is communicated through **tonal layers** and **subtle ambient shadows** rather than heavy gradients.\n\n- **Level 0 (Base):** Warm Porcelain (#F9F8F6).\n- **Level 1 (Cards/Floating):** White (#FFFFFF) with a very soft, diffused shadow (0px 4px 20px rgba(26, 28, 29, 0.04)).\n- **Level 2 (Modals):** White (#FFFFFF) with a more defined shadow and a backdrop blur (8px) on the underlying content to create a focus state.\n- **Outlines:** Use 1px solid borders in a slightly darker tint of the background (#EBEAE8) for structural definition in data-heavy areas like checkout.\n\n## Components\n\n- **Buttons:** \n  - Primary: Solid Basalt Charcoal (#1A1C1D) with White text. No border.\n  - Secondary: Outlined 1px Basalt Charcoal with transparent background.\n  - Tertiary: Text only, 14px uppercase with a 1px underline that expands on hover.\n- **Input Fields:** \n  - Minimalist design. Only a bottom border (1px) in Neutral-light, which turns to Primary (Terracotta) on focus.\n- **Product Cards:** \n  - Borderless with a Level 1 shadow on hover. Images should be high-resolution, featuring natural wood textures and soft lighting.\n- **Chips/Badges:** \n  - Small, pill-shaped with 12px Plus Jakarta Sans. Use Soft Sage (#545C50) for \"In Stock\" or \"Sustainably Sourced\" labels.\n- **Progress Indicators:** \n  - Used in the \"Flat-pack Assembly\" guides. Thin 2px lines in Terracotta to denote step completion.\n- **Navigation:** \n  - Top-aligned, centered logo, with menu items in Label-md. Subtle fade-in animations on hover.",
+    "theme": {
+      "colorMode": "LIGHT",
+      "font": "PLAYFAIR_DISPLAY",
+      "roundness": "ROUND_FOUR",
+      "customColor": "#a85f3b",
+      "headlineFont": "PLAYFAIR_DISPLAY",
+      "bodyFont": "PLUS_JAKARTA_SANS",
+      "labelFont": "PLUS_JAKARTA_SANS",
+      "namedColors": {
+        "surface_dim": "#dadadb",
+        "primary_fixed": "#ffdbcc",
+        "on_tertiary": "#ffffff",
+        "on_primary_fixed_variant": "#733515",
+        "on_surface_variant": "#54433c",
+        "inverse_on_surface": "#f1f1f1",
+        "tertiary_fixed_dim": "#78d6d1",
+        "error_container": "#ffdad6",
+        "on_primary_fixed": "#351000",
+        "background": "#f9f9fa",
+        "on_secondary_container": "#5d6559",
+        "tertiary_container": "#07807c",
+        "on_error_container": "#93000a",
+        "on_surface": "#1a1c1d",
+        "secondary_fixed": "#dde5d6",
+        "tertiary_fixed": "#94f3ed",
+        "on_primary_container": "#fff7f4",
+        "primary_container": "#a85f3b",
+        "surface_tint": "#904c2a",
+        "on_secondary_fixed": "#161d14",
+        "on_tertiary_container": "#e2fffc",
+        "on_secondary_fixed_variant": "#41493e",
+        "outline_variant": "#d9c2b8",
+        "on_primary": "#ffffff",
+        "secondary_fixed_dim": "#c1c9ba",
+        "surface_container_lowest": "#ffffff",
+        "surface_container_low": "#f3f3f4",
+        "on_background": "#1a1c1d",
+        "on_tertiary_fixed": "#00201f",
+        "surface_container_highest": "#e2e2e3",
+        "tertiary": "#006562",
+        "surface_bright": "#f9f9fa",
+        "primary": "#8a4725",
+        "primary_fixed_dim": "#ffb694",
+        "surface_container_high": "#e8e8e9",
+        "surface_variant": "#e2e2e3",
+        "on_error": "#ffffff",
+        "on_secondary": "#ffffff",
+        "surface_container": "#eeeeef",
+        "inverse_surface": "#2f3132",
+        "outline": "#86736b",
+        "secondary": "#596155",
+        "on_tertiary_fixed_variant": "#00504d",
+        "error": "#ba1a1a",
+        "surface": "#f9f9fa",
+        "inverse_primary": "#ffb694",
+        "secondary_container": "#dae2d3"
+      },
+      "designMd": "---\nname: Warm Minimalist Editorial\ncolors:\n  surface: '#f9f9fa'\n  surface-dim: '#dadadb'\n  surface-bright: '#f9f9fa'\n  surface-container-lowest: '#ffffff'\n  surface-container-low: '#f3f3f4'\n  surface-container: '#eeeeef'\n  surface-container-high: '#e8e8e9'\n  surface-container-highest: '#e2e2e3'\n  on-surface: '#1a1c1d'\n  on-surface-variant: '#54433c'\n  inverse-surface: '#2f3132'\n  inverse-on-surface: '#f1f1f1'\n  outline: '#86736b'\n  outline-variant: '#d9c2b8'\n  surface-tint: '#904c2a'\n  primary: '#8a4725'\n  on-primary: '#ffffff'\n  primary-container: '#a85f3b'\n  on-primary-container: '#fff7f4'\n  inverse-primary: '#ffb694'\n  secondary: '#596155'\n  on-secondary: '#ffffff'\n  secondary-container: '#dae2d3'\n  on-secondary-container: '#5d6559'\n  tertiary: '#006562'\n  on-tertiary: '#ffffff'\n  tertiary-container: '#07807c'\n  on-tertiary-container: '#e2fffc'\n  error: '#ba1a1a'\n  on-error: '#ffffff'\n  error-container: '#ffdad6'\n  on-error-container: '#93000a'\n  primary-fixed: '#ffdbcc'\n  primary-fixed-dim: '#ffb694'\n  on-primary-fixed: '#351000'\n  on-primary-fixed-variant: '#733515'\n  secondary-fixed: '#dde5d6'\n  secondary-fixed-dim: '#c1c9ba'\n  on-secondary-fixed: '#161d14'\n  on-secondary-fixed-variant: '#41493e'\n  tertiary-fixed: '#94f3ed'\n  tertiary-fixed-dim: '#78d6d1'\n  on-tertiary-fixed: '#00201f'\n  on-tertiary-fixed-variant: '#00504d'\n  background: '#f9f9fa'\n  on-background: '#1a1c1d'\n  surface-variant: '#e2e2e3'\ntypography:\n  display-lg:\n    fontFamily: Playfair Display\n    fontSize: 64px\n    fontWeight: '600'\n    lineHeight: '1.1'\n    letterSpacing: -0.02em\n  headline-lg:\n    fontFamily: Playfair Display\n    fontSize: 48px\n    fontWeight: '500'\n    lineHeight: '1.2'\n  headline-md:\n    fontFamily: Playfair Display\n    fontSize: 32px\n    fontWeight: '500'\n    lineHeight: '1.3'\n  headline-sm:\n    fontFamily: Playfair Display\n    fontSize: 24px\n    fontWeight: '500'\n    lineHeight: '1.4'\n  body-lg:\n    fontFamily: Plus Jakarta Sans\n    fontSize: 18px\n    fontWeight: '400'\n    lineHeight: '1.6'\n  body-md:\n    fontFamily: Plus Jakarta Sans\n    fontSize: 16px\n    fontWeight: '400'\n    lineHeight: '1.6'\n  label-md:\n    fontFamily: Plus Jakarta Sans\n    fontSize: 14px\n    fontWeight: '600'\n    lineHeight: '1.2'\n    letterSpacing: 0.05em\n  headline-lg-mobile:\n    fontFamily: Playfair Display\n    fontSize: 36px\n    fontWeight: '500'\n    lineHeight: '1.2'\nrounded:\n  sm: 0.125rem\n  DEFAULT: 0.25rem\n  md: 0.375rem\n  lg: 0.5rem\n  xl: 0.75rem\n  full: 9999px\nspacing:\n  base: 8px\n  gutter: 24px\n  margin-mobile: 20px\n  margin-desktop: 64px\n  section-gap: 120px\n---\n\n## Brand & Style\n\nThe design system is rooted in the \"Japandi\" philosophy—a fusion of Japanese functionalism and Scandinavian minimalism. It targets a sophisticated, design-conscious audience seeking order, warmth, and high-end craftsmanship. The emotional response is one of tranquility, precision, and tactile quality.\n\nThe style is **Warm Minimalism** with an **Editorial** lens. It prioritizes heavy whitespace to evoke a sense of air and luxury, allowing product photography to serve as the primary visual driver. The UI avoids unnecessary ornamentation, relying instead on masterful typography and a restrained, earth-toned palette to communicate premium value.\n\n## Colors\n\nThe palette is derived from natural architectural materials: clay, timber, stone, and plant life. \n\n- **Primary (Terracotta/Oak):** Used sparingly for call-to-action elements, price points, and key brand moments.\n- **Secondary (Soft Sage):** Used for secondary interactions, eco-conscious labels, and subtle background differentiators.\n- **Neutral (Basalt Charcoal):** Reserved for high-contrast typography and iconography to ensure maximum legibility.\n- **Background (Warm Porcelain):** The canvas for the entire system, providing a softer, more inviting atmosphere than pure white.\n\n## Typography\n\nThis design system utilizes a high-contrast typographic pairing. Headlines use **Playfair Display** to provide an authoritative, editorial feel reminiscent of luxury shelter magazines. Body copy uses **Plus Jakarta Sans** for its modern, approachable geometry and exceptional readability at smaller scales.\n\n- Use **display-lg** only for hero sections with minimal text.\n- Use **label-md** for navigation items and small UI hints, always in uppercase with slight tracking to maintain an architectural feel.\n- Maintain generous line heights for body text to preserve the \"airy\" brand quality.\n\n## Layout & Spacing\n\nThe layout is governed by a **fixed-width grid** on desktop (1440px max-width) and a **fluid grid** on mobile. The structure is inspired by *Shoji* screens—clean, rhythmic, and balanced.\n\n- **Grid:** 12-column system for desktop, 4-column for mobile.\n- **Rhythm:** All vertical spacing should be a multiple of 8px.\n- **Whitespace:** High-end appeal is achieved through \"wasteful\" whitespace. Content sections should have a minimum `section-gap` of 120px on desktop to allow the eye to rest between product categories.\n\n## Elevation & Depth\n\nTo maintain a minimalist aesthetic, depth is communicated through **tonal layers** and **subtle ambient shadows** rather than heavy gradients.\n\n- **Level 0 (Base):** Warm Porcelain (#F9F8F6).\n- **Level 1 (Cards/Floating):** White (#FFFFFF) with a very soft, diffused shadow (0px 4px 20px rgba(26, 28, 29, 0.04)).\n- **Level 2 (Modals):** White (#FFFFFF) with a more defined shadow and a backdrop blur (8px) on the underlying content to create a focus state.\n- **Outlines:** Use 1px solid borders in a slightly darker tint of the background (#EBEAE8) for structural definition in data-heavy areas like checkout.\n\n## Shapes\n\nThe shape language is **Soft**. It avoids the clinical nature of sharp corners while steering clear of the \"bubbly\" look of fully rounded UI.\n\n- **Standard Elements:** 4px (0.25rem) radius for buttons, input fields, and small UI components.\n- **Large Elements:** 8px (0.5rem) radius for product cards, image containers, and modals.\n- **Product Photography:** Should always be rectangular or slightly rounded; avoid circular crops to maintain the architectural integrity of the brand.\n\n## Components\n\n- **Buttons:** \n  - Primary: Solid Basalt Charcoal (#1A1C1D) with White text. No border.\n  - Secondary: Outlined 1px Basalt Charcoal with transparent background.\n  - Tertiary: Text only, 14px uppercase with a 1px underline that expands on hover.\n- **Input Fields:** \n  - Minimalist design. Only a bottom border (1px) in Neutral-light, which turns to Primary (Terracotta) on focus.\n- **Product Cards:** \n  - Borderless with a Level 1 shadow on hover. Images should be high-resolution, featuring natural wood textures and soft lighting.\n- **Chips/Badges:** \n  - Small, pill-shaped with 12px Plus Jakarta Sans. Use Soft Sage (#545C50) for \"In Stock\" or \"Sustainably Sourced\" labels.\n- **Progress Indicators:** \n  - Used in the \"Flat-pack Assembly\" guides. Thin 2px lines in Terracotta to denote step completion.\n- **Navigation:** \n  - Top-aligned, centered logo, with menu items in Label-md. Subtle fade-in animations on hover.",
+      "colorVariant": "FIDELITY",
+      "overridePrimaryColor": "#a85f3b",
+      "overrideSecondaryColor": "#545c50",
+      "overrideNeutralColor": "#1a1c1d",
+      "spacingScale": 2,
+      "typography": {
+        "headline-sm": {
+          "fontFamily": "Playfair Display",
+          "fontSize": "24px",
+          "fontWeight": "500",
+          "lineHeight": "1.4"
+        },
+        "body-lg": {
+          "fontFamily": "Plus Jakarta Sans",
+          "fontSize": "18px",
+          "fontWeight": "400",
+          "lineHeight": "1.6"
+        },
+        "display-lg": {
+          "fontFamily": "Playfair Display",
+          "fontSize": "64px",
+          "fontWeight": "600",
+          "lineHeight": "1.1",
+          "letterSpacing": "-0.02em"
+        },
+        "headline-lg": {
+          "fontFamily": "Playfair Display",
+          "fontSize": "48px",
+          "fontWeight": "500",
+          "lineHeight": "1.2"
+        },
+        "headline-md": {
+          "fontFamily": "Playfair Display",
+          "fontSize": "32px",
+          "fontWeight": "500",
+          "lineHeight": "1.3"
+        },
+        "body-md": {
+          "fontFamily": "Plus Jakarta Sans",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "lineHeight": "1.6"
+        },
+        "label-md": {
+          "fontFamily": "Plus Jakarta Sans",
+          "fontSize": "14px",
+          "fontWeight": "600",
+          "lineHeight": "1.2",
+          "letterSpacing": "0.05em"
+        },
+        "headline-lg-mobile": {
+          "fontFamily": "Playfair Display",
+          "fontSize": "36px",
+          "fontWeight": "500",
+          "lineHeight": "1.2"
+        }
+      },
+      "spacing": {
+        "section-gap": "120px",
+        "margin-desktop": "64px",
+        "gutter": "24px",
+        "base": "8px",
+        "margin-mobile": "20px"
+      },
+      "headlineFontFamily": "Playfair Display",
+      "bodyFontFamily": "Plus Jakarta Sans",
+      "labelFontFamily": "Plus Jakarta Sans"
+    }
+  }
+}

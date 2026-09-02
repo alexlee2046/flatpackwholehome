@@ -36,10 +36,12 @@
 
 ---
 
-## 2. 已生成的 5 大核心 UI 页面
+## 2. 已生成的 5 大核心 UI 页面与本地文件映射
 
-### 页面 1：独立站首页 (Homepage Desktop)
-* **Screen ID**: `09ac5b66726d49a291227264f25bb34c`
+* **本地画廊总览**：[stitch/gallery.html](../stitch/gallery.html)
+
+### 页面 1：[独立站首页 (Homepage Desktop)](../stitch/index.html)
+* **Screen ID**: `09ac5b66726d49a291227264f25bb34c` · 本地页面: [stitch/index.html](../stitch/index.html)
 * **核心内容**：
   * **Hero 视觉**：左侧 6 个整齐平放的牛皮纸箱，右侧蜕变为阳光洒满的原木奶油风 Japandi 客厅与卧室样板间；
   * **主标语**：“Your Entire Home. Delivered in 6 Flat Boxes.”
@@ -52,7 +54,8 @@
 
 ---
 
-### 页面 2：全屋一键入住套餐定制页 (Move-In Bundles & Room Kit Builder)
+### 页面 2：[全屋一键入住套餐定制页 (Move-In Bundles & Room Kit Builder)](../stitch/1-bedroom-kit-builder.html)
+* **本地页面**: [stitch/1-bedroom-kit-builder.html](../stitch/1-bedroom-kit-builder.html)
 * **核心内容**：
   * **左右分屏联动设计**：
     * 左侧：3D 样板间交互渲染 + 6 箱体积重量清单（总计 0.51 CBM / 102kg，电梯 100% 可进提示）；
@@ -62,7 +65,8 @@
 
 ---
 
-### 页面 3：核心爆款商详页 (PDP: The ModuSofa 3-Seater)
+### 页面 3：[核心爆款商详页 (PDP: The ModuSofa 3-Seater)](../stitch/modusofa-product-detail-page.html)
+* **本地页面**: [stitch/modusofa-product-detail-page.html](../stitch/modusofa-product-detail-page.html)
 * **核心内容**：
   * **多维度图集**：多场景样板间、15+ 种面料细节微距、自锁五金卡扣特写、扁平纸箱入户示意图；
   * **3D 内部透视图**：2英寸记忆棉 + 35D 高弹棉 + 独立袋装弹簧 + 自锁连接件；
@@ -71,7 +75,8 @@
 
 ---
 
-### 页面 4：免费面料样板盒申领页 (Free Swatch Box Landing Page)
+### 页面 4：[免费面料样板盒申领页 (Free Swatch Box Landing Page)](../stitch/free-swatch-box-material-discovery.html)
+* **本地页面**: [stitch/free-swatch-box-material-discovery.html](../stitch/free-swatch-box-material-discovery.html)
 * **核心内容**：
   * **牛皮纸盒开箱视觉**：6 款热门面料小样 + 35D/45D 海绵触感切块 + $50 现金抵扣券；
   * **交互式面料触感探索器**（微距纹理与防刮测试视频）；
@@ -79,11 +84,21 @@
 
 ---
 
-### 页面 5：全流程交付与工坊解密页 (How It Works & The DDP Journey)
+### 页面 5：[全流程交付与工坊解密页 (How It Works & The DDP Journey)](../stitch/how-it-works-craft-logistics.html)
+* **本地页面**: [stitch/how-it-works-craft-logistics.html](../stitch/how-it-works-craft-logistics.html)
 * **核心内容**：
   * **3 大核心支柱探索**：现压保鲜、0 螺丝自锁五金、标准快递小箱化；
   * **5 阶段跨洋履约时间轴**（工坊裁剪 ➔ 现压封箱 ➔ 跨洋海运 ➔ 清关完毕 ➔ 本地 FedEx 派送）；
   * **“以捐代退”（Donation-over-Return）ESG 政策全解读**。
+
+---
+
+### 辅助页面与实验室
+* [Your Cart & Checkout 购物车与结算页](../stitch/cart.html)
+* [Frequently Asked Questions (FAQ) 常见疑问解答](../stitch/faq.html)
+* [Design Lab: 3D Snap-Joint 卡扣交互实验](../stitch/three-js.html)
+* [Design Lab: Shader Study 流体着色器实验](../stitch/shader.html)
+* [404 Not Found 页面](../stitch/404.html)
 
 ---
 *Generated and synchronized with Stitch UI Project 1318977181840355780.*
