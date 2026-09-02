@@ -129,8 +129,8 @@ export function KitBuilder({
   const spaceLivingDoc = spaces?.find((s) => s.slug === 'living-room')
   const spaceBedroomDoc = spaces?.find((s) => s.slug === 'bedroom')
 
-  const normalizeUrl = (url?: string | null) => {
-    if (!url) return null
+  const normalizeUrl = (url?: unknown) => {
+    if (!url || typeof url !== 'string') return null
     return url
       .replace(/^https?:\/\/[^/]+/, '')
       .replace(/^\/api\/media\/file\//, '/media/')
