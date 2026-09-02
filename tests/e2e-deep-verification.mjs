@@ -97,7 +97,7 @@ async function runDeepE2E() {
     const emailInput = page.locator('#sf-email');
     const addressInput = page.locator('#sf-address');
     const cityInput = page.locator('#sf-city');
-    const postalInput = page.locator('#sf-postal');
+    const postalInput = page.locator('#sf-zip');
     const submitBtn = page.locator('button[type="submit"]');
 
     if (await nameInput.isVisible() && await emailInput.isVisible()) {
@@ -110,7 +110,7 @@ async function runDeepE2E() {
       await submitBtn.click();
       await page.waitForTimeout(1500);
 
-      const hasSuccess = (await page.locator('body').textContent()).includes('Order Confirmed') || (await page.locator('body').textContent()).includes('on its way');
+      const hasSuccess = (await page.locator('body').textContent()).includes('Order Confirmed') || (await page.locator('body').textContent()).includes('Your swatch box is reserved');
       console.log('   Form submitted successfully:', hasSuccess);
       if (!hasSuccess) failures++;
     } else {
