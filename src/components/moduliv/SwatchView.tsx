@@ -1,6 +1,7 @@
 'use client'
 
 import { Link } from '@/i18n/navigation'
+import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
@@ -86,10 +87,13 @@ export function SwatchView() {
             {t('orderButton')}
           </a>
         </div>
-        <div className="aspect-[4/3] bg-surface-container rounded-2xl overflow-hidden shadow-sm">
-          <img
+        <div className="aspect-[4/3] bg-surface-container rounded-2xl overflow-hidden shadow-sm relative">
+          <Image
             alt="Moduliv curated swatch box"
-            className="w-full h-full object-cover"
+            className="object-cover"
+            fill
+            priority
+            sizes="(max-width: 1024px) 100vw, 50vw"
             src="/screenshots/asset-swatch-box-hero.png"
           />
         </div>

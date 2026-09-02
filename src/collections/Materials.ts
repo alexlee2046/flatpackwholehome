@@ -1,5 +1,6 @@
 import { adminOnly } from '@/access/adminOnly'
 import { adminOrPublishedStatus } from '@/access/adminOrPublishedStatus'
+import { revalidateStorefrontTag } from '@/utilities/revalidate'
 import type { CollectionConfig } from 'payload'
 import { slugField } from 'payload'
 
@@ -37,6 +38,13 @@ export const Materials: CollectionConfig = {
       ],
     },
   ],
+  hooks: {
+    afterChange: [
+      () => {
+        revalidateStorefrontTag('materials')
+      },
+    ],
+  },
   versions: {
     drafts: { autosave: true },
     maxPerDoc: 50,

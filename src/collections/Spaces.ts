@@ -1,5 +1,6 @@
 import { adminOnly } from '@/access/adminOnly'
 import { adminOrPublishedStatus } from '@/access/adminOrPublishedStatus'
+import { revalidateStorefrontTag } from '@/utilities/revalidate'
 import type { CollectionConfig } from 'payload'
 import { slugField } from 'payload'
 
@@ -21,6 +22,13 @@ export const Spaces: CollectionConfig = {
     { name: 'relatedProducts', type: 'relationship', hasMany: true, relationTo: 'products' },
     { name: 'relatedPosts', type: 'relationship', hasMany: true, relationTo: 'journal-posts' },
   ],
+  hooks: {
+    afterChange: [
+      () => {
+        revalidateStorefrontTag('spaces')
+      },
+    ],
+  },
   versions: {
     drafts: { autosave: true },
     maxPerDoc: 50,

@@ -85,6 +85,9 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || 'postgresql://127.0.0.1:5432/flatpackwholehome',
+      connectionTimeoutMillis: 5000,
+      idleTimeoutMillis: 30000,
+      max: process.env.DB_POOL_MAX ? parseInt(process.env.DB_POOL_MAX, 10) : 15,
     },
   }),
   editor: lexicalEditor({

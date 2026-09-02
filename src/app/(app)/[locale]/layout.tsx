@@ -70,6 +70,9 @@ export default async function RootLayout({ children, params }: LayoutProps) {
       suppressHydrationWarning
     >
       <head>
+        <link rel="preload" href="/vendor/fonts/f305d441dc1.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/vendor/fonts/f49e0be9626.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/vendor/tailwind.js" as="script" />
         <link href="/vendor/fonts/fonts-a39f5c6f.css" rel="stylesheet" />
         <link href="/vendor/fonts/fonts-7cdb80a7.css" rel="stylesheet" />
         <link

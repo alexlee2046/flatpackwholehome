@@ -2,6 +2,7 @@ import { CallToAction } from '@/blocks/CallToAction/config'
 import { Content } from '@/blocks/Content/config'
 import { MediaBlock } from '@/blocks/MediaBlock/config'
 import { adminOnlyFieldAccess } from '@/access/adminOnlyFieldAccess'
+import { revalidateStorefrontTag } from '@/utilities/revalidate'
 import { slugField } from 'payload'
 import { generatePreviewPath } from '@/utilities/generatePreviewPath'
 import { CollectionOverride } from '@payloadcms/plugin-ecommerce/types'
@@ -58,6 +59,18 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     material: true,
     madeToOrder: true,
     packedVolumeCbm: true,
+  },
+  hooks: {
+    ...defaultCollection?.hooks,
+    afterChange: [
+      ...(defaultCollection?.hooks?.afterChange || []),
+      ({ doc }) => {
+        revalidateStorefrontTag('products')
+        if (doc?.slug) {
+          revalidateStorefrontTag(`product-${doc.slug}`)
+        }
+      },
+    ],
   },
   fields: [
     { name: 'title', type: 'text', localized: true, required: true },

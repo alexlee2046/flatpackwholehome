@@ -1,4 +1,5 @@
 import { adminOnly } from '@/access/adminOnly'
+import { revalidateStorefrontTag } from '@/utilities/revalidate'
 import type { GlobalConfig } from 'payload'
 
 export const Homepage: GlobalConfig = {
@@ -35,8 +36,16 @@ export const Homepage: GlobalConfig = {
     { name: 'featuredCollection', type: 'relationship', relationTo: 'product-collections' },
     { name: 'featuredPosts', type: 'relationship', hasMany: true, relationTo: 'journal-posts' },
   ],
+  hooks: {
+    afterChange: [
+      () => {
+        revalidateStorefrontTag('homepage')
+      },
+    ],
+  },
   versions: {
     drafts: { autosave: true },
     max: 50,
   },
 }
+

@@ -3,15 +3,21 @@ import { ModulivHeader } from '@/components/moduliv/ModulivHeader'
 import { ProductDetail } from '@/components/moduliv/ProductDetail'
 import { getPayloadLocale } from '@/i18n/getPayloadLocale'
 import { buildPageMetadata } from '@/i18n/pageMetadata'
-import configPromise from '@payload-config'
+import { getProductData } from '@/lib/data/storefront'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { connection } from 'next/server'
-import { getPayload } from 'payload'
 import React from 'react'
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>
+}
+
+export async function generateStaticParams() {
+  return [
+    { slug: 'modusofa' },
+    { slug: 'snapbed' },
+    { slug: '1-bedroom-kit' },
+  ]
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -20,24 +26,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   let title = 'ModuSofa 3-Seater'
   let description = 'Shop flat-pack furniture from The Flat Set. Tool-free assembly.'
 
-  try {
-    const payload = await getPayload({ config: configPromise })
-    const productResult = await payload.find({
-      collection: 'products',
-      depth: 1,
-      limit: 1,
-      locale,
-      overrideAccess: true,
-      where: {
-        slug: { equals: slug },
-      },
-    })
-    const product = productResult.docs[0]
-    if (product?.title) title = product.title
-    if (product?.subtitle) description = product.subtitle
-  } catch {
-    // fallback
-  }
+  const product = await getProductData(slug, locale)
+  if (product?.title) title = product.title
+  if (product?.subtitle) description = product.subtitle
 
   return buildPageMetadata({
     description,
@@ -48,27 +39,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage({ params }: Props) {
-  await connection()
   const { slug } = await params
   const locale = await getPayloadLocale()
-  let doc: any = null
-
-  try {
-    const payload = await getPayload({ config: configPromise })
-    const productResult = await payload.find({
-      collection: 'products',
-      depth: 2,
-      limit: 1,
-      locale,
-      overrideAccess: true,
-      where: {
-        slug: { equals: slug },
-      },
-    })
-    doc = productResult.docs[0]
-  } catch {
-    // fallback
-  }
+  const doc = await getProductData(slug, locale)
   if (!doc && slug !== 'modusofa') {
     notFound()
   }
