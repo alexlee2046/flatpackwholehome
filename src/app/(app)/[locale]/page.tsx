@@ -6,6 +6,7 @@ import { buildPageMetadata } from '@/i18n/pageMetadata'
 import configPromise from '@payload-config'
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
+import { connection } from 'next/server'
 import { getPayload } from 'payload'
 import React from 'react'
 
@@ -22,23 +23,32 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
+  await connection()
   const locale = await getPayloadLocale()
-  const payload = await getPayload({ config: configPromise })
+  let homepage: any = null
+  let announcement: any = null
 
-  const [homepage, announcement] = await Promise.all([
-    payload.findGlobal({
-      slug: 'homepage',
-      depth: 2,
-      locale,
-      overrideAccess: true,
-    }),
-    payload.findGlobal({
-      slug: 'announcement',
-      depth: 1,
-      locale,
-      overrideAccess: true,
-    }),
-  ])
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const [h, a] = await Promise.all([
+      payload.findGlobal({
+        slug: 'homepage',
+        depth: 2,
+        locale,
+        overrideAccess: true,
+      }),
+      payload.findGlobal({
+        slug: 'announcement',
+        depth: 1,
+        locale,
+        overrideAccess: true,
+      }),
+    ])
+    homepage = h
+    announcement = a
+  } catch (err) {
+    // Fallback when DB is not reachable during build
+  }
 
   return (
     <>
