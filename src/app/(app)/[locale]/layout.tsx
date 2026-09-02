@@ -78,8 +78,11 @@ export default async function RootLayout({ children, params }: LayoutProps) {
           type="image/svg+xml"
           href="/assets/brand/favicon.svg"
         />
-        <Script src="/vendor/tailwind.js" strategy="beforeInteractive" />
-        <Script id="tailwind-config" strategy="beforeInteractive">{`
+        <script src="/vendor/tailwind.js" />
+        <script
+          id="tailwind-config"
+          dangerouslySetInnerHTML={{
+            __html: `
           tailwind.config = {
             darkMode: "class",
             theme: {
@@ -168,8 +171,10 @@ export default async function RootLayout({ children, params }: LayoutProps) {
                 }
               }
             }
-          }
-        `}</Script>
+          };
+          `,
+          }}
+        />
         <Script src="/moduliv-core.js" strategy="afterInteractive" />
         <style dangerouslySetInnerHTML={{ __html: `
           .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }

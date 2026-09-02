@@ -582,7 +582,22 @@
     /* ==========================================================================
        INITIALIZATION
        ========================================================================== */
+    function ensureTailwindCompiled() {
+        if (typeof window !== 'undefined' && window.tailwind && window.tailwind.config) {
+            var probe = document.querySelector('.bg-on-background');
+            if (probe && window.getComputedStyle(probe).backgroundColor === 'rgba(0, 0, 0, 0)') {
+                window.tailwind.config = JSON.parse(JSON.stringify(window.tailwind.config));
+            }
+        }
+    }
+
     function init() {
+        ensureTailwindCompiled();
+        setTimeout(ensureTailwindCompiled, 100);
+        setTimeout(ensureTailwindCompiled, 500);
+        // #region agent log
+        fetch('http://127.0.0.1:7812/ingest/fa02535f-a3bf-4319-91c3-645fd5697ed4',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'f43786'},body:JSON.stringify({sessionId:'f43786',location:'moduliv-core.js:586',message:'init state audit',data:{hasTailwind:typeof window.tailwind!=='undefined',hasCustomColors:!!(window.tailwind&&window.tailwind.config&&window.tailwind.config.theme&&window.tailwind.config.theme.extend&&window.tailwind.config.theme.extend.colors&&window.tailwind.config.theme.extend.colors['on-background']),bgComputed:document.querySelector('.bg-on-background')?window.getComputedStyle(document.querySelector('.bg-on-background')).backgroundColor:'none',h1Computed:document.querySelector('h1')?{size:window.getComputedStyle(document.querySelector('h1')).fontSize,font:window.getComputedStyle(document.querySelector('h1')).fontFamily}:'none',styleTags:Array.from(document.querySelectorAll('style')).map(function(s){return s.textContent.length})},timestamp:Date.now()})}).catch(function(){});
+        // #endregion
         paintCartBadges(false);
         wireSearchButtons();
         initCurrencySwitcher();

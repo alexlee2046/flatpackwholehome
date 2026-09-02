@@ -67,6 +67,21 @@ async function testPlaywright() {
     const brandHeading = await page.locator('header a[aria-label="The Flat Set — Home"]').textContent();
     console.log('   Header Brand:', brandHeading?.replace(/\s+/g, ' ').trim());
 
+    // 8. Test Visual Styles (Tailwind compilation & Fonts)
+    console.log('8. Verifying Desktop Visual Styles & Tailwind compilation...');
+    const styleAudit = await page.evaluate(() => {
+      const h1 = document.querySelector('h1');
+      const btn = document.querySelector('.bg-on-background');
+      return {
+        h1Size: h1 ? window.getComputedStyle(h1).fontSize : null,
+        btnBg: btn ? window.getComputedStyle(btn).backgroundColor : null
+      };
+    });
+    console.log('   Visual Audit:', styleAudit);
+    if (styleAudit.btnBg === 'rgba(0, 0, 0, 0)' || styleAudit.h1Size === '16px') {
+      throw new Error(`Visual styles failed to compile: ${JSON.stringify(styleAudit)}`);
+    }
+
     console.log('\n Playwright Storefront E2E Test SUCCESSFUL!');
   } finally {
     await browser.close();
