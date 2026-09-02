@@ -129,6 +129,14 @@ export function KitBuilder({
   const spaceLivingDoc = spaces?.find((s) => s.slug === 'living-room')
   const spaceBedroomDoc = spaces?.find((s) => s.slug === 'bedroom')
 
+  const normalizeUrl = (url?: string | null) => {
+    if (!url) return null
+    return url
+      .replace(/^https?:\/\/[^/]+/, '')
+      .replace(/^\/api\/media\/file\//, '/media/')
+      .replace(/-\d+(\.[a-zA-Z0-9]+)$/, '$1')
+  }
+
   const dynamicSpaces: Record<
     SpaceKey,
     {
@@ -146,9 +154,10 @@ export function KitBuilder({
       caption: spaceBedroomDoc?.intro || SPACES.bedroom.caption,
       cta: spaceBedroomDoc?.title || tKit('bedroom'),
       img:
-        (typeof spaceBedroomDoc?.hero === 'object' && spaceBedroomDoc?.hero?.url) ||
-        (typeof spaceBedroomDoc?.hero === 'string' && spaceBedroomDoc.hero) ||
-        SPACES.bedroom.img,
+        normalizeUrl(
+          (typeof spaceBedroomDoc?.hero === 'object' && spaceBedroomDoc?.hero?.url) ||
+          (typeof spaceBedroomDoc?.hero === 'string' && spaceBedroomDoc.hero)
+        ) || SPACES.bedroom.img,
       price: bedProduct?.priceInUSD || SPACES.bedroom.price,
     },
     full: {
@@ -157,9 +166,10 @@ export function KitBuilder({
       caption: spaceWholeHome?.intro || SPACES.full.caption,
       cta: spaceWholeHome?.title || tKit('fullHome'),
       img:
-        (typeof spaceWholeHome?.hero === 'object' && spaceWholeHome?.hero?.url) ||
-        (typeof spaceWholeHome?.hero === 'string' && spaceWholeHome.hero) ||
-        SPACES.full.img,
+        normalizeUrl(
+          (typeof spaceWholeHome?.hero === 'object' && spaceWholeHome?.hero?.url) ||
+          (typeof spaceWholeHome?.hero === 'string' && spaceWholeHome.hero)
+        ) || SPACES.full.img,
       price: bundleProduct?.priceInUSD || SPACES.full.price,
     },
     living: {
@@ -168,9 +178,10 @@ export function KitBuilder({
       caption: spaceLivingDoc?.intro || SPACES.living.caption,
       cta: spaceLivingDoc?.title || tKit('living'),
       img:
-        (typeof spaceLivingDoc?.hero === 'object' && spaceLivingDoc?.hero?.url) ||
-        (typeof spaceLivingDoc?.hero === 'string' && spaceLivingDoc.hero) ||
-        SPACES.living.img,
+        normalizeUrl(
+          (typeof spaceLivingDoc?.hero === 'object' && spaceLivingDoc?.hero?.url) ||
+          (typeof spaceLivingDoc?.hero === 'string' && spaceLivingDoc.hero)
+        ) || SPACES.living.img,
       price: livingProduct?.priceInUSD || SPACES.living.price,
     },
   }
