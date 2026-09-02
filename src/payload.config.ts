@@ -182,20 +182,6 @@ export default buildConfig({
         })
         payload.logger.info(`[onInit] Admin user created: ${adminEmail}`)
       }
-
-      const existingMedia = await payload.find({
-        collection: 'media',
-        depth: 0,
-        limit: 1,
-        overrideAccess: true,
-      })
-
-      if (existingMedia.totalDocs === 0) {
-        payload.logger.info('[onInit] Media collection empty, auto-seeding media records...')
-        const { seedMedia } = await import('./scripts/seed-media')
-        await seedMedia(payload)
-        payload.logger.info('[onInit] Media auto-seeding complete!')
-      }
     } catch (err: any) {
       payload.logger.warn(`[onInit] Initialization error: ${err.message}`)
     }

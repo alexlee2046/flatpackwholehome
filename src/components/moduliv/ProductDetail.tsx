@@ -65,6 +65,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
     return url
       .replace(/^https?:\/\/[^/]+/, '')
       .replace(/^\/api\/media\/file\//, '/media/')
+      .replace(/-\d+(\.[a-zA-Z0-9]+)$/, '$1')
   }
 
   const galleryUrls = (product?.gallery || [])
