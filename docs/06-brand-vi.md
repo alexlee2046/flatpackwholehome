@@ -58,7 +58,21 @@ flowchart LR
 - **单色牛皮纸印章**：专供海外代工厂外箱水印柔版印刷。
 
 ### 2.4 Favicon 与 App 磁贴
-- **标准规格**：深陶土 Burnt Oak `#8A4725` 圓角方块（rx: 14/64），内嵌瓷白 Warm Porcelain `#F9F8F6` 六板印。
+- **浏览器标签 `favicon.svg`**：`16×16` 视框，Burnt Oak `#8A4725`，圆角 `rx=3`。六条瓷白线，各高 1px、隙 1px，从 `y=2` 起（上 2 / 下 3，对齐整像素）。**禁止减成 4 条。**
+- **App / 社媒 `icon-tile.svg`**：陶土底 `rx=12`，里面的六板印与 `mark.svg` 同一套几何（条 52、底条 48、高 4、隙 5）。16px 标签仍用等长 1px 线，避免糊成一团。
+- 字标文件必须是 **描边 path**，禁止依赖网页 `@font-face`。
+
+### 2.5 多语言（不托管 Noto）
+字标永远是英文 The Flat Set。中日阿语走系统黑体，排在 Playfair / Jakarta 后面：
+
+```
+标题  Playfair Display, Georgia, PingFang SC, Hiragino Sans, Yu Gothic, Microsoft YaHei, serif
+正文  Plus Jakarta Sans, system-ui, PingFang SC, Hiragino Sans, Yu Gothic, Microsoft YaHei, sans-serif
+```
+
+- `zh` / `ja` / `ar` 的原生文案关闭 `uppercase` 与 `0.05em` 字距；`BOX` / `DDP` / `$` 使用 `.latin-meta`。
+- 阿语 `dir=rtl`，行高 1.8。
+- **禁止**把完整 Noto CJK / Naskh 打进站点包。
 
 ---
 
@@ -126,11 +140,12 @@ flowchart LR
 
 所有标准矢量资产位于代码库：
 - `stitch/assets/brand/` 与 `public/assets/brand/`：
-  - `mark.svg`：六板印标准黑色版
+  - `mark.svg`：六板印标准黑色版（底条短 8%，印刷用）
   - `mark-on-dark.svg`：六板印反白版
-  - `favicon.svg`：深陶土底圆角 Favicon 图标
-  - `wordmark.svg`：单行桌面版文字标
-  - `wordmark-on-dark.svg`：深底反白文字标
-  - `wordmark-stacked.svg`：两行折叠手机版文字标
-  - `lockup.svg`：图文横排组合标
-  - `mark-mono-kraft.svg`：牛皮纸外箱柔印单色带框印章
+  - `favicon.svg`：16px 陶土底，六条 1px 线
+  - `icon-tile.svg`：64px App / 社媒磁贴
+  - `wordmark.svg`：单行桌面字标（描边）
+  - `wordmark-on-dark.svg`：深底反白字标（描边）
+  - `wordmark-stacked.svg`：两行折叠字标（描边）
+  - `lockup.svg`：六板 + 字标横排（描边）
+  - `mark-mono-kraft.svg`：牛皮纸外箱单色印章（描边）

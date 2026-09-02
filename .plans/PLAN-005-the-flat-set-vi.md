@@ -1,6 +1,6 @@
 # PLAN-005 The Flat Set 视觉识别（VI）
 
-> 状态：等待批准后落地品牌手册、Logo SVG、并接到现有 Stitch 站点  
+> 状态：VI 终稿已落地（描边字标、6×1px favicon、系统字栈）。俄文西里尔正文仍待补。
 > 原则：**不另起一套视觉**，把现站 Warm Japandi Editorial 升格为品牌 VI  
 > 品牌：The Flat Set · 门面 `theflatset.com`
 

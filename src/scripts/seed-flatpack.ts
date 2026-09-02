@@ -362,7 +362,7 @@ export async function seedFlatpack(payload: Payload) {
     }),
   ])
 
-  payload.logger.info('MODULIV seed complete!')
+  payload.logger.info('The Flat Set seed complete!')
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === filename) {

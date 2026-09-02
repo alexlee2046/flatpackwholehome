@@ -399,22 +399,22 @@
        ========================================================================== */
     var PRIVACY_CONTENT = 
         '<div class="space-y-4 text-sm font-body-md text-[#54433c]">' +
-        '  <p class="font-medium text-[#1a1c1d]">Effective Date: January 1, 2025 · Compliant with GDPR, CCPA, and Global Consumer Protection Standards.</p>' +
+        '  <p class="font-medium text-[#1a1c1d]">Effective Date: January 1, 2026 · Compliant with GDPR, CCPA, and Global Consumer Protection Standards.</p>' +
         '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">1. Plain-Language Data Promise</h4>' +
-        '  <p>MODULIV collects only the information required to build, ship, and deliver your flat-pack living system to your door. We will never sell, rent, or trade your personal data to data brokers or advertising networks.</p>' +
+        '  <p>The Flat Set collects only the information required to build, ship, and deliver your flat-pack living system to your door. We will never sell, rent, or trade your personal data to data brokers or advertising networks.</p>' +
         '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">2. What We Collect</h4>' +
         '  <p>• Delivery Coordinates: Physical address and contact telephone number required exclusively for DDP customs clearing and FedEx/UPS doorstep parcel drops.<br>' +
         '     • Order Configuration: Fabric selections, module dimensions, and room preferences stored locally to facilitate seamless assembly support.<br>' +
-        '     • Payment Security: All live payments are processed via end-to-end PCI-DSS Level 1 certified gateways. MODULIV never stores raw credit card numbers.</p>' +
+        '     • Payment Security: All live payments are processed via end-to-end PCI-DSS Level 1 certified gateways. The Flat Set never stores raw credit card numbers.</p>' +
         '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">3. 100-Night Return Anonymity</h4>' +
         '  <p>Should you utilize our donation-over-return protocol, donation receipts from our local verified charity partners are processed privately with zero public disclosure.</p>' +
         '</div>';
 
     var TERMS_CONTENT = 
         '<div class="space-y-4 text-sm font-body-md text-[#54433c]">' +
-        '  <p class="font-medium text-[#1a1c1d]">MODULIV Global Customer Agreement · Whole-Home Flat-Pack Systems</p>' +
+        '  <p class="font-medium text-[#1a1c1d]">The Flat Set Global Customer Agreement · Whole-Home Flat-Pack Systems</p>' +
         '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">1. Zero-Surprise DDP Delivery Guarantee</h4>' +
-        '  <p>Every price listed on MODULIV is Delivered Duty Paid (DDP). All import taxes, ocean freight, customs clearance tariffs, and final-mile doorstep delivery are paid in full by MODULIV. No freight fees or broker bills will ever be owed at delivery.</p>' +
+        '  <p>Every price listed on The Flat Set is Delivered Duty Paid (DDP). All import taxes, ocean freight, customs clearance tariffs, and final-mile doorstep delivery are paid in full by The Flat Set. No freight fees or broker bills will ever be owed at delivery.</p>' +
         '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">2. 100-Night In-Home Trial & Donation Guarantee</h4>' +
         '  <p>From the date your 6 boxes arrive, you have 100 nights to live with the furniture. If you decide it does not suit your space, notify our concierge team. We coordinate free pickup by an accredited local housing charity and issue a 100% full refund upon donation confirmation.</p>' +
         '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">3. 5-Year Solid Oak Frame Warranty</h4>' +

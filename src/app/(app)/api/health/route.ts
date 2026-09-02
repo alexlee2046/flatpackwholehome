@@ -10,13 +10,13 @@ export async function GET() {
     const count = await payload.count({ collection: 'products', overrideAccess: true }).catch(() => null)
     return NextResponse.json({
       database: count !== null ? 'connected' : 'initializing',
-      service: 'moduliv-storefront',
+      service: 'theflatset-storefront',
       status: 'ready',
     })
   } catch {
     return NextResponse.json({
       database: 'pending',
-      service: 'moduliv-storefront',
+      service: 'theflatset-storefront',
       status: 'ready',
     })
   }

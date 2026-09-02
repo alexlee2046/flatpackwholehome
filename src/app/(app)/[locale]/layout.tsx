@@ -71,7 +71,6 @@ export default async function RootLayout({ children, params }: LayoutProps) {
     >
       <head>
         <link href="/vendor/fonts/fonts-a39f5c6f.css" rel="stylesheet" />
-        <link href="/vendor/fonts/fonts-ace2f763.css" rel="stylesheet" />
         <link href="/vendor/fonts/fonts-7cdb80a7.css" rel="stylesheet" />
         <link
           rel="icon"
@@ -150,14 +149,14 @@ export default async function RootLayout({ children, params }: LayoutProps) {
                   "base": "8px"
                 },
                 fontFamily: {
-                  "headline-md": ["Playfair Display"],
-                  "headline-lg-mobile": ["Playfair Display"],
-                  "headline-sm": ["Playfair Display"],
-                  "body-md": ["Plus Jakarta Sans"],
-                  "display-lg": ["Playfair Display"],
-                  "headline-lg": ["Playfair Display"],
-                  "body-lg": ["Plus Jakarta Sans"],
-                  "label-md": ["Plus Jakarta Sans"]
+                  "headline-md": ["Playfair Display", "Georgia", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "serif"],
+                  "headline-lg-mobile": ["Playfair Display", "Georgia", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "serif"],
+                  "headline-sm": ["Playfair Display", "Georgia", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "serif"],
+                  "body-md": ["Plus Jakarta Sans", "system-ui", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "sans-serif"],
+                  "display-lg": ["Playfair Display", "Georgia", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "serif"],
+                  "headline-lg": ["Playfair Display", "Georgia", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "serif"],
+                  "body-lg": ["Plus Jakarta Sans", "system-ui", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "sans-serif"],
+                  "label-md": ["Plus Jakarta Sans", "system-ui", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "sans-serif"]
                 },
                 fontSize: {
                   "headline-md": ["32px", { lineHeight: "1.3", fontWeight: "500" }],
@@ -190,6 +189,14 @@ export default async function RootLayout({ children, params }: LayoutProps) {
           .reveal--in { opacity: 1; transform: translateY(0); }
           .skip-link { position: absolute; left: -9999px; top: 0; z-index: 100; background: #8a4725; color: #fff; padding: 12px 20px; font: 600 14px 'Plus Jakarta Sans',sans-serif; }
           .skip-link:focus { left: 0; }
+          :is(html[lang^="zh"], html[lang="ja"], html[lang="ar"]) .font-label-md,
+          :is(html[lang^="zh"], html[lang="ja"], html[lang="ar"]) .tracking-wider,
+          :is(html[lang^="zh"], html[lang="ja"], html[lang="ar"]) .tracking-widest {
+            letter-spacing: normal;
+            text-transform: none;
+          }
+          html[lang="ar"] { line-height: 1.8; }
+          .latin-meta { letter-spacing: 0.05em; text-transform: uppercase; }
           @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto !important; }
             .reveal { opacity: 1; transform: none; transition: none; }

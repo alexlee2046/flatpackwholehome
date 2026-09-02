@@ -19,7 +19,7 @@ export const generateMeta = async ({
     return { robots: { follow: false, index: false } }
   }
 
-  const title = doc.meta?.title || doc.title || 'MODULIV'
+  const title = doc.meta?.title || doc.title || 'The Flat Set'
   const description = doc.meta?.description || undefined
   const media = typeof doc.meta?.image === 'object' ? doc.meta.image : null
   const imageURL = media?.url
@@ -32,7 +32,7 @@ export const generateMeta = async ({
     openGraph: {
       description,
       images: imageURL ? [{ alt: media?.alt || title, url: imageURL }] : undefined,
-      siteName: 'MODULIV',
+      siteName: 'The Flat Set',
       title,
       type: 'website',
       url: getAbsoluteLocaleURL(locale, pathname),
