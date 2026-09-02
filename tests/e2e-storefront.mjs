@@ -62,6 +62,11 @@ async function testPlaywright() {
       console.log('   Chinese Hero Heading:', zhHero?.trim());
     }
 
+    // 7. Test The Flat Set Brand Identity
+    console.log('7. Verifying The Flat Set Brand Identity in Header...');
+    const brandHeading = await page.locator('header a[aria-label="The Flat Set — Home"]').textContent();
+    console.log('   Header Brand:', brandHeading?.replace(/\s+/g, ' ').trim());
+
     console.log('\n Playwright Storefront E2E Test SUCCESSFUL!');
   } finally {
     await browser.close();

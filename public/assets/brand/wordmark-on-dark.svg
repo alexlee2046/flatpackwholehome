@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 185 30" width="185" height="30" fill="none" aria-label="The Flat Set (On Dark)">
+  <style>
+    .the-prefix { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: 14.5px; fill: #F9F8F6; letter-spacing: 0.04em; }
+    .flat-set { font-family: 'Playfair Display', Georgia, serif; font-style: normal; font-weight: 600; font-size: 24px; fill: #F9F8F6; letter-spacing: -0.02em; }
+  </style>
+  <text x="0" y="22">
+    <tspan class="the-prefix">The </tspan><tspan class="flat-set">Flat Set</tspan>
+  </text>
+</svg>

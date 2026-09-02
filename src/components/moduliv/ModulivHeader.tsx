@@ -8,12 +8,18 @@ export function ModulivHeader() {
   return (
     <header className="sticky top-0 z-50 w-full bg-surface/90 backdrop-blur-md border-b border-outline-variant/30">
       <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4 w-full px-margin-mobile md:px-margin-desktop py-3">
-        {/* Logo */}
+        {/* The Flat Set Wordmark */}
         <Link
-          className="font-headline-sm text-headline-sm tracking-tighter text-on-surface dark:text-surface-bright font-bold uppercase shrink-0"
+          className="group flex items-baseline gap-1.5 shrink-0 text-on-surface dark:text-surface-bright hover:opacity-85 transition-opacity"
           href="/"
+          aria-label="The Flat Set — Home"
         >
-          MODULIV
+          <span className="font-headline-md italic font-normal text-[17px] tracking-wider text-on-surface/80 dark:text-surface-dim">
+            The
+          </span>
+          <span className="font-headline-md font-semibold text-[23px] tracking-[-0.02em] text-on-surface dark:text-surface-bright">
+            Flat Set
+          </span>
         </Link>
 
         {/* Navigation */}

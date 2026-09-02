@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 36" width="110" height="36" fill="none" aria-label="The Flat Set (Stacked)">
+  <style>
+    .the-stacked { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: 13px; fill: #1A1C1D; letter-spacing: 0.05em; }
+    .flat-stacked { font-family: 'Playfair Display', Georgia, serif; font-style: normal; font-weight: 600; font-size: 21px; fill: #1A1C1D; letter-spacing: -0.02em; }
+  </style>
+  <text x="0" y="12" class="the-stacked">The</text>
+  <text x="0" y="32" class="flat-stacked">Flat Set</text>
+</svg>

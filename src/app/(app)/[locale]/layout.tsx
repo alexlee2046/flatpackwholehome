@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
     },
     title: {
       default: t('defaultTitle'),
-      template: '%s | MODULIV',
+      template: '%s | The Flat Set',
     },
     twitter: {
       card: 'summary_large_image',
@@ -76,7 +76,7 @@ export default async function RootLayout({ children, params }: LayoutProps) {
         <link
           rel="icon"
           type="image/svg+xml"
-          href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%238a4725'/%3E%3Cpath d='M14 46V18h8l10 15 10-15h8v28h-8V31L32 45 22 31v15z' fill='%23f9f9fa'/%3E%3C/svg%3E"
+          href="/assets/brand/favicon.svg"
         />
         <Script src="/vendor/tailwind.js" strategy="beforeInteractive" />
         <Script id="tailwind-config" strategy="beforeInteractive">{`

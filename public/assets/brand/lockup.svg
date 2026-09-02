@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 230 32" width="230" height="32" fill="none" aria-label="The Flat Set (Lockup)">
+  <style>
+    .the-prefix { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: 14.5px; fill: #1A1C1D; letter-spacing: 0.04em; }
+    .flat-set { font-family: 'Playfair Display', Georgia, serif; font-style: normal; font-weight: 600; font-size: 24px; fill: #1A1C1D; letter-spacing: -0.02em; }
+  </style>
+  <!-- Six Slabs Icon -->
+  <g transform="translate(0, 3)">
+    <rect x="0" y="0" width="26" height="2.5" fill="#1A1C1D" />
+    <rect x="0" y="5" width="26" height="2.5" fill="#1A1C1D" />
+    <rect x="0" y="10" width="26" height="2.5" fill="#1A1C1D" />
+    <rect x="0" y="15" width="26" height="2.5" fill="#1A1C1D" />
+    <rect x="0" y="20" width="26" height="2.5" fill="#1A1C1D" />
+    <rect x="0" y="25" width="24" height="2.5" fill="#1A1C1D" />
+  </g>
+  <!-- Wordmark -->
+  <text x="38" y="23">
+    <tspan class="the-prefix">The </tspan><tspan class="flat-set">Flat Set</tspan>
+  </text>
+</svg>

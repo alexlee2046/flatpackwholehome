@@ -19,7 +19,8 @@ HIW = "how-it-works-craft-logistics.html"
 
 # ordered: first match wins
 RULES = [
-    (r"^(MODULIV)$", HOME),                      # logo
+    (r"^(MODULIV|The Flat Set)$", HOME),                      # logo
+    (r"BRAND|VI|GUIDELINES", "brand.html"),
     (r"SWATCH", SWATCH),
     (r"HOW IT WORKS", HIW),
     (r"CRAFTSMANSHIP|JOURNEY", None),            # in-page sections, keep dead

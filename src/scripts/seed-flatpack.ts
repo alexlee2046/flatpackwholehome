@@ -212,12 +212,12 @@ export async function seedFlatpack(payload: Payload) {
     payload.updateGlobal({
       slug: 'site-settings',
       data: {
-        brandName: 'MODULIV',
+        brandName: 'The Flat Set',
         defaultCurrency: 'USD',
         defaultLocale: 'en',
         descriptor: 'Whole-home flat-pack Japandi furniture delivered in 6 flat boxes worldwide.',
         tagline: 'Your entire home. Delivered in 6 flat boxes.',
-        contactEmail: 'hello@moduliv.studio',
+        contactEmail: 'hello@theflatset.com',
       },
       overrideAccess: true,
     }),

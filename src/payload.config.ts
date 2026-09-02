@@ -44,9 +44,9 @@ export default buildConfig({
   admin: {
     meta: {
       icons: {
-        icon: '/favicon.ico',
+        icon: '/assets/brand/favicon.svg',
       },
-      titleSuffix: ' — MODULIV',
+      titleSuffix: ' — The Flat Set',
     },
     theme: 'light',
     user: Users.slug,

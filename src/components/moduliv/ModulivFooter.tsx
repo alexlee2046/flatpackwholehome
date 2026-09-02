@@ -8,13 +8,19 @@ export function ModulivFooter() {
     <footer className="bg-surface-container-low dark:bg-inverse-surface w-full px-margin-mobile md:px-margin-desktop py-16 md:py-section-gap flex flex-col md:flex-row justify-between items-start gap-gutter max-w-[1440px] mx-auto border-t border-outline-variant dark:border-outline flat no shadows mt-section-gap">
       <div className="flex flex-col gap-4">
         <Link
-          className="font-headline-sm text-headline-sm text-on-surface dark:text-surface-bright font-bold uppercase tracking-tighter"
+          className="group flex items-baseline gap-1.5 shrink-0 text-on-surface dark:text-surface-bright hover:opacity-85 transition-opacity"
           href="/"
+          aria-label="The Flat Set — Home"
         >
-          MODULIV
+          <span className="font-headline-md italic font-normal text-[17px] tracking-wider text-on-surface/80 dark:text-surface-dim">
+            The
+          </span>
+          <span className="font-headline-md font-semibold text-[23px] tracking-[-0.02em] text-on-surface dark:text-surface-bright">
+            Flat Set
+          </span>
         </Link>
         <p className="font-body-md text-body-md text-on-surface-variant dark:text-surface-dim">
-          © 2026 MODULIV / The Flat Set. Sustainably crafted. DDP Guaranteed.
+          © 2026 The Flat Set Inc. Sustainably crafted. DDP Guaranteed.
         </p>
         <p className="font-label-md text-[12px] tracking-widest uppercase text-outline mt-2">
           6 Boxes · 60 Minutes · 0 Screws · DDP Duties Included

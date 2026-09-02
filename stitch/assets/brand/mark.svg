@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" aria-label="The Flat Set  Six Slabs Icon">
+  <!-- The Flat Set: Six horizontal slabs representing the 6 flat boxes of a whole home -->
+  <rect x="6" y="8" width="52" height="4" fill="#1A1C1D" />
+  <rect x="6" y="17" width="52" height="4" fill="#1A1C1D" />
+  <rect x="6" y="26" width="52" height="4" fill="#1A1C1D" />
+  <rect x="6" y="35" width="52" height="4" fill="#1A1C1D" />
+  <rect x="6" y="44" width="52" height="4" fill="#1A1C1D" />
+  <!-- Bottom slab is 8% shorter, symbolizing the foundation box sliding into the home -->
+  <rect x="6" y="53" width="48" height="4" fill="#1A1C1D" />
+</svg>

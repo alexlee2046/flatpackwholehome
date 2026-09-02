@@ -27,7 +27,7 @@ export function buildPageMetadata({
     description,
     openGraph: {
       description,
-      siteName: 'MODULIV',
+      siteName: 'The Flat Set',
       title,
       type: 'website',
       url,

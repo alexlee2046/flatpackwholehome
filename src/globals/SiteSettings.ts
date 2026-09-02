@@ -5,7 +5,7 @@ export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
   access: { read: () => true, update: adminOnly },
   fields: [
-    { name: 'brandName', type: 'text', defaultValue: 'MODULIV', required: true },
+    { name: 'brandName', type: 'text', defaultValue: 'The Flat Set', required: true },
     {
       name: 'descriptor',
       type: 'text',
@@ -27,7 +27,7 @@ export const SiteSettings: GlobalConfig = {
       defaultValue: 'USD',
       options: ['USD', 'EUR', 'GBP', 'CNY', 'CAD', 'AUD'],
     },
-    { name: 'contactEmail', type: 'email', defaultValue: 'hello@moduliv.studio' },
+    { name: 'contactEmail', type: 'email', defaultValue: 'hello@theflatset.com' },
   ],
   versions: {
     drafts: { autosave: true },
