@@ -1,9 +1,12 @@
 'use client'
 
 import { Link } from '@/i18n/navigation'
+import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
 export function SwatchView() {
+  const t = useTranslations('Swatch')
+  const tCommon = useTranslations('Common')
   const [formData, setFormData] = useState({
     address: '',
     city: '',
@@ -19,7 +22,7 @@ export function SwatchView() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.name || !formData.email || !formData.address || !formData.city || !formData.postal) {
-      setErrorMsg('Please complete all required fields.')
+      setErrorMsg(t('requiredError'))
       return
     }
     setErrorMsg('')
@@ -58,29 +61,29 @@ export function SwatchView() {
     >
       <nav className="flex items-center gap-2 text-sm font-label-md text-on-surface-variant mb-8">
         <Link className="hover:text-primary transition-colors" href="/">
-          Home
+          {tCommon('home')}
         </Link>
         <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-        <span className="text-on-surface font-medium">Free Swatch Box</span>
+        <span className="text-on-surface font-medium">{t('breadcrumb')}</span>
       </nav>
 
       {/* Hero */}
       <section className="mb-section-gap grid grid-cols-1 lg:grid-cols-2 gap-gutter items-center">
         <div>
           <span className="block font-label-md text-label-md text-primary tracking-[0.1em] uppercase mb-4">
-            DISCOVERY KIT
+            {t('discoveryKit')}
           </span>
           <h1 className="font-headline-lg text-[36px] md:text-[56px] leading-[1.1] text-on-surface mb-6">
-            Feel the Fabric in Your Living Light.
+            {t('heroTitle')}
           </h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant mb-8">
-            Touch every weave, compare high-resilience foam densities, and inspect solid oak finishes in your own home lighting before ordering. Ships free with a $50 voucher card inside the lid.
+            {t('heroSubtitle')}
           </p>
           <a
             className="inline-flex bg-on-background text-on-primary font-label-md text-label-md uppercase tracking-wider px-8 py-4 rounded-full hover:bg-primary transition-colors"
             href="#swatch-order"
           >
-            Order My Free Swatch Box
+            {t('orderButton')}
           </a>
         </div>
         <div className="aspect-[4/3] bg-surface-container rounded-2xl overflow-hidden shadow-sm">
@@ -100,24 +103,24 @@ export function SwatchView() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-gutter items-start">
           <div className="flex flex-col gap-5">
             <span className="font-label-md text-label-md uppercase tracking-wider text-primary">
-              ORDER THE FREE BOX
+              {t('orderEyebrow')}
             </span>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface">Reserve Your Swatch Box.</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface">{t('reserveTitle')}</h2>
             <p className="font-body-lg text-body-lg text-on-surface-variant">
-              One form, flat $5 express shipping, zero follow-up calls. Your box leaves the studio within 48 hours and reaches most doors in 7–10 days — with a $50 voucher printed inside the lid.
+              {t('reserveSubtitle')}
             </p>
             <ul className="font-body-md text-body-md text-on-surface-variant flex flex-col gap-3 mt-2">
               <li className="flex items-start gap-3">
                 <span className="material-symbols-outlined text-primary mt-0.5">check_circle</span>
-                4 full-weave fabric swatches, 2 foam-density slices, oak & walnut chips.
+                {t('trustItem1')}
               </li>
               <li className="flex items-start gap-3">
                 <span className="material-symbols-outlined text-primary mt-0.5">check_circle</span>
-                $50 voucher toward any sofa, bed or bundle — valid 60 days.
+                {t('trustItem2')}
               </li>
               <li className="flex items-start gap-3">
                 <span className="material-symbols-outlined text-primary mt-0.5">check_circle</span>
-                One box per household; decide in your own light, not a showroom’s.
+                {t('trustItem3')}
               </li>
             </ul>
           </div>
@@ -130,20 +133,20 @@ export function SwatchView() {
               >
                 <span className="material-symbols-outlined text-primary text-[40px]">check_circle</span>
                 <h3 className="font-headline-md text-headline-md text-on-surface">
-                  Your swatch box is reserved.
+                  {t('reservedTitle')}
                 </h3>
                 <p className="font-body-md text-body-md text-on-surface-variant">
-                  It leaves the workshop within 48 hours. Inside the lid you’ll find your $50 voucher card — valid 60 days toward any furniture order, on top of Move-In Bundle pricing.
+                  {t('reservedDesc')}
                 </p>
                 <p className="font-body-md text-sm text-primary flex items-center gap-2">
                   <span className="material-symbols-outlined text-[18px]">redeem</span>
-                  Voucher code: SWATCH50
+                  {t('voucherCode')}
                 </p>
                 <Link
                   className="bg-on-background text-on-primary font-label-md text-label-md uppercase tracking-wider px-8 py-3.5 rounded-full hover:bg-primary transition-colors mt-4 inline-flex items-center"
                   href="/cart"
                 >
-                  Go to Cart
+                  {t('goToCart')}
                 </Link>
               </div>
             ) : (
@@ -151,11 +154,11 @@ export function SwatchView() {
                 className="bg-surface-container-lowest border border-outline-variant/50 p-6 md:p-8 flex flex-col gap-5 rounded-xl"
                 onSubmit={handleSubmit}
               >
-                <h3 className="font-headline-sm text-headline-sm text-on-surface">Delivery details</h3>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">{t('formTitle')}</h3>
                 {errorMsg && <p className="text-sm text-error">{errorMsg}</p>}
                 <div>
                   <label className="font-label-md text-label-md text-on-surface block mb-2" htmlFor="sf-name">
-                    Full name *
+                    {t('fullName')}
                   </label>
                   <input
                     className="w-full px-4 py-3 font-body-md text-sm border border-outline-variant/60 rounded bg-surface"
@@ -169,7 +172,7 @@ export function SwatchView() {
                 </div>
                 <div>
                   <label className="font-label-md text-label-md text-on-surface block mb-2" htmlFor="sf-email">
-                    Email *
+                    {t('email')}
                   </label>
                   <input
                     className="w-full px-4 py-3 font-body-md text-sm border border-outline-variant/60 rounded bg-surface"
@@ -183,7 +186,7 @@ export function SwatchView() {
                 </div>
                 <div>
                   <label className="font-label-md text-label-md text-on-surface block mb-2" htmlFor="sf-address">
-                    Street address *
+                    {t('streetAddress')}
                   </label>
                   <input
                     className="w-full px-4 py-3 font-body-md text-sm border border-outline-variant/60 rounded bg-surface"
@@ -198,7 +201,7 @@ export function SwatchView() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="font-label-md text-label-md text-on-surface block mb-2" htmlFor="sf-city">
-                      City *
+                      {t('city')}
                     </label>
                     <input
                       className="w-full px-4 py-3 font-body-md text-sm border border-outline-variant/60 rounded bg-surface"
@@ -212,7 +215,7 @@ export function SwatchView() {
                   </div>
                   <div>
                     <label className="font-label-md text-label-md text-on-surface block mb-2" htmlFor="sf-zip">
-                      Postal code *
+                      {t('postalCode')}
                     </label>
                     <input
                       className="w-full px-4 py-3 font-body-md text-sm border border-outline-variant/60 rounded bg-surface"
@@ -231,10 +234,10 @@ export function SwatchView() {
                   className="bg-on-background text-on-primary font-label-md text-label-md uppercase tracking-wider px-8 py-4 rounded-full hover:bg-primary transition-colors mt-2 cursor-pointer disabled:opacity-50"
                   type="submit"
                 >
-                  {isLoading ? 'Processing Request...' : 'Order My Free Swatch Box — Free DDP Delivery'}
+                  {isLoading ? t('processing') : t('submitButton')}
                 </button>
                 <p className="font-body-md text-[13px] text-on-surface-variant">
-                  Delivered straight to your door with 4 curated fabrics and a $50 voucher card inside.
+                  {t('deliveryNote')}
                 </p>
               </form>
             )}

@@ -12,6 +12,7 @@ const THUMBS: Record<string, string> = {
 
 export function CartView() {
   const t = useTranslations('Transaction')
+  const tCommon = useTranslations('Common')
   const [items, setItems] = useState<any[]>([])
   const [promoCode, setPromoCode] = useState('')
   const [promoMessage, setPromoMessage] = useState<{ text: string; type: 'error' | 'success' } | null>(
@@ -74,7 +75,7 @@ export function CartView() {
       setVoucherApplied(true)
       localStorage.setItem('moduliv-voucher-applied', '1')
       setPromoMessage({
-        text: `Code ${trimmed} applied successfully (−$50.00)`,
+        text: t('promoSuccess', { amount: '50.00', code: trimmed }),
         type: 'success',
       })
     } else {
@@ -113,7 +114,7 @@ export function CartView() {
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-2 text-sm font-label-md text-on-surface-variant mb-8">
         <Link className="hover:text-primary transition-colors" href="/">
-          Home
+          {tCommon('home')}
         </Link>
         <span className="material-symbols-outlined text-[16px]">chevron_right</span>
         <span className="text-on-surface font-medium">{t('cartTitle')}</span>
@@ -133,26 +134,26 @@ export function CartView() {
             <span className="material-symbols-outlined text-[36px] text-primary">check_circle</span>
           </span>
           <h2 className="font-headline-md text-headline-md text-on-surface mb-2">
-            Order confirmed — DDP delivery scheduled.
+            {t('orderConfirmed')}
           </h2>
           <p className="font-body-md text-body-md text-on-surface-variant max-w-lg mx-auto">
-            Your pieces will enter our precision workshop within 48 hours, freshly compressed and packaged into standard courier flat boxes. Delivered DDP to your door with 0 screws and 100 nights in-home trial.
+            {t('orderConfirmedDesc')}
           </p>
           <p className="font-label-md text-label-md uppercase tracking-wider text-primary mt-6 mb-8">
-            Order ref: <span id="order-ref">{orderRef}</span>
+            {t('orderRef')} <span id="order-ref">{orderRef}</span>
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
               className="bg-on-background text-on-primary py-4 px-8 font-label-md text-label-md uppercase hover:bg-surface-tint transition-colors duration-300 inline-flex items-center justify-center rounded-full"
               href="/"
             >
-              Back to Homepage
+              {t('backHome')}
             </Link>
             <Link
               className="border border-on-background text-on-background py-4 px-8 font-label-md text-label-md uppercase hover:bg-surface-container-low transition-colors duration-300 inline-flex items-center justify-center rounded-full"
               href="/how-it-works-craft-logistics"
             >
-              See What Happens Next
+              {t('seeNext')}
             </Link>
           </div>
         </section>
@@ -177,7 +178,7 @@ export function CartView() {
               className="border border-on-background text-on-background py-4 px-8 font-label-md text-label-md uppercase hover:bg-surface-container-low transition-colors duration-300 inline-flex items-center justify-center rounded-full"
               href="/products/modusofa"
             >
-              Explore ModuSofa
+              {t('exploreModusofa')}
             </Link>
           </div>
         </section>
@@ -209,7 +210,7 @@ export function CartView() {
                   <div className="flex items-center gap-5 mt-4">
                     <div className="inline-flex items-center border border-outline-variant rounded">
                       <button
-                        aria-label="Decrease quantity"
+                        aria-label={t('decreaseQuantity')}
                         className="w-9 h-9 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
                         onClick={() => updateQuantity(idx, -1)}
                         type="button"
@@ -220,7 +221,7 @@ export function CartView() {
                         {it.qty}
                       </span>
                       <button
-                        aria-label="Increase quantity"
+                        aria-label={t('increaseQuantity')}
                         className="w-9 h-9 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
                         onClick={() => updateQuantity(idx, 1)}
                         type="button"
@@ -233,7 +234,7 @@ export function CartView() {
                       onClick={() => removeItem(idx)}
                       type="button"
                     >
-                      Remove
+                      {t('remove')}
                     </button>
                   </div>
                 </div>
@@ -257,12 +258,12 @@ export function CartView() {
               {voucherApplied && (
                 <div className="flex justify-between gap-4 items-center border border-primary/30 bg-primary-fixed/20 px-3 py-2 rounded">
                   <dt className="text-on-surface">
-                    Voucher <span className="font-label-md text-[12px] uppercase tracking-wider text-primary">SWATCH50</span>
+                    {t('voucher')} <span className="font-label-md text-[12px] uppercase tracking-wider text-primary">SWATCH50</span>
                   </dt>
                   <dd className="flex items-center gap-3">
                     <span className="text-primary font-medium">−$50.00</span>
                     <button
-                      aria-label="Remove voucher"
+                      aria-label={t('removeVoucher')}
                       className="text-on-surface-variant hover:text-error transition-colors cursor-pointer"
                       onClick={handleRemoveVoucher}
                       type="button"

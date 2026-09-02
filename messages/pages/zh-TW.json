@@ -12,29 +12,111 @@
     "stat2Number": "60",
     "stat2Label": "分鐘免工具徒手拼裝",
     "stat3Number": "100",
-    "stat3Label": "天全屋試用退換保障"
+    "stat3Label": "天全屋試用退換保障",
+    "ctaSave": "立省 $395",
+    "ctaFree": "$0 免費",
+    "statHomesNumber": "12,000+",
+    "statHomesLabel": "自 2023 年起已裝配的家庭",
+    "statReviewsNumber": "4.8 / 5",
+    "statReviewsLabel": "3,148 則真實認證評價",
+    "statAssemblyNumber": "58 分鐘",
+    "statAssemblyLabel": "單人全套完整組裝中位用時",
+    "statTrialNumber": "100 天",
+    "statTrialLabel": "無憂試用體驗期",
+    "quote1Text": "“這是第一套既尊重你的牆壁、又尊重你週末時光的扁平化家具。”",
+    "quote1Author": "— 《寧靜家居雜誌》 (The Calm Home Journal)",
+    "quote2Text": "“裝在紙箱裡的日式侘寂之美。我們實測了 60 分鐘組裝宣稱，完全屬實。”",
+    "quote2Author": "— 《形態與功能》 (Form & Function)",
+    "quote3Text": "“六個箱子、一杯咖啡、零顆多餘螺絲。不留一件累贅，正是它的靈魂。”",
+    "quote3Author": "— 《居住季刊》 (Dwelling Quarterly)",
+    "comparisonEyebrow": "為什麼選擇 THE FLAT SET",
+    "comparisonTitle": "享受扁平包裝的便捷，告別廉價拼裝的妥協。",
+    "comparisonSubtitle": "傳統家具為賣場陳列而生，我們的家具專為窄樓梯、輕鬆週末以及日常真實生活而設計。",
+    "comparisonColFlatSet": "The Flat Set 模組整裝",
+    "comparisonColTraditional": "傳統賣場展廳家具",
+    "rowAssemblyLabel": "組裝體驗",
+    "rowAssemblyFlatSet": "免工具精密暗榫自鎖卡扣。單人約 60 分鐘即可搞定一居室整套全套家具。",
+    "rowAssemblyTraditional": "拿著內六角扳手折騰一整個下午，或者額外花 $200+ 請人上門安裝。",
+    "rowLeadTimeLabel": "交付週期",
+    "rowLeadTimeFlatSet": "接單按需精工打造，48 小時內發貨，14–18 天直送入戶。",
+    "rowLeadTimeTraditional": "漫長的 6–12 週缺貨等待，還經常附帶“運輸途中延誤”通知。",
+    "rowFreshnessLabel": "材料新鮮度",
+    "rowFreshnessFlatSet": "高回彈海綿定型固化當天即真空壓縮密封，杜絕長期受潮老化。",
+    "rowFreshnessTraditional": "坐墊在倉庫貨架或集裝箱積壓數月，彈性大幅折損。",
+    "rowPriceLabel": "價格透明度",
+    "rowPriceFlatSet": "$1,499 包攬全套 6 件核心家具。DDP 完稅直達，關稅與運費全包。",
+    "rowPriceTraditional": "結帳後再追加昂貴的大件海運費、進口關稅與搬運上樓服務費。",
+    "bundleEyebrow": "一站式全屋方案",
+    "bundleTitle": "一居室全套家具解決方案",
+    "bundleSubtitle": "三人沙發、原木茶几、長凳、雙人床架、床頭櫃與儲物單元 — 以和諧一體的白橡木日式極簡美學協同共生。",
+    "bundleCta": "定制一居室全套方案"
   },
   "KitBuilder": {
     "title": "一居室全套定制器",
-    "subtitle": "自由挑选空间配置，包装箱清单与参数实时联动更新。",
+    "subtitle": "自由挑選空間配置，包裝箱清單與參數即時連動更新。",
     "fullHome": "全套一居室方案",
-    "living": "客厅套装",
-    "bedroom": "卧室套装"
+    "living": "客廳套裝",
+    "bedroom": "臥室套裝",
+    "headerEyebrow": "一鍵搞定全屋家具",
+    "roomView": "空間視角",
+    "whatsInSixBoxes": "6 個包裝箱內含物品",
+    "boxNum": "第 {number} 箱",
+    "step1": "步驟 01",
+    "upholsteryFabric": "面料軟包挑選",
+    "step2": "步驟 02",
+    "woodFinish": "實木工藝",
+    "step3": "步驟 03",
+    "bedFrameSize": "床架規格",
+    "queen": "Queen 標準雙人",
+    "included": "已包含",
+    "king": "King 加大雙人",
+    "kingUpgrade": "+$150.00",
+    "step4": "步驟 04",
+    "curatedAddons": "精選搭配升級",
+    "mattressTitle": "雲端混合彈簧床墊",
+    "mattressPrice": "+$399.00",
+    "mattressDesc": "10 英寸厚度頂級記憶海綿與獨立袋裝彈簧複合。專屬扁平箱獨立真空包裝。",
+    "notReadyTitle": "還沒決定好？",
+    "notReadyDesc": "先申領一套免費實物面料樣板盒，在家中實際光線下親身體驗材質質感。",
+    "orderFreeSwatches": "申領免費樣板盒",
+    "zeroScrews": "0 顆螺絲 · 0 組裝工具",
+    "trial": "100 天安心試用",
+    "dutiesIncluded": "DDP 關稅與送貨全包",
+    "retailPrice": "傳統單買零售價 $1,894.00",
+    "saveBadge": "立省 $395",
+    "deliveryNotice": "{count} 箱 · DDP 門到門完稅交付全包（48小時內發貨）",
+    "orderSwatchesFirst": "先免費領面料樣板盒",
+    "addedOpeningCart": "✓ 已加入 — 正在打開購物車…",
+    "addToCartButton": "加入購物車 · {space}（共 {count} 箱）",
+    "fabrics": {
+      "corduroy": "焦糖燈芯絨",
+      "boucle": "燕麥奶白顆粒絨",
+      "chenille": "橄欖綠雪尼爾",
+      "techGrey": "冷調科技灰"
+    },
+    "boxes": {
+      "b1": "沙發底座",
+      "b2": "沙發靠背",
+      "b3": "原木茶几",
+      "b4": "電視機櫃",
+      "b5": "Snap 床架",
+      "b6": "2x 懸浮床頭櫃"
+    }
   },
   "FAQ": {
-    "title": "常见问题解答",
-    "subtitle": "物流时效、免工具拼装、100 天退换、DDP 关税及 $50 抵用券使用规则完整解答。"
+    "title": "常見問題解答",
+    "subtitle": "物流時效、免工具拼裝、100 天退換、DDP 關稅及 $50 抵用券使用規則完整解答。"
   },
   "Cart": {
-    "title": "购物车",
-    "subtitle": "所有标价均含 DDP 门到门完税交付 — 关税税费全包，送货上门无二次收费。"
+    "title": "購物車",
+    "subtitle": "所有標價均含 DDP 門到門完稅交付 — 關稅稅費全包，送貨上門無二次收費。"
   },
   "Swatch": {
-    "title": "免费面料样板盒",
-    "subtitle": "在家居真实光线下感受面料肌理、回弹海绵密度与实木色泽，内附 $50 购车抵用券。"
+    "title": "免費面料樣板盒",
+    "subtitle": "在家居真實光線下感受面料肌理、回彈海綿密度與實木色澤，內附 $50 購車抵用券。"
   },
   "HowItWorks": {
-    "title": "精密工艺与跨洋速递的融合",
-    "subtitle": "从零浪费工坊数控 CNC 雕琢白橡木，到 14-18 天直达您的客厅。"
+    "title": "精密工藝與跨洋速遞的融合",
+    "subtitle": "從零浪費工坊數控 CNC 雕琢白橡木，到 14-18 天直達您的客廳。"
   }
 }

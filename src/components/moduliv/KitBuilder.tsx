@@ -53,6 +53,13 @@ const BOX_LIST = [
   { id: 'b6', img: '/assets/1-bedroom-kit-builder/d66ddc7ba1.png', name: '2x Nightstands', num: 'Box 6' },
 ]
 
+const FABRIC_ITEMS = [
+  { id: 'boucle', img: '/assets/1-bedroom-kit-builder/ec621fdd7b.png', label: 'Cream Bouclé' },
+  { id: 'corduroy', img: '/assets/1-bedroom-kit-builder/42c66f93ee.png', label: 'Caramel Corduroy' },
+  { id: 'chenille', img: '/assets/1-bedroom-kit-builder/359e11ad79.png', label: 'Olive Chenille' },
+  { id: 'techGrey', img: '/assets/1-bedroom-kit-builder/13266a8714.png', label: 'Tech Grey' },
+]
+
 export type KitBuilderProductData = {
   assemblyMinutes?: number | null
   boxBreakdown?: Array<{
@@ -137,7 +144,7 @@ export function KitBuilder({
       alt: SPACES.bedroom.alt,
       boxes: ['b5', 'b6'],
       caption: spaceBedroomDoc?.intro || SPACES.bedroom.caption,
-      cta: spaceBedroomDoc?.title || tKit('bedroom') || 'Bedroom Set',
+      cta: spaceBedroomDoc?.title || tKit('bedroom'),
       img:
         (typeof spaceBedroomDoc?.hero === 'object' && spaceBedroomDoc?.hero?.url) ||
         (typeof spaceBedroomDoc?.hero === 'string' && spaceBedroomDoc.hero) ||
@@ -148,7 +155,7 @@ export function KitBuilder({
       alt: SPACES.full.alt,
       boxes: ['b1', 'b2', 'b3', 'b4', 'b5', 'b6'],
       caption: spaceWholeHome?.intro || SPACES.full.caption,
-      cta: spaceWholeHome?.title || tKit('fullHome') || 'Full Bundle',
+      cta: spaceWholeHome?.title || tKit('fullHome'),
       img:
         (typeof spaceWholeHome?.hero === 'object' && spaceWholeHome?.hero?.url) ||
         (typeof spaceWholeHome?.hero === 'string' && spaceWholeHome.hero) ||
@@ -159,7 +166,7 @@ export function KitBuilder({
       alt: SPACES.living.alt,
       boxes: ['b1', 'b2'],
       caption: spaceLivingDoc?.intro || SPACES.living.caption,
-      cta: spaceLivingDoc?.title || tKit('living') || 'Living Set',
+      cta: spaceLivingDoc?.title || tKit('living'),
       img:
         (typeof spaceLivingDoc?.hero === 'object' && spaceLivingDoc?.hero?.url) ||
         (typeof spaceLivingDoc?.hero === 'string' && spaceLivingDoc.hero) ||
@@ -177,9 +184,10 @@ export function KitBuilder({
 
   const resolvedBoxList = BOX_LIST.map((b) => {
     const cmsBox = boxBreakdownMap.get(b.id)
+    const fallbackName = tKit.has(`boxes.${b.id}`) ? tKit(`boxes.${b.id}`) : b.name
     return {
       ...b,
-      name: cmsBox?.title || b.name,
+      name: cmsBox?.title || fallbackName,
       description: cmsBox?.description || undefined,
     }
   })
@@ -192,8 +200,8 @@ export function KitBuilder({
 
   const handleAddToCart = () => {
     const variantParts = [fabric, wood]
-    if (!isLiving) variantParts.push(bed === 'king' ? 'King Bed (+$150)' : 'Queen Bed')
-    if (!isLiving && hasMattress) variantParts.push('Cloud Hybrid Mattress (+$399)')
+    if (!isLiving) variantParts.push(bed === 'king' ? `King Bed (${tKit('kingUpgrade')})` : tKit('queen'))
+    if (!isLiving && hasMattress) variantParts.push(`${tKit('mattressTitle')} (${tKit('mattressPrice')})`)
 
     if (typeof window !== 'undefined' && (window as any).modulivCart) {
       ;(window as any).modulivCart.add(1, {
@@ -223,7 +231,7 @@ export function KitBuilder({
         {/* Breadcrumbs */}
         <nav className="flex items-center text-sm font-label-md text-on-surface-variant mb-8 gap-2">
           <Link className="hover:text-primary transition-colors" href="/">
-            Home
+            {tCommon('home')}
           </Link>
           <span className="material-symbols-outlined text-[16px]">chevron_right</span>
           <span className="text-on-surface font-medium">{tKit('title')}</span>
@@ -232,7 +240,7 @@ export function KitBuilder({
         {/* Header */}
         <header className="mb-12 max-w-3xl">
           <span className="block font-label-md text-label-md text-primary tracking-[0.1em] uppercase mb-4">
-            FURNISH YOUR WHOLE HOME IN ONE CLICK
+            {tKit('headerEyebrow')}
           </span>
           <h1 className="font-display-lg text-[36px] leading-[1.15] md:text-[64px] md:leading-[1.1] text-on-surface mb-6">
             {bundleProduct?.title || tKit('title')}
@@ -258,7 +266,7 @@ export function KitBuilder({
               />
               {/* Space Toggles */}
               <div
-                aria-label="Room view"
+                aria-label={tKit('roomView')}
                 className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md rounded-full p-1.5 flex shadow-sm border border-outline-variant/30 z-10"
                 role="group"
               >
@@ -287,13 +295,13 @@ export function KitBuilder({
             {/* Boxes Strip */}
             <div className="flex flex-col gap-3">
               <h2 className="font-headline-sm text-headline-sm text-on-surface">
-                What&apos;s in the 6 Boxes
+                {tKit('whatsInSixBoxes')}
               </h2>
               <p aria-live="polite" className="font-body-md text-sm text-on-surface-variant">
                 {currentSpace.caption}
               </p>
               <div className="flex gap-4 overflow-x-auto pb-4 -mx-margin-mobile px-margin-mobile md:mx-0 md:px-0">
-                {resolvedBoxList.map((b) => {
+                {resolvedBoxList.map((b, idx) => {
                   const included = currentSpace.boxes.includes(b.id)
                   return (
                     <div
@@ -313,7 +321,7 @@ export function KitBuilder({
                       </div>
                       <div className="flex flex-col">
                         <span className="font-label-md text-[11px] text-on-surface-variant uppercase">
-                          {b.num}
+                          {tKit('boxNum', { number: idx + 1 })}
                         </span>
                         <span className="font-body-md text-sm text-on-surface">{b.name}</span>
                         {b.description && (
@@ -336,20 +344,16 @@ export function KitBuilder({
               <div className="flex justify-between items-end mb-6">
                 <div>
                   <span className="font-label-md text-[12px] text-primary uppercase tracking-widest mb-1 block">
-                    Step 01
+                    {tKit('step1')}
                   </span>
-                  <h2 className="font-headline-md text-[28px] text-on-surface">Upholstery Fabric</h2>
+                  <h2 className="font-headline-md text-[28px] text-on-surface">{tKit('upholsteryFabric')}</h2>
                 </div>
                 <span className="font-body-md text-sm text-on-surface-variant">{fabric}</span>
               </div>
               <div className="grid grid-cols-4 gap-4">
-                {[
-                  { label: 'Cream Bouclé', img: '/assets/1-bedroom-kit-builder/ec621fdd7b.png' },
-                  { label: 'Caramel Corduroy', img: '/assets/1-bedroom-kit-builder/42c66f93ee.png' },
-                  { label: 'Olive Chenille', img: '/assets/1-bedroom-kit-builder/359e11ad79.png' },
-                  { label: 'Tech Grey', img: '/assets/1-bedroom-kit-builder/13266a8714.png' },
-                ].map((item) => {
+                {FABRIC_ITEMS.map((item) => {
                   const sel = fabric === item.label
+                  const fabLabel = tKit.has(`fabrics.${item.id}`) ? tKit(`fabrics.${item.id}`) : item.label
                   return (
                     <button
                       aria-pressed={sel}
@@ -369,7 +373,7 @@ export function KitBuilder({
                         />
                       </div>
                       <span className="font-body-md text-[13px] text-on-surface-variant text-center">
-                        {item.label}
+                        {fabLabel}
                       </span>
                     </button>
                   )
@@ -382,9 +386,9 @@ export function KitBuilder({
               <div className="flex justify-between items-end mb-6">
                 <div>
                   <span className="font-label-md text-[12px] text-primary uppercase tracking-widest mb-1 block">
-                    Step 02
+                    {tKit('step2')}
                   </span>
-                  <h2 className="font-headline-md text-[28px] text-on-surface">Wood Finish</h2>
+                  <h2 className="font-headline-md text-[28px] text-on-surface">{tKit('woodFinish')}</h2>
                 </div>
                 <span className="font-body-md text-sm text-on-surface-variant">{wood}</span>
               </div>
@@ -430,9 +434,9 @@ export function KitBuilder({
                 <div className="flex justify-between items-end mb-6">
                   <div>
                     <span className="font-label-md text-[12px] text-primary uppercase tracking-widest mb-1 block">
-                      Step 03
+                      {tKit('step3')}
                     </span>
-                    <h2 className="font-headline-md text-[28px] text-on-surface">Bed Frame Size</h2>
+                    <h2 className="font-headline-md text-[28px] text-on-surface">{tKit('bedFrameSize')}</h2>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -446,8 +450,8 @@ export function KitBuilder({
                     onClick={() => setBed('queen')}
                     type="button"
                   >
-                    <span className="font-medium text-lg">Queen</span>
-                    <span className="text-[13px] text-on-surface-variant">Included</span>
+                    <span className="font-medium text-lg">{tKit('queen')}</span>
+                    <span className="text-[13px] text-on-surface-variant">{tKit('included')}</span>
                   </button>
                   <button
                     aria-pressed={bed === 'king'}
@@ -459,8 +463,8 @@ export function KitBuilder({
                     onClick={() => setBed('king')}
                     type="button"
                   >
-                    <span className="font-medium text-lg">King</span>
-                    <span className="text-[13px] text-on-surface-variant">+$150.00</span>
+                    <span className="font-medium text-lg">{tKit('king')}</span>
+                    <span className="text-[13px] text-on-surface-variant">{tKit('kingUpgrade')}</span>
                   </button>
                 </div>
               </section>
@@ -471,9 +475,9 @@ export function KitBuilder({
               <div className="flex justify-between items-end mb-6">
                 <div>
                   <span className="font-label-md text-[12px] text-primary uppercase tracking-widest mb-1 block">
-                    Step 04
+                    {tKit('step4')}
                   </span>
-                  <h2 className="font-headline-md text-[28px] text-on-surface">Curated Add-ons</h2>
+                  <h2 className="font-headline-md text-[28px] text-on-surface">{tKit('curatedAddons')}</h2>
                 </div>
               </div>
               <div className="flex flex-col gap-4">
@@ -491,12 +495,12 @@ export function KitBuilder({
                     <div className="flex-1">
                       <div className="flex justify-between items-center mb-1">
                         <span className="font-body-md font-medium text-on-surface text-[16px]">
-                          Cloud Hybrid Mattress
+                          {tKit('mattressTitle')}
                         </span>
-                        <span className="font-body-md text-on-surface">+$399.00</span>
+                        <span className="font-body-md text-on-surface">{tKit('mattressPrice')}</span>
                       </div>
                       <p className="font-body-md text-sm text-on-surface-variant pr-8">
-                        10-inch premium memory foam and pocket spring hybrid. Ships compressed in its own box.
+                        {tKit('mattressDesc')}
                       </p>
                     </div>
                   </label>
@@ -509,17 +513,17 @@ export function KitBuilder({
                   <div className="flex-1">
                     <div className="flex justify-between items-center mb-1">
                       <span className="font-body-md font-medium text-on-surface text-[16px]">
-                        Not ready to commit?
+                        {tKit('notReadyTitle')}
                       </span>
                     </div>
                     <p className="font-body-md text-sm text-on-surface-variant mb-3">
-                      Order a free physical swatch box to feel the fabrics in your home lighting before purchasing.
+                      {tKit('notReadyDesc')}
                     </p>
                     <Link
                       className="font-label-md text-[13px] text-primary uppercase tracking-wider underline hover:text-on-surface transition-colors"
                       href="/free-swatch-box-material-discovery"
                     >
-                      Order Free Swatches
+                      {tKit('orderFreeSwatches')}
                     </Link>
                   </div>
                 </div>
@@ -530,15 +534,15 @@ export function KitBuilder({
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2 pb-4 text-on-surface-variant">
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
                 <span className="material-symbols-outlined text-[16px] text-primary">handyman</span>
-                0 Screws · 0 Tools
+                {tKit('zeroScrews')}
               </span>
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
                 <span className="material-symbols-outlined text-[16px] text-primary">nights_stay</span>
-                100-Night Trial
+                {tKit('trial')}
               </span>
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
                 <span className="material-symbols-outlined text-[16px] text-primary">local_shipping</span>
-                DDP Duties Included
+                {tKit('dutiesIncluded')}
               </span>
             </div>
           </div>
@@ -556,10 +560,10 @@ export function KitBuilder({
               {space === 'full' && (
                 <>
                   <span className="font-body-md text-sm text-on-surface-variant line-through mb-1 hidden sm:inline">
-                    Retail $1,894.00
+                    {tKit('retailPrice')}
                   </span>
                   <span className="font-label-md text-xs text-primary bg-primary-fixed/30 px-2 py-0.5 rounded-full mb-1.5 ml-2">
-                    Save $395
+                    {tKit('saveBadge')}
                   </span>
                 </>
               )}
@@ -567,7 +571,7 @@ export function KitBuilder({
             <div className="flex items-center gap-1.5 mt-1 text-on-surface-variant">
               <span className="material-symbols-outlined text-[16px]">local_shipping</span>
               <span className="font-body-md text-[13px]">
-                {currentSpace.boxes.length} boxes · DDP Doorstep Delivery Included (Ships in 48h)
+                {tKit('deliveryNotice', { count: currentSpace.boxes.length })}
               </span>
             </div>
           </div>
@@ -576,7 +580,7 @@ export function KitBuilder({
               className="px-6 py-4 rounded-full border border-on-surface text-on-surface font-label-md text-sm uppercase tracking-wider hover:bg-on-background hover:text-on-primary transition-colors text-center"
               href="/free-swatch-box-material-discovery"
             >
-              Order Free Swatches First
+              {tKit('orderSwatchesFirst')}
             </Link>
             <button
               className="px-8 py-4 rounded-full bg-on-surface text-on-primary font-label-md text-sm uppercase tracking-wider hover:bg-primary transition-colors flex justify-center items-center gap-2 cursor-pointer disabled:opacity-75"
@@ -587,8 +591,8 @@ export function KitBuilder({
             >
               <span>
                 {isAdded
-                  ? `✓ ${tCommon('added')} — Opening Cart…`
-                  : `${tCommon('addToCart')} · ${currentSpace.cta} (${currentSpace.boxes.length} Boxes)`}
+                  ? tKit('addedOpeningCart')
+                  : tKit('addToCartButton', { space: currentSpace.cta, count: currentSpace.boxes.length })}
               </span>
               <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>

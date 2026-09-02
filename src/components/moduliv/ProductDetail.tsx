@@ -2,6 +2,7 @@
 
 import { Link, useRouter } from '@/i18n/navigation'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
 type ProductDetailProps = {
@@ -37,21 +38,23 @@ type ProductDetailProps = {
 }
 
 const FABRICS = [
-  { img: '/assets/1-bedroom-kit-builder/42c66f93ee.png', name: 'Caramel Corduroy', tag: 'Best Seller' },
-  { img: '/assets/1-bedroom-kit-builder/ec621fdd7b.png', name: 'Cream Bouclé', tag: 'Textured' },
-  { img: '/assets/1-bedroom-kit-builder/359e11ad79.png', name: 'Olive Chenille', tag: 'Plush' },
-  { img: '/assets/1-bedroom-kit-builder/13266a8714.png', name: 'Tech Grey', tag: 'Cool Touch' },
+  { id: 'corduroy', img: '/assets/1-bedroom-kit-builder/42c66f93ee.png', name: 'Caramel Corduroy', tag: 'Best Seller' },
+  { id: 'boucle', img: '/assets/1-bedroom-kit-builder/ec621fdd7b.png', name: 'Cream Bouclé', tag: 'Textured' },
+  { id: 'chenille', img: '/assets/1-bedroom-kit-builder/359e11ad79.png', name: 'Olive Chenille', tag: 'Plush' },
+  { id: 'techGrey', img: '/assets/1-bedroom-kit-builder/13266a8714.png', name: 'Tech Grey', tag: 'Cool Touch' },
 ]
 
 export function ProductDetail({ product }: ProductDetailProps) {
   const router = useRouter()
+  const t = useTranslations('PDP')
+  const tCommon = useTranslations('Common')
   const isSofa = !product?.slug || product.slug === 'modusofa'
   const [selectedFabric, setSelectedFabric] = useState(FABRICS[0].name)
   const [selectedLeg, setSelectedLeg] = useState(isSofa ? 'Natural Oak' : 'Queen')
   const [qty, setQty] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
 
-  const title = product?.title || 'ModuSofa 3-Seater'
+  const title = product?.title || (isSofa ? t('defaultTitle') : 'SnapBed Frame')
   const price = product?.price || 699
   const boxCount = product?.boxCount || (isSofa ? 2 : 3)
   const assemblyMinutes = product?.assemblyMinutes || 15
@@ -95,10 +98,10 @@ export function ProductDetail({ product }: ProductDetailProps) {
   const activeMainImage = availableImages.includes(selectedImage) ? selectedImage : availableImages[0]
   const thumbImages = availableImages.length > 1 ? availableImages.slice(1, 4) : defaultThumbs
 
-  const categoryName = isSofa ? 'Seating' : 'Bedroom'
+  const categoryName = isSofa ? t('categorySeating') : t('categoryBedroom')
   const eyebrowText = isSofa
-    ? 'LIVING ROOM · TOOL-FREE SNAP ASSEMBLY'
-    : `${product?.joineryType || 'SOLID WOOD'} · TOOL-FREE LIVING SYSTEM`
+    ? t('eyebrowSofa')
+    : (product?.joineryType ? t('eyebrowOtherWithJoinery', { joinery: product.joineryType }) : t('eyebrowOther'))
 
   const handleAddToCart = () => {
     if (typeof window !== 'undefined' && (window as any).modulivCart) {
@@ -130,7 +133,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
       {/* Breadcrumbs */}
       <nav className="flex items-center text-sm font-label-md text-on-surface-variant mb-8 gap-2">
         <Link className="hover:text-primary transition-colors" href="/">
-          Home
+          {tCommon('home')}
         </Link>
         <span className="material-symbols-outlined text-[16px]">chevron_right</span>
         <Link className="hover:text-primary transition-colors" href="/1-bedroom-kit-builder">
@@ -159,7 +162,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
               const isSelected = activeMainImage === thumb
               return (
                 <button
-                  aria-label={`View angle ${idx + 1}`}
+                  aria-label={t('viewAngle', { number: idx + 1 })}
                   className={`relative aspect-square bg-surface-container rounded-lg overflow-hidden border-2 transition-all cursor-pointer text-left ${
                     isSelected
                       ? 'border-primary ring-2 ring-primary/40'
@@ -203,33 +206,37 @@ export function ProductDetail({ product }: ProductDetailProps) {
             >
               <span className="material-symbols-outlined text-[18px] text-amber-500">star</span>
               <span className="font-medium text-on-surface">4.9</span>
-              <span className="text-on-surface-variant">(348 reviews)</span>
+              <span className="text-on-surface-variant">{t('reviewsCount', { count: 348 })}</span>
             </a>
             <span className="text-outline-variant">·</span>
             <span className="font-label-md text-xs uppercase tracking-wider text-primary bg-primary-fixed/30 px-2 py-0.5 rounded-full">
-              {boxCount} Flat Boxes · {assemblyMinutes}m Assembly
+              {t('boxesAndAssembly', { count: boxCount, minutes: assemblyMinutes })}
             </span>
           </div>
 
           <div className="flex items-baseline gap-3 mb-8">
             <span className="font-headline-lg text-[36px] text-on-surface">${price}.00</span>
-            <span className="font-body-md text-sm text-on-surface-variant">USD · DDP Doorstep Delivery Included</span>
+            <span className="font-body-md text-sm text-on-surface-variant">{t('deliveryIncluded')}</span>
           </div>
 
           {/* Fabric Selector */}
           <div className="mb-8 border-t border-b border-outline-variant/30 py-6">
             <div className="flex justify-between items-center mb-3">
               <span className="font-label-md text-label-md uppercase tracking-wider text-on-surface">
-                Fabric Upholstery
+                {t('fabricUpholstery')}
               </span>
               <span className="font-body-md text-sm text-on-surface-variant">{selectedFabric}</span>
             </div>
             <div className="grid grid-cols-4 gap-3">
               {FABRICS.map((fab) => {
                 const sel = selectedFabric === fab.name
+                const fabLabel = fab.name === 'Caramel Corduroy' ? t('fabrics.corduroy')
+                  : fab.name === 'Cream Bouclé' ? t('fabrics.boucle')
+                  : fab.name === 'Olive Chenille' ? t('fabrics.chenille')
+                  : t('fabrics.techGrey')
                 return (
                   <button
-                    aria-label={`Select ${fab.name}`}
+                    aria-label={t('selectFabric', { name: fab.name })}
                     aria-pressed={sel}
                     className={`flex flex-col items-center gap-1.5 p-2 rounded-lg border transition-all cursor-pointer ${
                       sel ? 'border-primary ring-1 ring-primary bg-primary-fixed/10' : 'border-outline-variant/50'
@@ -239,10 +246,10 @@ export function ProductDetail({ product }: ProductDetailProps) {
                     type="button"
                   >
                     <div className="relative w-12 h-12 rounded-full overflow-hidden border border-outline-variant/30">
-                      <Image alt={fab.name} className="object-cover" fill sizes="48px" src={fab.img} />
+                      <Image alt={fabLabel} className="object-cover" fill sizes="48px" src={fab.img} />
                     </div>
                     <span className="font-body-md text-[11px] text-center leading-tight text-on-surface mt-1">
-                      {fab.name}
+                      {fabLabel}
                     </span>
                   </button>
                 )
@@ -253,11 +260,20 @@ export function ProductDetail({ product }: ProductDetailProps) {
           {/* Leg Finish Selector */}
           <div className="mb-8">
             <span className="font-label-md text-label-md uppercase tracking-wider text-on-surface block mb-3">
-              Leg Finish
+              {t('legFinish')}
             </span>
             <div className="flex gap-3">
-              {['Natural Oak', 'Matte Black Steel'].map((leg) => {
-                const sel = selectedLeg === leg
+              {(isSofa
+                ? [
+                    { key: 'Natural Oak', label: t('finishNaturalOak') },
+                    { key: 'Matte Black Steel', label: t('finishMatteBlackSteel') },
+                  ]
+                : [
+                    { key: 'Queen', label: t('finishQueen') },
+                    { key: 'King', label: t('finishKing') },
+                  ]
+              ).map((leg) => {
+                const sel = selectedLeg === leg.key
                 return (
                   <button
                     aria-pressed={sel}
@@ -266,11 +282,11 @@ export function ProductDetail({ product }: ProductDetailProps) {
                         ? 'bg-on-surface text-white border-on-surface'
                         : 'border-outline-variant text-on-surface hover:border-on-surface'
                     }`}
-                    key={leg}
-                    onClick={() => setSelectedLeg(leg)}
+                    key={leg.key}
+                    onClick={() => setSelectedLeg(leg.key)}
                     type="button"
                   >
-                    {leg}
+                    {leg.label}
                   </button>
                 )
               })}
@@ -281,11 +297,11 @@ export function ProductDetail({ product }: ProductDetailProps) {
           <div className="flex flex-col gap-3 mb-6">
             <div className="flex items-center justify-between mb-1">
               <span className="font-label-md text-label-md text-on-surface uppercase tracking-wider">
-                Quantity
+                {t('quantity')}
               </span>
               <div className="flex items-center border border-outline-variant rounded">
                 <button
-                  aria-label="Decrease quantity"
+                  aria-label={t('decreaseQuantity')}
                   className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
                   onClick={() => setQty(Math.max(1, qty - 1))}
                   type="button"
@@ -296,7 +312,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                   {qty}
                 </span>
                 <button
-                  aria-label="Increase quantity"
+                  aria-label={t('increaseQuantity')}
                   className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
                   onClick={() => setQty(qty + 1)}
                   type="button"
@@ -312,7 +328,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
               onClick={handleAddToCart}
               type="button"
             >
-              <span>{isAdded ? '✓ Added to Cart!' : `Add to Cart — $${(price * qty).toFixed(2)}`}</span>
+              <span>{isAdded ? t('addedToCart') : t('addToCartWithPrice', { price: (price * qty).toFixed(2) })}</span>
               <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
 
@@ -322,7 +338,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
               onClick={handleBuyNow}
               type="button"
             >
-              Buy Now — Express Checkout
+              {t('buyNow')}
               <span className="material-symbols-outlined text-[18px]">bolt</span>
             </button>
 
@@ -330,15 +346,15 @@ export function ProductDetail({ product }: ProductDetailProps) {
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-1 pt-2 text-on-surface-variant">
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
                 <span className="material-symbols-outlined text-[16px] text-primary">handyman</span>
-                0 Screws
+                {t('zeroScrews')}
               </span>
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
                 <span className="material-symbols-outlined text-[16px] text-primary">nights_stay</span>
-                100-Night Trial
+                {t('trial')}
               </span>
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
                 <span className="material-symbols-outlined text-[16px] text-primary">local_shipping</span>
-                DDP Duties Included
+                {t('dutiesIncluded')}
               </span>
             </div>
           </div>
@@ -351,10 +367,10 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 className="font-label-md text-sm underline hover:text-primary transition-colors block mb-1 text-on-surface"
                 href="/free-swatch-box-material-discovery"
               >
-                Order Free Swatch Box
+                {t('orderFreeSwatchBox')}
               </Link>
               <p className="text-sm text-on-surface-variant">
-                Includes all 4 premium fabrics and a $50 voucher towards your sofa order.
+                {t('swatchBoxCardDesc')}
               </p>
             </div>
           </div>
@@ -363,7 +379,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           {product?.boxBreakdown && product.boxBreakdown.length > 0 && (
             <div className="border-t border-outline-variant/30 pt-6 mb-8">
               <span className="font-label-md text-label-md uppercase tracking-wider text-on-surface block mb-3">
-                Flat Packaging Breakdown ({product.boxBreakdown.length} Boxes)
+                {t('boxBreakdownHeader', { count: product.boxBreakdown.length })}
               </span>
               <div className="space-y-3">
                 {product.boxBreakdown.map((box) => (
@@ -394,7 +410,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           {product?.specifications && product.specifications.length > 0 && (
             <div className="border-t border-outline-variant/30 pt-6 mb-8">
               <span className="font-label-md text-label-md uppercase tracking-wider text-on-surface block mb-3">
-                Specifications
+                {t('specificationsHeader')}
               </span>
               <div className="grid grid-cols-1 gap-2 text-sm">
                 {product.specifications.map((spec, i) => (
@@ -414,23 +430,25 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
       {/* Reviews Section */}
       <section className="pt-12 border-t border-outline-variant/40" id="reviews">
-        <h2 className="font-headline-md text-headline-md text-on-surface mb-6">Verified Customer Reviews</h2>
+        <h2 className="font-headline-md text-headline-md text-on-surface mb-6">
+          {t('verifiedReviewsHeader')}
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
-              author: 'Elena R., Brooklyn NY',
-              date: '2 weeks ago',
-              text: 'Delivered in 3 flat boxes that fit right up my 4th-floor walk-up. Clicked together in 12 minutes without a screwdriver. Beautiful corduroy finish.',
+              author: t('review1Author'),
+              date: t('review1Date'),
+              text: t('review1Text'),
             },
             {
-              author: 'Kenji T., Vancouver BC',
-              date: '1 month ago',
-              text: 'The Japandi proportions are perfection. Deep seat, firm supportive cushions, and zero import duties or surprise carrier bills.',
+              author: t('review2Author'),
+              date: t('review2Date'),
+              text: t('review2Text'),
             },
             {
-              author: 'Sarah M., Austin TX',
-              date: '6 weeks ago',
-              text: 'We bought the swatch box first and the $50 discount applied smoothly at checkout. Best apartment sofa we ever owned.',
+              author: t('review3Author'),
+              date: t('review3Date'),
+              text: t('review3Text'),
             },
           ].map((rev) => (
             <div className="bg-surface-container-low p-6 rounded-xl border border-outline-variant/30 flex flex-col justify-between" key={rev.author}>
