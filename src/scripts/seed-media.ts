@@ -7,7 +7,7 @@ import type { Payload } from 'payload'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
-const rootDir = path.resolve(dirname, '../..')
+const rootDir = process.cwd()
 
 export const ALT_MAP: Record<string, string> = {
   // Screenshots & Key Visuals
