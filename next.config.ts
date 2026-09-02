@@ -21,6 +21,12 @@ const nextConfig: NextConfig = {
         pathname: '/api/media/file/**',
       },
       {
+        pathname: '/media/**',
+      },
+      {
+        pathname: '/screenshots/**',
+      },
+      {
         pathname: '/assets/**',
       },
       {
@@ -41,6 +47,14 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   redirects,
+  async rewrites() {
+    return [
+      {
+        source: '/api/media/file/:path*',
+        destination: '/media/:path*',
+      },
+    ]
+  },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],

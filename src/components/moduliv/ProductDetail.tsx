@@ -57,12 +57,17 @@ export function ProductDetail({ product }: ProductDetailProps) {
   const assemblyMinutes = product?.assemblyMinutes || 15
 
   // Resolve Payload gallery images or static fallbacks
+  const normalizeUrl = (url?: string | null) => {
+    if (!url) return null
+    return url.replace(/^\/api\/media\/file\//, '/media/')
+  }
+
   const galleryUrls = (product?.gallery || [])
     .map((item) => {
       if (!item) return null
-      if (typeof item.image === 'string') return item.image
+      if (typeof item.image === 'string') return normalizeUrl(item.image)
       if (typeof item.image === 'object' && item.image && 'url' in item.image && item.image.url) {
-        return item.image.url
+        return normalizeUrl(item.image.url)
       }
       return null
     })
