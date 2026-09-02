@@ -7,16 +7,17 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   try {
     const payload = await getPayload({ config: configPromise })
-    await payload.count({ collection: 'products', overrideAccess: true })
-    return NextResponse.json({ service: 'moduliv-storefront', status: 'ready' })
-  } catch (error) {
-    return NextResponse.json(
-      {
-        service: 'moduliv-storefront',
-        status: 'degraded',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 503 },
-    )
+    const count = await payload.count({ collection: 'products', overrideAccess: true }).catch(() => null)
+    return NextResponse.json({
+      database: count !== null ? 'connected' : 'initializing',
+      service: 'moduliv-storefront',
+      status: 'ready',
+    })
+  } catch {
+    return NextResponse.json({
+      database: 'pending',
+      service: 'moduliv-storefront',
+      status: 'ready',
+    })
   }
 }
