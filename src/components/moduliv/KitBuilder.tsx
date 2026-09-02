@@ -53,19 +53,136 @@ const BOX_LIST = [
   { id: 'b6', img: '/assets/1-bedroom-kit-builder/d66ddc7ba1.png', name: '2x Nightstands', num: 'Box 6' },
 ]
 
-export function KitBuilder() {
+export type KitBuilderProductData = {
+  assemblyMinutes?: number | null
+  boxBreakdown?: Array<{
+    boxId: string
+    description?: string | null
+    dimensions?: string | null
+    title: string
+    weight?: string | null
+  }> | null
+  boxCount?: number | null
+  id?: string | number
+  joineryType?: string | null
+  priceInUSD?: number | null
+  slug?: string
+  subtitle?: string | null
+  title?: string
+}
+
+export type KitBuilderSpaceData = {
+  hero?: { url?: string | null } | string | null
+  id?: string | number
+  intro?: string | null
+  slug?: string
+  title?: string
+}
+
+export type KitBuilderMaterialData = {
+  facts?: Array<{ body: string; label: string }> | null
+  id?: string | number
+  intro?: string | null
+  slug?: string
+  title?: string
+}
+
+export type KitBuilderProps = {
+  bedProduct?: KitBuilderProductData | null
+  bundleProduct?: KitBuilderProductData | null
+  livingProduct?: KitBuilderProductData | null
+  materials?: KitBuilderMaterialData[] | null
+  spaces?: KitBuilderSpaceData[] | null
+}
+
+export function KitBuilder({
+  bedProduct,
+  bundleProduct,
+  livingProduct,
+  materials,
+  spaces,
+}: KitBuilderProps = {}) {
   const router = useRouter()
   const tKit = useTranslations('Pages.KitBuilder')
   const tCommon = useTranslations('Common')
   const [space, setSpace] = useState<SpaceKey>('full')
   const [bed, setBed] = useState<'queen' | 'king'>('queen')
   const [fabric, setFabric] = useState('Caramel Corduroy')
-  const [wood, setWood] = useState('Natural White Oak')
+
+  const oakMaterial = materials?.find((m) => m.slug === 'white-oak')
+  const walnutMaterial = materials?.find((m) => m.slug === 'black-walnut')
+  const defaultWood = oakMaterial?.title || 'Natural White Oak'
+  const walnutLabel = walnutMaterial?.title || 'Smoked Walnut'
+  const [wood, setWood] = useState(defaultWood)
+
   const [hasMattress, setHasMattress] = useState(false)
   const [isAdded, setIsAdded] = useState(false)
 
-  const currentSpace = SPACES[space]
+  const spaceWholeHome = spaces?.find((s) => s.slug === 'whole-home')
+  const spaceLivingDoc = spaces?.find((s) => s.slug === 'living-room')
+  const spaceBedroomDoc = spaces?.find((s) => s.slug === 'bedroom')
+
+  const dynamicSpaces: Record<
+    SpaceKey,
+    {
+      alt: string
+      boxes: string[]
+      caption: string
+      cta: string
+      img: string
+      price: number
+    }
+  > = {
+    bedroom: {
+      alt: SPACES.bedroom.alt,
+      boxes: ['b5', 'b6'],
+      caption: spaceBedroomDoc?.intro || SPACES.bedroom.caption,
+      cta: spaceBedroomDoc?.title || tKit('bedroom') || 'Bedroom Set',
+      img:
+        (typeof spaceBedroomDoc?.hero === 'object' && spaceBedroomDoc?.hero?.url) ||
+        (typeof spaceBedroomDoc?.hero === 'string' && spaceBedroomDoc.hero) ||
+        SPACES.bedroom.img,
+      price: bedProduct?.priceInUSD || SPACES.bedroom.price,
+    },
+    full: {
+      alt: SPACES.full.alt,
+      boxes: ['b1', 'b2', 'b3', 'b4', 'b5', 'b6'],
+      caption: spaceWholeHome?.intro || SPACES.full.caption,
+      cta: spaceWholeHome?.title || tKit('fullHome') || 'Full Bundle',
+      img:
+        (typeof spaceWholeHome?.hero === 'object' && spaceWholeHome?.hero?.url) ||
+        (typeof spaceWholeHome?.hero === 'string' && spaceWholeHome.hero) ||
+        SPACES.full.img,
+      price: bundleProduct?.priceInUSD || SPACES.full.price,
+    },
+    living: {
+      alt: SPACES.living.alt,
+      boxes: ['b1', 'b2'],
+      caption: spaceLivingDoc?.intro || SPACES.living.caption,
+      cta: spaceLivingDoc?.title || tKit('living') || 'Living Set',
+      img:
+        (typeof spaceLivingDoc?.hero === 'object' && spaceLivingDoc?.hero?.url) ||
+        (typeof spaceLivingDoc?.hero === 'string' && spaceLivingDoc.hero) ||
+        SPACES.living.img,
+      price: livingProduct?.priceInUSD || SPACES.living.price,
+    },
+  }
+
+  const currentSpace = dynamicSpaces[space]
   const isLiving = space === 'living'
+
+  const boxBreakdownMap = new Map(
+    (bundleProduct?.boxBreakdown || []).map((b) => [b.boxId, b]),
+  )
+
+  const resolvedBoxList = BOX_LIST.map((b) => {
+    const cmsBox = boxBreakdownMap.get(b.id)
+    return {
+      ...b,
+      name: cmsBox?.title || b.name,
+      description: cmsBox?.description || undefined,
+    }
+  })
 
   let total = currentSpace.price
   if (!isLiving) {
@@ -81,7 +198,9 @@ export function KitBuilder() {
     if (typeof window !== 'undefined' && (window as any).modulivCart) {
       ;(window as any).modulivCart.add(1, {
         id: 'bundle-1bed',
-        name: `The Flat Set 1-Bedroom (${currentSpace.cta})`,
+        name: bundleProduct?.title
+          ? `${bundleProduct.title} (${currentSpace.cta})`
+          : `The Flat Set 1-Bedroom (${currentSpace.cta})`,
         price: total,
         qty: 1,
         variant: variantParts.join(' · '),
@@ -116,10 +235,10 @@ export function KitBuilder() {
             FURNISH YOUR WHOLE HOME IN ONE CLICK
           </span>
           <h1 className="font-display-lg text-[36px] leading-[1.15] md:text-[64px] md:leading-[1.1] text-on-surface mb-6">
-            {tKit('title')}
+            {bundleProduct?.title || tKit('title')}
           </h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant">
-            {tKit('subtitle')}
+            {bundleProduct?.subtitle || tKit('subtitle')}
           </p>
         </header>
 
@@ -145,7 +264,7 @@ export function KitBuilder() {
               >
                 {(['full', 'living', 'bedroom'] as const).map((sKey) => {
                   const active = space === sKey
-                  const label = sKey === 'full' ? 'Full Home' : sKey === 'living' ? 'Living' : 'Bedroom'
+                  const label = dynamicSpaces[sKey].cta
                   return (
                     <button
                       aria-pressed={active}
@@ -174,7 +293,7 @@ export function KitBuilder() {
                 {currentSpace.caption}
               </p>
               <div className="flex gap-4 overflow-x-auto pb-4 -mx-margin-mobile px-margin-mobile md:mx-0 md:px-0">
-                {BOX_LIST.map((b) => {
+                {resolvedBoxList.map((b) => {
                   const included = currentSpace.boxes.includes(b.id)
                   return (
                     <div
@@ -197,6 +316,11 @@ export function KitBuilder() {
                           {b.num}
                         </span>
                         <span className="font-body-md text-sm text-on-surface">{b.name}</span>
+                        {b.description && (
+                          <span className="font-body-md text-[10px] text-on-surface-variant/80 line-clamp-2 mt-0.5" title={b.description}>
+                            {b.description}
+                          </span>
+                        )}
                       </div>
                     </div>
                   )
@@ -266,8 +390,8 @@ export function KitBuilder() {
               </div>
               <div className="flex gap-6">
                 {[
-                  { label: 'Natural White Oak', img: '/assets/1-bedroom-kit-builder/ebd8892f4c.png' },
-                  { label: 'Smoked Walnut', img: '/assets/1-bedroom-kit-builder/188581c175.png' },
+                  { label: defaultWood, img: '/assets/1-bedroom-kit-builder/ebd8892f4c.png' },
+                  { label: walnutLabel, img: '/assets/1-bedroom-kit-builder/188581c175.png' },
                 ].map((item) => {
                   const sel = wood === item.label
                   return (

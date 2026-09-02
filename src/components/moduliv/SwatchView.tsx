@@ -87,7 +87,7 @@ export function SwatchView() {
           <img
             alt="Moduliv curated swatch box"
             className="w-full h-full object-cover"
-            src="/assets/1-bedroom-kit-builder/ec621fdd7b.png"
+            src="/screenshots/asset-swatch-box-hero.png"
           />
         </div>
       </section>

@@ -18,6 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const locale = await getPayloadLocale()
   let title = 'ModuSofa 3-Seater'
+  let description = 'Shop flat-pack furniture from The Flat Set. Tool-free assembly.'
 
   try {
     const payload = await getPayload({ config: configPromise })
@@ -33,12 +34,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     })
     const product = productResult.docs[0]
     if (product?.title) title = product.title
+    if (product?.subtitle) description = product.subtitle
   } catch {
     // fallback
   }
 
   return buildPageMetadata({
-    description: `Shop the ${title} from The Flat Set. Tool-free assembly flat-pack furniture.`,
+    description,
     locale,
     pathname: `/products/${slug}`,
     title,
@@ -55,7 +57,7 @@ export default async function ProductPage({ params }: Props) {
     const payload = await getPayload({ config: configPromise })
     const productResult = await payload.find({
       collection: 'products',
-      depth: 1,
+      depth: 2,
       limit: 1,
       locale,
       overrideAccess: true,
@@ -76,8 +78,10 @@ export default async function ProductPage({ params }: Props) {
         assemblyMinutes: doc.assemblyMinutes,
         boxBreakdown: doc.boxBreakdown as any,
         boxCount: doc.boxCount,
+        gallery: doc.gallery as any,
         id: doc.id,
         joineryType: doc.joineryType,
+        meta: doc.meta as any,
         price: doc.priceInUSD || 699,
         slug: doc.slug,
         specifications: doc.specifications,

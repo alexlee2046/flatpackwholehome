@@ -27,10 +27,11 @@ export default async function HomePage() {
   const locale = await getPayloadLocale()
   let homepage: any = null
   let announcement: any = null
+  let kitProduct: any = null
 
   try {
     const payload = await getPayload({ config: configPromise })
-    const [h, a] = await Promise.all([
+    const [h, a, kitProductRes] = await Promise.all([
       payload.findGlobal({
         slug: 'homepage',
         depth: 2,
@@ -43,9 +44,18 @@ export default async function HomePage() {
         locale,
         overrideAccess: true,
       }),
+      payload.find({
+        collection: 'products',
+        depth: 0,
+        limit: 1,
+        locale,
+        overrideAccess: true,
+        where: { slug: { equals: '1-bedroom-kit' } },
+      }),
     ])
     homepage = h
     announcement = a
+    kitProduct = kitProductRes.docs[0] || null
   } catch (err) {
     // Fallback when DB is not reachable during build
   }
@@ -55,9 +65,13 @@ export default async function HomePage() {
       <ModulivHeader />
       <ModulivHomepage
         announcement={announcement?.message || undefined}
+        bundlePrice={kitProduct?.priceInUSD}
+        bundleSubtitle={kitProduct?.subtitle}
+        bundleTitle={kitProduct?.title}
         heroBody={homepage?.hero?.body || undefined}
         heroEyebrow={homepage?.hero?.eyebrow || undefined}
         heroHeadline={homepage?.hero?.headline || undefined}
+        heroImage={homepage?.hero?.image || undefined}
       />
       <ModulivFooter />
     </>

@@ -113,7 +113,7 @@ export default buildConfig({
   localization: {
     defaultLocale: 'en',
     defaultLocalePublishOption: 'active',
-    fallback: false,
+    fallback: true,
     locales: [
       { code: 'en', label: 'English' },
       { code: 'zh-CN', label: '简体中文' },

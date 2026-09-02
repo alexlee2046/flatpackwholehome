@@ -9,22 +9,36 @@ type ModulivHomepageProps = {
   heroEyebrow?: string
   heroHeadline?: string
   heroBody?: string
-  heroImage?: string
+  heroImage?: string | { alt?: string | null; url?: string | null } | null
   announcement?: string
+  bundleTitle?: string
+  bundleSubtitle?: string
+  bundlePrice?: number
 }
 
 export function ModulivHomepage({
   heroEyebrow,
   heroHeadline,
   heroBody,
-  heroImage = '/assets/homepage/hero-split.png',
+  heroImage,
   announcement = 'Global DDP Doorstep Delivery (All Duties & Taxes Included) | Free Fabric Swatch Box With $50 Voucher | 100-Night In-Home Trial',
+  bundleTitle,
+  bundleSubtitle,
+  bundlePrice,
 }: ModulivHomepageProps) {
   const tHome = useTranslations('Pages.Home')
 
   const resolvedEyebrow = heroEyebrow || tHome('heroEyebrow')
   const resolvedHeadline = heroHeadline || tHome('heroHeadline')
   const resolvedBody = heroBody || tHome('heroBody')
+
+  const heroSrc =
+    (typeof heroImage === 'object' && heroImage?.url) ||
+    (typeof heroImage === 'string' && heroImage) ||
+    '/assets/homepage/hero-split.png'
+  const heroAlt =
+    (typeof heroImage === 'object' && heroImage?.alt) ||
+    'Six flat-pack The Flat Set boxes beside the same room fully furnished in warm minimalist style'
 
   return (
     <>
@@ -79,12 +93,12 @@ export function ModulivHomepage({
           <div className="flex-1 w-full relative reveal" style={{ transitionDelay: '.1s' }}>
             <div className="relative w-full aspect-[16/10] md:aspect-[16/9] overflow-hidden rounded-xl shadow-sm">
               <Image
-                alt="Six flat-pack The Flat Set boxes beside the same room fully furnished in warm minimalist style"
+                alt={heroAlt}
                 className="object-cover"
                 fill
                 priority
                 sizes="(max-width: 768px) 100vw, 50vw"
-                src={heroImage}
+                src={heroSrc}
               />
             </div>
           </div>
@@ -230,17 +244,18 @@ export function ModulivHomepage({
                 COMPLETE APARTMENT READY
               </span>
               <h2 className="font-headline-lg text-[32px] md:text-[44px] text-on-surface mb-4">
-                The 1-Bedroom Full Apartment Kit
+                {bundleTitle || 'The 1-Bedroom Full Apartment Kit'}
               </h2>
               <p className="font-body-lg text-on-surface-variant mb-6">
-                Sofa, dining table, chairs, bed frame, nightstands, and storage — all engineered to live together in harmonious Japandi oak.
+                {bundleSubtitle ||
+                  'Sofa, dining table, chairs, bed frame, nightstands, and storage — all engineered to live together in harmonious Japandi oak.'}
               </p>
               <div className="flex gap-4">
                 <Link
                   className="bg-on-background text-on-primary py-3.5 px-7 font-label-md text-label-md uppercase rounded-full hover:bg-primary transition-colors"
                   href="/1-bedroom-kit-builder"
                 >
-                  Configure My Space ($1,499)
+                  {tHome('ctaExplore')} (${bundlePrice ?? 1499})
                 </Link>
               </div>
             </div>

@@ -15,8 +15,15 @@ type ProductDetailProps = {
       weight?: string | null
     }> | null
     boxCount?: number | null
+    gallery?: Array<{
+      id?: string | null
+      image: number | string | { alt?: string | null; url?: string | null }
+    }> | null
     id?: string | number
     joineryType?: string | null
+    meta?: {
+      image?: number | string | { alt?: string | null; url?: string | null } | null
+    } | null
     price?: number
     slug?: string
     specifications?: Array<{
@@ -30,10 +37,10 @@ type ProductDetailProps = {
 }
 
 const FABRICS = [
-  { img: '/assets/modusofa-product-detail-page/4c8a514d7a.png', name: 'Caramel Corduroy', tag: 'Best Seller' },
-  { img: '/assets/modusofa-product-detail-page/79b47e0bb2.png', name: 'Oatmeal Bouclé', tag: 'Textured' },
-  { img: '/assets/modusofa-product-detail-page/6848039aa7.png', name: 'Forest Moss Velvet', tag: 'Plush' },
-  { img: '/assets/modusofa-product-detail-page/7bc8f04499.png', name: 'Natural Raw Linen', tag: 'Cool Touch' },
+  { img: '/assets/1-bedroom-kit-builder/42c66f93ee.png', name: 'Caramel Corduroy', tag: 'Best Seller' },
+  { img: '/assets/1-bedroom-kit-builder/ec621fdd7b.png', name: 'Cream Bouclé', tag: 'Textured' },
+  { img: '/assets/1-bedroom-kit-builder/359e11ad79.png', name: 'Olive Chenille', tag: 'Plush' },
+  { img: '/assets/1-bedroom-kit-builder/13266a8714.png', name: 'Tech Grey', tag: 'Cool Touch' },
 ]
 
 export function ProductDetail({ product }: ProductDetailProps) {
@@ -49,21 +56,39 @@ export function ProductDetail({ product }: ProductDetailProps) {
   const boxCount = product?.boxCount || (isSofa ? 2 : 3)
   const assemblyMinutes = product?.assemblyMinutes || 15
 
-  const mainImage = isSofa
+  // Resolve Payload gallery images or static fallbacks
+  const galleryUrls = (product?.gallery || [])
+    .map((item) => {
+      if (!item) return null
+      if (typeof item.image === 'string') return item.image
+      if (typeof item.image === 'object' && item.image && 'url' in item.image && item.image.url) {
+        return item.image.url
+      }
+      return null
+    })
+    .filter((url): url is string => Boolean(url))
+
+  const defaultMainImage = isSofa
     ? '/assets/modusofa-product-detail-page/e38c85e68d.png'
     : '/assets/1-bedroom-kit-builder/da48e93272.png'
 
-  const thumbImages = isSofa
+  const defaultThumbs = isSofa
     ? [
-        '/assets/modusofa-product-detail-page/0bbfa9bb39.png',
-        '/assets/modusofa-product-detail-page/07df972410.png',
-        '/assets/modusofa-product-detail-page/a56da1ec79.png',
+        '/screenshots/asset-boxes-to-room-split.png',
+        '/assets/modusofa-product-detail-page/b354f66f79.png',
+        '/assets/modusofa-product-detail-page/d3a3e93b3d.png',
       ]
     : [
         '/assets/1-bedroom-kit-builder/d4a4793ee2.png',
         '/assets/1-bedroom-kit-builder/d66ddc7ba1.png',
         '/assets/1-bedroom-kit-builder/b4e5f4d8a0.png',
       ]
+
+  const availableImages = galleryUrls.length > 0 ? galleryUrls : [defaultMainImage, ...defaultThumbs]
+  const [selectedImage, setSelectedImage] = useState<string>(availableImages[0])
+
+  const activeMainImage = availableImages.includes(selectedImage) ? selectedImage : availableImages[0]
+  const thumbImages = availableImages.length > 1 ? availableImages.slice(1, 4) : defaultThumbs
 
   const categoryName = isSofa ? 'Seating' : 'Bedroom'
   const eyebrowText = isSofa
@@ -121,37 +146,34 @@ export function ProductDetail({ product }: ProductDetailProps) {
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 55vw"
-              src={mainImage}
+              src={activeMainImage}
             />
           </div>
           <div className="grid grid-cols-3 gap-4">
-            <div className="relative aspect-square bg-surface-container rounded-lg overflow-hidden">
-              <Image
-                alt="Product angle view"
-                className="object-cover"
-                fill
-                sizes="(max-width: 1024px) 30vw, 15vw"
-                src={thumbImages[0]}
-              />
-            </div>
-            <div className="relative aspect-square bg-surface-container rounded-lg overflow-hidden">
-              <Image
-                alt="Product detail view"
-                className="object-cover"
-                fill
-                sizes="(max-width: 1024px) 30vw, 15vw"
-                src={thumbImages[1]}
-              />
-            </div>
-            <div className="relative aspect-square bg-surface-container rounded-lg overflow-hidden">
-              <Image
-                alt="Packaging breakdown view"
-                className="object-cover"
-                fill
-                sizes="(max-width: 1024px) 30vw, 15vw"
-                src={thumbImages[2]}
-              />
-            </div>
+            {thumbImages.map((thumb, idx) => {
+              const isSelected = activeMainImage === thumb
+              return (
+                <button
+                  aria-label={`View angle ${idx + 1}`}
+                  className={`relative aspect-square bg-surface-container rounded-lg overflow-hidden border-2 transition-all cursor-pointer text-left ${
+                    isSelected
+                      ? 'border-primary ring-2 ring-primary/40'
+                      : 'border-transparent hover:border-outline-variant'
+                  }`}
+                  key={thumb + idx}
+                  onClick={() => setSelectedImage(thumb)}
+                  type="button"
+                >
+                  <Image
+                    alt={`${title} view ${idx + 1}`}
+                    className="object-cover"
+                    fill
+                    sizes="(max-width: 1024px) 30vw, 15vw"
+                    src={thumb}
+                  />
+                </button>
+              )
+            })}
           </div>
         </div>
 
@@ -163,6 +185,11 @@ export function ProductDetail({ product }: ProductDetailProps) {
           <h1 className="font-display-lg text-[32px] md:text-[44px] leading-tight text-on-surface mb-3">
             {title}
           </h1>
+          {product?.subtitle && (
+            <p className="font-body-md text-base text-on-surface-variant mb-4">
+              {product.subtitle}
+            </p>
+          )}
 
           <div className="flex items-center gap-4 mb-6">
             <a
@@ -325,6 +352,57 @@ export function ProductDetail({ product }: ProductDetailProps) {
               </p>
             </div>
           </div>
+
+          {/* Packaging Breakdown */}
+          {product?.boxBreakdown && product.boxBreakdown.length > 0 && (
+            <div className="border-t border-outline-variant/30 pt-6 mb-8">
+              <span className="font-label-md text-label-md uppercase tracking-wider text-on-surface block mb-3">
+                Flat Packaging Breakdown ({product.boxBreakdown.length} Boxes)
+              </span>
+              <div className="space-y-3">
+                {product.boxBreakdown.map((box) => (
+                  <div
+                    key={box.boxId}
+                    className="p-3 bg-surface-container-low rounded-lg border border-outline-variant/30 text-sm"
+                  >
+                    <div className="flex justify-between items-center font-medium text-on-surface">
+                      <span>{box.title}</span>
+                      {box.dimensions && (
+                        <span className="text-xs text-on-surface-variant font-mono">
+                          {box.dimensions} {box.weight ? `· ${box.weight}` : ''}
+                        </span>
+                      )}
+                    </div>
+                    {box.description && (
+                      <p className="text-xs text-on-surface-variant mt-1">
+                        {box.description}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Specifications */}
+          {product?.specifications && product.specifications.length > 0 && (
+            <div className="border-t border-outline-variant/30 pt-6 mb-8">
+              <span className="font-label-md text-label-md uppercase tracking-wider text-on-surface block mb-3">
+                Specifications
+              </span>
+              <div className="grid grid-cols-1 gap-2 text-sm">
+                {product.specifications.map((spec, i) => (
+                  <div
+                    key={spec.id || i}
+                    className="flex justify-between py-1.5 border-b border-outline-variant/20"
+                  >
+                    <span className="text-on-surface-variant">{spec.label}</span>
+                    <span className="font-medium text-on-surface text-right">{spec.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
