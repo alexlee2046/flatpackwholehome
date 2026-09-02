@@ -19,7 +19,7 @@ ENV PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000
 ENV PAYLOAD_RUN_MIGRATIONS=false
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN pnpm build
+RUN pnpm generate:importmap && pnpm build
 
 FROM node:22-bookworm-slim AS runner
 ENV NODE_ENV=production

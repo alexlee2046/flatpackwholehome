@@ -23,7 +23,6 @@ pnpm-debug.log*
 
 # Payload
 .payload/
-importMap.js
 
 # OS files
 .DS_Store
