@@ -162,7 +162,7 @@ export function ModulivHeader() {
       {/* Mobile Drawer (Accessible, Warm Japandi Style) */}
       <div
         className={`fixed inset-0 z-50 transition-opacity duration-300 ${
-          isDrawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          isDrawerOpen ? 'opacity-100 pointer-events-auto visible' : 'opacity-0 pointer-events-none invisible'
         }`}
         aria-hidden={!isDrawerOpen}
       >
