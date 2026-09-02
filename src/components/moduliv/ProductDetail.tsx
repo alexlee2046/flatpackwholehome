@@ -229,6 +229,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 const sel = selectedFabric === fab.name
                 return (
                   <button
+                    aria-label={`Select ${fab.name}`}
                     aria-pressed={sel}
                     className={`flex flex-col items-center gap-1.5 p-2 rounded-lg border transition-all cursor-pointer ${
                       sel ? 'border-primary ring-1 ring-primary bg-primary-fixed/10' : 'border-outline-variant/50'
