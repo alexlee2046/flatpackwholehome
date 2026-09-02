@@ -77,7 +77,20 @@ export async function seedFlatpack(payload: Payload) {
     },
   })
 
-  if (!existingAdmin.docs[0]) {
+  if (existingAdmin.docs[0]) {
+    await payload.update({
+      collection: 'users',
+      id: existingAdmin.docs[0].id,
+      data: {
+        email: adminEmail,
+        name: 'The Flat Set Admin',
+        password: adminPassword,
+        roles: ['admin'],
+      },
+      overrideAccess: true,
+    })
+    payload.logger.info(`Updated admin credentials for: ${adminEmail}`)
+  } else {
     await payload.create({
       collection: 'users',
       data: {

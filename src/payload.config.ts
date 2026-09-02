@@ -138,6 +138,54 @@ export default buildConfig({
       { code: 'ru', label: 'Русский' },
     ],
   },
+  onInit: async (payload) => {
+    try {
+      const adminEmail = process.env.INITIAL_ADMIN_EMAIL || 'admin@theflatset.com'
+      const adminPassword = process.env.INITIAL_ADMIN_PASSWORD || 'flatset_admin_2026'
+
+      const existingAdmin = await payload.find({
+        collection: 'users',
+        depth: 0,
+        limit: 1,
+        overrideAccess: true,
+        where: {
+          or: [
+            { email: { equals: adminEmail } },
+            { email: { equals: 'admin@moduliv.studio' } },
+          ],
+        },
+      })
+
+      if (existingAdmin.docs[0]) {
+        await payload.update({
+          collection: 'users',
+          id: existingAdmin.docs[0].id,
+          data: {
+            email: adminEmail,
+            name: 'The Flat Set Admin',
+            password: adminPassword,
+            roles: ['admin'],
+          },
+          overrideAccess: true,
+        })
+        payload.logger.info(`[onInit] Admin credentials verified for: ${adminEmail}`)
+      } else {
+        await payload.create({
+          collection: 'users',
+          data: {
+            email: adminEmail,
+            name: 'The Flat Set Admin',
+            password: adminPassword,
+            roles: ['admin'],
+          },
+          overrideAccess: true,
+        })
+        payload.logger.info(`[onInit] Admin user created: ${adminEmail}`)
+      }
+    } catch (err: any) {
+      payload.logger.warn(`[onInit] Admin user check skipped: ${err.message}`)
+    }
+  },
   plugins,
   secret: (() => {
     const isProduction = process.env.NODE_ENV === 'production'
