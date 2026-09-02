@@ -82,6 +82,55 @@ async function testPlaywright() {
       throw new Error(`Visual styles failed to compile: ${JSON.stringify(styleAudit)}`);
     }
 
+    // 9. Test Mobile Drawer UX (390x844 viewport)
+    console.log('9. Testing Mobile Drawer Navigation (390x844 viewport)...');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${BASE_URL}/en`, { waitUntil: 'networkidle' });
+
+    const mobileMenuTrigger = page.locator('#mobile-menu-trigger');
+    const isTriggerVisible = await mobileMenuTrigger.isVisible();
+    console.log('   Mobile menu trigger is visible:', isTriggerVisible);
+    if (!isTriggerVisible) {
+      throw new Error('Mobile menu trigger should be visible on 390px viewport');
+    }
+
+    // Open drawer
+    await mobileMenuTrigger.click();
+    await page.waitForTimeout(400);
+
+    const drawer = page.locator('#mobile-nav-drawer, #moduliv-mobile-drawer');
+    const isDrawerVisible = await drawer.isVisible();
+    console.log('   Mobile drawer opened successfully:', isDrawerVisible);
+    if (!isDrawerVisible) {
+      throw new Error('Mobile drawer failed to open upon clicking menu trigger');
+    }
+
+    // Verify drawer links
+    const kitLink = page.locator('#mobile-nav-drawer a[href*="kit-builder"], #moduliv-mobile-drawer a[href*="kit-builder"]');
+    const isKitLinkVisible = await kitLink.isVisible();
+    console.log('   Drawer Move-In Bundles link is visible:', isKitLinkVisible);
+
+    // Test close button
+    const closeBtn = page.locator('#mobile-nav-drawer button[aria-label="Close navigation menu"], #moduliv-drawer-close');
+    await closeBtn.click();
+    await page.waitForTimeout(400);
+    const isDrawerClosed = !(await drawer.isVisible());
+    console.log('   Mobile drawer closed successfully with close button:', isDrawerClosed);
+    if (!isDrawerClosed) {
+      throw new Error('Mobile drawer failed to close upon clicking close button');
+    }
+
+    // Re-open and test Escape key
+    await mobileMenuTrigger.click();
+    await page.waitForTimeout(400);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(400);
+    const isDrawerClosedByEsc = !(await drawer.isVisible());
+    console.log('   Mobile drawer closed successfully with Escape key:', isDrawerClosedByEsc);
+    if (!isDrawerClosedByEsc) {
+      throw new Error('Mobile drawer failed to close upon pressing Escape key');
+    }
+
     console.log('\n Playwright Storefront E2E Test SUCCESSFUL!');
   } finally {
     await browser.close();

@@ -146,11 +146,16 @@
   <!-- Global Header -->
   <header class="sticky top-0 z-50 w-full bg-surface/90 backdrop-blur-md border-b border-outline-variant/30">
     <div class="max-w-[1440px] mx-auto flex items-center justify-between gap-4 w-full px-margin-mobile md:px-margin-desktop py-3">
-      <!-- The Flat Set Wordmark Brand Anchor -->
-      <a class="group flex items-baseline gap-1.5 shrink-0 text-on-surface hover:opacity-85 transition-opacity" href="index.html" aria-label="The Flat Set — Home">
-        <span class="font-headline-md italic font-normal text-[17px] tracking-wider text-on-surface/80">The</span>
-        <span class="font-headline-md font-semibold text-[23px] tracking-[-0.02em] text-on-surface">Flat Set</span>
-      </a>
+      <!-- Mobile Menu Trigger & Logo -->
+      <div class="flex items-center gap-3">
+        <button id="mobile-menu-trigger" type="button" aria-label="Open navigation menu" class="md:hidden flex items-center justify-center w-10 h-10 -ml-2 rounded-full text-on-surface hover:bg-surface-container-highest transition-colors">
+          <span class="material-symbols-outlined text-[24px]">menu</span>
+        </button>
+        <a class="group flex items-baseline gap-1.5 shrink-0 text-on-surface hover:opacity-85 transition-opacity" href="index.html" aria-label="The Flat Set — Home">
+          <span class="font-headline-md italic font-normal text-[17px] tracking-wider text-on-surface/80">The</span>
+          <span class="font-headline-md font-semibold text-[23px] tracking-[-0.02em] text-on-surface">Flat Set</span>
+        </a>
+      </div>
 
       <!-- Navigation -->
       <nav class="hidden md:flex gap-8 items-center ml-auto">
@@ -161,10 +166,10 @@
         <a class="text-on-surface font-semibold border-b border-on-surface pb-0.5 font-label-md text-label-md" href="brand.html">VI Guidelines</a>
       </nav>
 
-      <div class="flex items-center gap-4 text-primary ml-8">
+      <div class="flex items-center gap-4 text-primary md:ml-8">
         <button onclick="window.print()" type="button" class="no-print inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-outline-variant/80 text-on-surface text-xs font-label-md uppercase tracking-wider hover:bg-surface-container-highest transition-colors">
           <span class="material-symbols-outlined text-[16px]">print</span>
-          <span>Export PDF</span>
+          <span class="hidden sm:inline">Export PDF</span>
         </button>
         <button id="search-trigger" aria-label="Search" type="button" class="hover:opacity-80 transition-opacity"><span class="material-symbols-outlined" data-icon="search">search</span></button>
         <a data-cart-link="true" aria-label="Cart" class="hover:opacity-80 transition-opacity relative inline-block text-primary" href="cart.html"><span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span></a>

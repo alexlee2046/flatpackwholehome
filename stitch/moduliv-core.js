@@ -555,6 +555,225 @@
         }
     }
 
+    /* ==========================================================================
+       6. MOBILE DRAWER NAVIGATION (DEF-08)
+       ========================================================================== */
+    function initMobileDrawer() {
+        var existing = document.getElementById('moduliv-mobile-drawer');
+        if (existing) {
+            return;
+        }
+
+        var isStitch = window.location.pathname.indexOf('stitch') !== -1;
+
+        var drawer = document.createElement('div');
+        drawer.id = 'moduliv-mobile-drawer';
+        drawer.className = 'fixed inset-0 z-50 flex hidden';
+        drawer.style.display = 'none';
+        drawer.setAttribute('role', 'dialog');
+        drawer.setAttribute('aria-modal', 'true');
+        drawer.setAttribute('aria-label', 'Mobile navigation menu');
+
+        drawer.innerHTML =
+            '<div id="moduliv-drawer-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>' +
+            '<aside id="moduliv-drawer-panel" class="relative w-[320px] max-w-[85vw] h-full bg-[#f9f8f6] dark:bg-[#1a1c1d] shadow-2xl flex flex-col justify-between overflow-y-auto transform -translate-x-full transition-transform duration-300 ease-out z-10 p-6">' +
+            '  <div>' +
+            '    <div class="flex items-center justify-between pb-5 border-b border-outline-variant/30 dark:border-outline/20">' +
+            '      <a href="' + (isStitch ? 'index.html' : '/') + '" class="group flex items-baseline gap-1.5 focus:outline-none" aria-label="The Flat Set — Home">' +
+            '        <span class="font-serif italic text-xl tracking-tight text-on-surface dark:text-surface-bright group-hover:text-primary transition-colors">The</span>' +
+            '        <span class="font-serif font-semibold text-xl tracking-tight text-on-surface dark:text-surface-bright group-hover:text-primary transition-colors">Flat Set</span>' +
+            '      </a>' +
+            '      <button id="moduliv-drawer-close" type="button" aria-label="Close navigation menu" class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors">' +
+            '        <span class="material-symbols-outlined text-[22px]">close</span>' +
+            '      </button>' +
+            '    </div>' +
+            '    <div class="mt-4">' +
+            '      <button id="moduliv-drawer-search-btn" type="button" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-full bg-surface-container-lowest dark:bg-surface-container border border-outline-variant/40 text-on-surface-variant text-sm font-label-md hover:border-primary transition-colors text-left">' +
+            '        <span class="material-symbols-outlined text-[20px] text-primary">search</span>' +
+            '        <span>Search furniture, kits, FAQs...</span>' +
+            '      </button>' +
+            '    </div>' +
+            '    <nav class="mt-6 flex flex-col gap-1" aria-label="Mobile Navigation">' +
+            '      <span class="text-[10px] uppercase font-bold tracking-widest text-outline mb-2 px-2">Collections & Living</span>' +
+            '      <a href="' + (isStitch ? '1-bedroom-kit-builder.html' : '/1-bedroom-kit-builder') + '" class="drawer-nav-item flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors">' +
+            '        <span>1-Bedroom Kit</span>' +
+            '        <span class="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>' +
+            '      </a>' +
+            '      <a href="' + (isStitch ? 'modusofa-product-detail-page.html' : '/products/modusofa') + '" class="drawer-nav-item flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors">' +
+            '        <span>ModuSofa</span>' +
+            '        <span class="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>' +
+            '      </a>' +
+            '      <a href="' + (isStitch ? 'how-it-works-craft-logistics.html' : '/how-it-works-craft-logistics') + '" class="drawer-nav-item flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors">' +
+            '        <span>Craft & Logistics</span>' +
+            '        <span class="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>' +
+            '      </a>' +
+            '      <a href="' + (isStitch ? 'free-swatch-box-material-discovery.html' : '/free-swatch-box-material-discovery') + '" class="drawer-nav-item flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors">' +
+            '        <span>Free Swatch Box</span>' +
+            '        <span class="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>' +
+            '      </a>' +
+            '      <a href="' + (isStitch ? 'brand.html' : '/brand') + '" class="drawer-nav-item flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors">' +
+            '        <span>Brand VI Guidelines</span>' +
+            '        <span class="text-xs uppercase px-2 py-0.5 rounded bg-primary-fixed text-primary font-sans font-semibold">New</span>' +
+            '      </a>' +
+            '      <a href="' + (isStitch ? 'faq.html' : '/faq') + '" class="drawer-nav-item flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors">' +
+            '        <span>FAQ & Support</span>' +
+            '        <span class="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>' +
+            '      </a>' +
+            '      <a href="' + (isStitch ? 'cart.html' : '/cart') + '" class="drawer-nav-item flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors">' +
+            '        <span>Cart & Checkout</span>' +
+            '        <span class="drawer-cart-badge text-xs px-2 py-0.5 rounded-full bg-primary text-on-primary font-sans font-bold">0</span>' +
+            '      </a>' +
+            '    </nav>' +
+            '  </div>' +
+            '  <div class="pt-6 border-t border-outline-variant/30 dark:border-outline/20 flex flex-col gap-4">' +
+            '    <div class="bg-surface-container-low dark:bg-surface-container p-3.5 rounded-xl border border-outline-variant/30 text-xs text-on-surface-variant">' +
+            '      <div class="font-semibold text-on-surface mb-1 flex items-center gap-1.5">' +
+            '        <span class="material-symbols-outlined text-[16px] text-primary">verified</span>' +
+            '        <span>The Flat Set Guarantee</span>' +
+            '      </div>' +
+            '      <p class="text-[11px] leading-relaxed text-outline">6 Flat Boxes · 60-Minute Assembly · 0 Screws · DDP Guaranteed Delivery.</p>' +
+            '    </div>' +
+            '    <div class="flex items-center justify-between text-xs text-outline">' +
+            '      <button type="button" id="moduliv-drawer-privacy" class="hover:text-primary transition-colors cursor-pointer">Privacy Policy</button>' +
+            '      <span>•</span>' +
+            '      <button type="button" id="moduliv-drawer-terms" class="hover:text-primary transition-colors cursor-pointer">Terms & Conditions</button>' +
+            '    </div>' +
+            '    <div class="text-[11px] text-outline/80 text-center">' +
+            '      © 2026 The Flat Set Inc.' +
+            '    </div>' +
+            '  </div>' +
+            '</aside>';
+
+        document.body.appendChild(drawer);
+
+        var backdrop = document.getElementById('moduliv-drawer-backdrop');
+        var panel = document.getElementById('moduliv-drawer-panel');
+        var closeBtn = document.getElementById('moduliv-drawer-close');
+
+        function openDrawer() {
+            drawer.style.display = 'flex';
+            drawer.classList.remove('hidden');
+            var badge = drawer.querySelector('.drawer-cart-badge');
+            if (badge && window.modulivCart) badge.textContent = window.modulivCart.count();
+            setTimeout(function () {
+                backdrop.classList.remove('opacity-0');
+                backdrop.classList.add('opacity-100');
+                panel.classList.remove('-translate-x-full');
+                panel.classList.add('translate-x-0');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+            var trigger = document.getElementById('mobile-menu-trigger');
+            if (trigger) trigger.setAttribute('aria-expanded', 'true');
+        }
+
+        function closeDrawer() {
+            backdrop.classList.remove('opacity-100');
+            backdrop.classList.add('opacity-0');
+            panel.classList.remove('translate-x-0');
+            panel.classList.add('-translate-x-full');
+            setTimeout(function () {
+                drawer.classList.add('hidden');
+                drawer.style.display = 'none';
+                document.body.style.overflow = '';
+            }, 300);
+            var trigger = document.getElementById('mobile-menu-trigger');
+            if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        }
+
+        function toggleDrawer() {
+            if (drawer.classList.contains('hidden') || drawer.style.display === 'none') {
+                openDrawer();
+            } else {
+                closeDrawer();
+            }
+        }
+
+        if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+        if (backdrop) backdrop.addEventListener('click', closeDrawer);
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !drawer.classList.contains('hidden')) {
+                closeDrawer();
+            }
+        });
+
+        drawer.querySelectorAll('.drawer-nav-item').forEach(function (link) {
+            link.addEventListener('click', closeDrawer);
+        });
+
+        var drawerSearchBtn = document.getElementById('moduliv-drawer-search-btn');
+        if (drawerSearchBtn) {
+            drawerSearchBtn.addEventListener('click', function () {
+                closeDrawer();
+                setTimeout(function () {
+                    if (window.modulivOpenSearch) window.modulivOpenSearch();
+                }, 200);
+            });
+        }
+
+        var drawerPrivacyBtn = document.getElementById('moduliv-drawer-privacy');
+        if (drawerPrivacyBtn) {
+            drawerPrivacyBtn.addEventListener('click', function () {
+                closeDrawer();
+                setTimeout(function () {
+                    var m = document.getElementById('moduliv-privacy-modal');
+                    if (m) {
+                        m.style.display = 'flex';
+                        m.classList.remove('hidden');
+                        setTimeout(function () {
+                            m.classList.remove('opacity-0');
+                            if (m.firstElementChild) {
+                                m.firstElementChild.classList.remove('scale-95');
+                                m.firstElementChild.classList.add('scale-100');
+                            }
+                        }, 10);
+                        document.body.style.overflow = 'hidden';
+                    }
+                }, 200);
+            });
+        }
+
+        var drawerTermsBtn = document.getElementById('moduliv-drawer-terms');
+        if (drawerTermsBtn) {
+            drawerTermsBtn.addEventListener('click', function () {
+                closeDrawer();
+                setTimeout(function () {
+                    var m = document.getElementById('moduliv-terms-modal');
+                    if (m) {
+                        m.style.display = 'flex';
+                        m.classList.remove('hidden');
+                        setTimeout(function () {
+                            m.classList.remove('opacity-0');
+                            if (m.firstElementChild) {
+                                m.firstElementChild.classList.remove('scale-95');
+                                m.firstElementChild.classList.add('scale-100');
+                            }
+                        }, 10);
+                        document.body.style.overflow = 'hidden';
+                    }
+                }, 200);
+            });
+        }
+
+        document.querySelectorAll('#mobile-menu-trigger, [data-drawer-trigger]').forEach(function (btn) {
+            if (!btn.hasAttribute('data-drawer-wired')) {
+                btn.setAttribute('data-drawer-wired', 'true');
+                btn.setAttribute('aria-expanded', 'false');
+                btn.setAttribute('aria-controls', 'moduliv-mobile-drawer');
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    toggleDrawer();
+                });
+            }
+        });
+
+        window.modulivDrawer = {
+            open: openDrawer,
+            close: closeDrawer,
+            toggle: toggleDrawer
+        };
+    }
+
     function wireScrollReveal() {
         var els = document.querySelectorAll('.reveal');
         if (!els.length) return;
@@ -600,6 +819,7 @@
         initCurrencySwitcher();
         wireFooterPolicies();
         wireAnnouncementDismiss();
+        initMobileDrawer();
         wireScrollReveal();
     }
 

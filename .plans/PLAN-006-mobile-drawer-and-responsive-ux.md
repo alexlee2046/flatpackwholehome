@@ -1,6 +1,6 @@
 # PLAN-006 The Flat Set 移动端抽屉导航（Mobile Drawer）与响应式无障碍体验升级
 
-> 状态：待用户批准（Plan 模式）  
+> 状态：执行中 / 部分已完成（Act 模式）  
 > 责任模块：`stitch/moduliv-core.js`、`stitch/*.html`、`src/components/moduliv/ModulivHeader.tsx`、`tests/e2e-storefront.mjs`  
 > 目标：彻底补齐 DEF-08 缺陷，为移动端（<768px 视口，如 iPhone 390px、折叠屏）提供媲美原生 App 质感的 Warm Japandi 侧边抽屉菜单，集成多语言、货币切换、快捷检索、全套导航与政策弹窗。
 
@@ -8,11 +8,11 @@
 
 ## 一、任务跟踪清单 (Checklist)
 
-- [ ] [P6-01] 在 `stitch/moduliv-core.js` 实现移动端抽屉动态注入与手势交互（`initMobileDrawer`）
-- [ ] [P6-02] 在 `stitch/` 所有原型页面 Header 增加汉堡按钮并优化移动顶栏视觉（单行紧凑布局）
-- [ ] [P6-03] 升级 Next.js 生产组件 `src/components/moduliv/ModulivHeader.tsx`（React 状态驱动抽屉、无障碍 ARIA、平滑过渡动画）
-- [ ] [P6-04] 在抽屉内整合完整功能族：全套产品/工艺/VI导航、搜索唤起、7国语言切换、6国货币切换、DDP 服务背书、政策模态窗触发
-- [ ] [P6-05] 编写针对移动端（390×844 视口）的 Playwright 自动化测试脚本并本地验证
+- [x] [P6-01] 在 `stitch/moduliv-core.js` 实现移动端抽屉动态注入与手势交互（`initMobileDrawer`）
+- [x] [P6-02] 在 `stitch/` 所有原型页面 Header 增加汉堡按钮并优化移动顶栏视觉（单行紧凑布局）
+- [x] [P6-03] 升级 Next.js 生产组件 `src/components/moduliv/ModulivHeader.tsx`（React 状态驱动抽屉、无障碍 ARIA、平滑过渡动画）
+- [x] [P6-04] 在抽屉内整合完整功能族：全套产品/工艺/VI导航、搜索唤起、7国语言切换、6国货币切换、DDP 服务背书、政策模态窗触发
+- [x] [P6-05] 编写针对移动端（390×844 视口）的 Playwright 自动化测试脚本并本地验证
 - [ ] [P6-06] 提交 Git 代码，触发 Coolify 自动化构建流水线并完成线上生产验证
 
 ---

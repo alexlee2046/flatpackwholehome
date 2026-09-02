@@ -145,17 +145,25 @@
 <!-- Header & Navigation -->
 <header class="sticky top-0 z-50 w-full bg-surface/90 backdrop-blur-md border-b border-outline-variant/30">
 <div class="max-w-[1440px] mx-auto flex items-center justify-between gap-4 w-full px-margin-mobile md:px-margin-desktop py-3">
+<!-- Mobile Menu Trigger & Logo -->
+<div class="flex items-center gap-3">
+<button id="mobile-menu-trigger" type="button" aria-label="Open navigation menu" class="md:hidden flex items-center justify-center w-10 h-10 -ml-2 rounded-full text-on-surface hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-[24px]">menu</span>
+</button>
 <a class="group flex items-baseline gap-1.5 shrink-0 text-on-surface dark:text-surface-bright hover:opacity-85 transition-opacity" href="index.html" aria-label="The Flat Set — Home">
 <span class="font-headline-md italic font-normal text-[17px] tracking-wider text-on-surface/80 dark:text-surface-dim">The</span>
 <span class="font-headline-md font-semibold text-[23px] tracking-[-0.02em] text-on-surface dark:text-surface-bright">Flat Set</span>
 </a>
+</div>
 <nav class="hidden md:flex items-center gap-8 ml-auto">
 <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-on-surface transition-all duration-300" href="1-bedroom-kit-builder.html">Move-In Bundles</a>
 <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-on-surface transition-all duration-300" href="modusofa-product-detail-page.html">ModuSofa</a>
 <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-on-surface transition-all duration-300" href="how-it-works-craft-logistics.html">How It Works</a>
 <a class="font-label-md text-label-md uppercase tracking-wider text-primary dark:text-inverse-primary border-b-2 border-primary dark:border-inverse-primary pb-1 transition-all duration-300" href="free-swatch-box-material-discovery.html">Free Swatch Box</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-on-surface transition-all duration-300" href="brand.html">Brand VI</a>
 </nav>
-<div class="flex items-center gap-4 text-primary">
+<div class="flex items-center gap-4 text-primary md:ml-8">
+<span class="hidden md:inline font-label-md text-label-md cursor-pointer hover:opacity-80 transition-opacity duration-300">USD</span>
 <button aria-label="Search" class="hover:opacity-80 transition-opacity duration-300">
 <span class="material-symbols-outlined" data-icon="search">search</span>
 </button>
@@ -164,7 +172,6 @@
 </a>
 </div>
 </div>
-<nav class="md:hidden flex gap-6 overflow-x-auto whitespace-nowrap px-margin-mobile pb-3 font-label-md text-label-md" aria-label="Site sections"><a class="shrink-0 pb-1 border-b-2 border-transparent text-on-surface-variant" href="1-bedroom-kit-builder.html">Move-In Bundles</a><a class="shrink-0 pb-1 border-b-2 border-transparent text-on-surface-variant" href="modusofa-product-detail-page.html">ModuSofa</a><a class="shrink-0 pb-1 border-b-2 border-transparent text-on-surface-variant" href="how-it-works-craft-logistics.html">How It Works</a><a class="shrink-0 pb-1 border-b-2 border-primary text-primary" href="free-swatch-box-material-discovery.html">Free Swatch Box</a></nav>
 </header>
 <main id="main" tabindex="-1">
 <!-- Hero Section -->
