@@ -708,12 +708,6 @@
             heroEl.src = s.img;
             heroEl.alt = s.alt;
         }
-// #region agent log
-(function() {
-    var heroImg = document.getElementById('kit-hero-render');
-    fetch('http://127.0.0.1:7812/ingest/fa02535f-a3bf-4319-91c3-645fd5697ed4',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'f43786'},body:JSON.stringify({sessionId:'f43786',runId:'post-fix',hypothesisId:'H5',location:'stitch/1-bedroom-kit-builder.html:742',message:'Audit hero image state on render',data:{space:state.space,imgSrc:heroImg?heroImg.src:null},timestamp:Date.now()})}).catch(()=>{});
-})();
-// #endregion
     }
     document.querySelectorAll('[data-space]').forEach(function (b) {
         b.addEventListener('click', function () { state.space = b.dataset.space; render(); });
