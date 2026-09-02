@@ -53,7 +53,7 @@ async function testPlaywright() {
     // 6. Test Language Switcher
     console.log('6. Testing Language Switcher to zh-CN...');
     await page.goto(`${BASE_URL}/en`, { waitUntil: 'networkidle' });
-    const langSelect = page.locator('select[aria-label="Language selector"]');
+    const langSelect = page.locator('header select[aria-label="Language selector"]');
     if (await langSelect.isVisible()) {
       await langSelect.selectOption('zh-CN');
       await page.waitForTimeout(1000);
@@ -98,7 +98,7 @@ async function testPlaywright() {
     await mobileMenuTrigger.click();
     await page.waitForTimeout(400);
 
-    const drawer = page.locator('#mobile-nav-drawer, #moduliv-mobile-drawer');
+    const drawer = page.locator('#mobile-nav-drawer');
     const isDrawerVisible = await drawer.isVisible();
     console.log('   Mobile drawer opened successfully:', isDrawerVisible);
     if (!isDrawerVisible) {
@@ -106,12 +106,12 @@ async function testPlaywright() {
     }
 
     // Verify drawer links
-    const kitLink = page.locator('#mobile-nav-drawer a[href*="kit-builder"], #moduliv-mobile-drawer a[href*="kit-builder"]');
+    const kitLink = page.locator('#mobile-nav-drawer a[href*="kit-builder"]');
     const isKitLinkVisible = await kitLink.isVisible();
     console.log('   Drawer Move-In Bundles link is visible:', isKitLinkVisible);
 
     // Test close button
-    const closeBtn = page.locator('#mobile-nav-drawer button[aria-label="Close navigation menu"], #moduliv-drawer-close');
+    const closeBtn = page.locator('#mobile-nav-drawer button[aria-label="Close navigation menu"]');
     await closeBtn.click();
     await page.waitForTimeout(400);
     const isDrawerClosed = !(await drawer.isVisible());

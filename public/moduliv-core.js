@@ -559,7 +559,7 @@
        6. MOBILE DRAWER NAVIGATION (DEF-08)
        ========================================================================== */
     function initMobileDrawer() {
-        var existing = document.getElementById('moduliv-mobile-drawer');
+        var existing = document.getElementById('moduliv-mobile-drawer') || document.getElementById('mobile-nav-drawer');
         if (existing) {
             return;
         }
