@@ -181,10 +181,11 @@ flowchart TD
 
 ## 6. 任务跟踪清单
 
-- [ ] [P4-01] 编写生产级 `Dockerfile`、`.dockerignore` 与健康探针 `src/app/api/health/route.ts`
-- [ ] [P4-02] 本地验证 Docker 镜像构建与探针接口响应
-- [ ] [P4-03] 配置 GitHub 远程仓库 (`alexlee2046/flatpackwholehome`) 并推送最新代码
-- [ ] [P4-04] 执行 `supactl create flatpackwholehome` 编排独立生产数据库实例并获取凭据
-- [ ] [P4-05] 通过 `coolify cli` 创建 Project 与 Application 配置
-- [ ] [P4-06] 通过 `coolify app env` 注入生产环境变量矩阵并绑定域名
-- [ ] [P4-07] 触发生产自动化部署、监控部署日志并完成全链路验收
+- [x] [P4-01] 编写生产级 `Dockerfile`、`.dockerignore` 与健康探针 `src/app/api/health/route.ts`
+- [x] [P4-02] 本地验证 Docker 镜像构建与探针接口响应
+- [x] [P4-03] 配置 GitHub 远程仓库 (`alexlee2046/flatpackwholehome`) 并推送最新代码
+- [x] [P4-04] 执行 `supactl create flatpackwholehome` 编排独立生产数据库实例并获取凭据
+- [x] [P4-05] 通过 `coolify cli` 创建 Project 与 Application 配置
+- [x] [P4-06] 通过 `coolify app env` 注入生产环境变量矩阵并绑定域名
+- [x] [P4-07] 触发生产自动化部署、监控部署日志并完成全链路验收
+- [x] [P4-08] 生产数据库数据播种 (Seed) 与多语言/全链路 Playwright E2E 自动化测试验收通过

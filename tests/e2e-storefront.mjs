@@ -9,11 +9,12 @@ async function testPlaywright() {
   });
 
   const page = await browser.newPage();
+  const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
   try {
     // 1. Visit Kit Builder
     console.log('1. Testing Kit Builder page...');
-    await page.goto('http://localhost:3000/en/1-bedroom-kit-builder', { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/en/1-bedroom-kit-builder`, { waitUntil: 'networkidle' });
     const heading = await page.textContent('h1');
     console.log('   Heading:', heading?.trim());
 
@@ -25,7 +26,7 @@ async function testPlaywright() {
 
     // 3. Verify on Cart page
     console.log('3. Verifying Cart page...');
-    await page.goto('http://localhost:3000/en/cart', { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/en/cart`, { waitUntil: 'networkidle' });
     const cartItemCount = await page.locator('#cart-items, article').count();
     console.log('   Cart articles count:', cartItemCount);
 
@@ -42,7 +43,7 @@ async function testPlaywright() {
 
     // 5. Test FAQ Live Search
     console.log('5. Testing FAQ search...');
-    await page.goto('http://localhost:3000/en/faq', { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/en/faq`, { waitUntil: 'networkidle' });
     const faqInput = page.locator('input[placeholder*="Filter questions"]');
     await faqInput.fill('duties');
     await page.waitForTimeout(300);
@@ -51,7 +52,7 @@ async function testPlaywright() {
 
     // 6. Test Language Switcher
     console.log('6. Testing Language Switcher to zh-CN...');
-    await page.goto('http://localhost:3000/en', { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/en`, { waitUntil: 'networkidle' });
     const langSelect = page.locator('select[aria-label="Language selector"]');
     if (await langSelect.isVisible()) {
       await langSelect.selectOption('zh-CN');

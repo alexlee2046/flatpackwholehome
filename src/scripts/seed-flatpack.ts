@@ -29,7 +29,7 @@ const richText = (...paragraphs: string[]) => ({
 export async function seedFlatpack(payload: Payload) {
   payload.logger.info('Seeding MODULIV / The Flat Set whole-home commerce content…')
 
-  const upsertBySlug = async (collection: any, slug: string, data: Record<string, unknown>) => {
+  const upsertBySlug = async (collection: any, slug: string, data: Record<string, unknown>, locale?: string) => {
     const existing = await payload.find({
       collection,
       depth: 0,
@@ -43,6 +43,7 @@ export async function seedFlatpack(payload: Payload) {
         collection,
         data: data as never,
         id: existing.docs[0].id,
+        locale: locale as never,
         overrideAccess: true,
       })
     }
@@ -50,6 +51,7 @@ export async function seedFlatpack(payload: Payload) {
     return payload.create({
       collection,
       data: { ...data, slug } as never,
+      locale: locale as never,
       overrideAccess: true,
     })
   }
@@ -205,7 +207,7 @@ export async function seedFlatpack(payload: Payload) {
     }),
   ])
 
-  // 5. Seed Globals
+  // 5. Seed Globals (en)
   await Promise.all([
     payload.updateGlobal({
       slug: 'site-settings',
@@ -239,6 +241,115 @@ export async function seedFlatpack(payload: Payload) {
         },
         featuredProducts: [productKit.id, productSofa.id, productBed.id],
       },
+      overrideAccess: true,
+    }),
+  ])
+
+  // 6. Seed Chinese Localization (zh-CN)
+  await Promise.all([
+    upsertBySlug('spaces', 'living-room', {
+      title: '客厅空间',
+      intro: '以模块化 ModuSofa 与实木橡木茶几为核心的日式极简客厅空间。',
+    }, 'zh-CN'),
+    upsertBySlug('spaces', 'bedroom', {
+      title: '卧室空间',
+      intro: '零螺丝组装 SnapBed 地台床打造的极简睡眠栖息地。',
+    }, 'zh-CN'),
+    upsertBySlug('spaces', 'whole-home', {
+      title: '一居室全屋整装',
+      intro: '仅需 6 个扁平包装箱，一次性送达客厅与卧室全套家具。',
+    }, 'zh-CN'),
+
+    upsertBySlug('materials', 'white-oak', {
+      title: 'FSC 认证欧洲白橡木',
+      intro: '可持续采伐的原木白橡木，表面采用天然哑光木蜡油与高精度榫卯工艺。',
+      facts: [
+        { label: '产地', body: 'FSC 认证欧洲可持续森林。' },
+        { label: '涂装', body: '零 VOC 植物基哑光木蜡油。' },
+        { label: '密度', body: '高密度慢生硬木，历久弥新。' },
+      ],
+    }, 'zh-CN'),
+    upsertBySlug('materials', 'black-walnut', {
+      title: '北美特级黑胡桃木',
+      intro: '温润醇厚的深巧克力色泽，带有行云流水般的天然山形纹理。',
+      facts: [
+        { label: '产地', body: '北美阿巴拉契亚优质硬木林。' },
+        { label: '纹理', body: '结构主梁采用连续山形拼花对称纹理。' },
+      ],
+    }, 'zh-CN'),
+    upsertBySlug('materials', 'oatmeal-boucle', {
+      title: '燕麦色肌理羊圈呢',
+      intro: '富有质感、耐磨抗污的舒适触感织物，专为日常舒适起居设计。',
+      facts: [
+        { label: '马丁代尔耐磨度', body: '超过 60,000 次双摩擦，商业级耐磨标准。' },
+        { label: '抗污防护', body: '无氟环保防泼水纱线工艺。' },
+      ],
+    }, 'zh-CN'),
+
+    upsertBySlug('products', 'modusofa', {
+      title: 'ModuSofa 模块化三人沙发',
+      subtitle: '免工具榫卯组装的日式沙发，专为深舒适坐感与自由拆卸设计。',
+      specifications: [
+        { label: '尺寸', value: '220 cm 宽 × 92 cm 深 × 74 cm 高' },
+        { label: '框架材质', value: 'FSC 认证欧洲特级白橡木原木' },
+        { label: '坐垫填充', value: '高回弹海绵支撑层 + 羽绒柔弹包裹层' },
+        { label: '包装规格', value: '2 个扁平纸箱（轻松进入标准客梯）' },
+      ],
+      boxBreakdown: [
+        { boxId: 'b1', title: '1 号箱：实木底座与榫卯横梁', dimensions: '115 × 50 × 20 cm', weight: '24 kg', description: '纯实木白橡木边框与中央承重梁。' },
+        { boxId: 'b2', title: '2 号箱：坐垫与靠背支撑件', dimensions: '100 × 70 × 35 cm', weight: '18 kg', description: '羽绒混纺坐垫与模块化靠背组件。' },
+      ],
+    }, 'zh-CN'),
+    upsertBySlug('products', 'snapbed', {
+      title: 'SnapBed 极简地台床',
+      subtitle: '纯实木橡木悬浮地台床架，兼容无缝悬浮床头柜。',
+      specifications: [
+        { label: '尺寸 (Queen 标准双人)', value: '160 cm 宽 × 210 cm 长 × 28 cm 高' },
+        { label: '包装规格', value: '2 个扁平纸箱' },
+      ],
+      boxBreakdown: [
+        { boxId: 'b5', title: '5 号箱：床架侧梁与五金锁扣', dimensions: '215 × 25 × 18 cm', weight: '22 kg', description: '内嵌自重锁止结构的实木长侧梁。' },
+        { boxId: 'b6', title: '6 号箱：排骨架与床头模块', dimensions: '165 × 40 × 15 cm', weight: '20 kg', description: 'FSC 桦木卷式排骨架与低矮床头板。' },
+      ],
+    }, 'zh-CN'),
+    upsertBySlug('products', '1-bedroom-kit', {
+      title: '一居室全套家具包 (6 箱整套)',
+      subtitle: '全屋家具一站式解决方案：客厅、餐厅与卧室仅需 6 个包装箱。',
+      specifications: [
+        { label: '全套配置', value: 'ModuSofa 三人沙发 + 实木茶几 + SnapBed 地台床 + 餐厅长凳' },
+        { label: '包装规格', value: '6 个扁平包装箱（一次性完整配送）' },
+        { label: '组装时间', value: '双人约 60 分钟全程免螺丝组装' },
+      ],
+      boxBreakdown: [
+        { boxId: 'b1', title: '1 号箱：ModuSofa 橡木底架', dimensions: '115 × 50 × 20 cm', weight: '24 kg', description: '沙发实木框架与免工具卡扣' },
+        { boxId: 'b2', title: '2 号箱：ModuSofa 坐垫靠包', dimensions: '100 × 70 × 35 cm', weight: '18 kg', description: '羊圈呢坐垫与靠枕组' },
+        { boxId: 'b3', title: '3 号箱：低矮极简茶几', dimensions: '90 × 60 × 12 cm', weight: '14 kg', description: '纯实木橡木有机形态茶几' },
+        { boxId: 'b4', title: '4 号箱：多功能长凳', dimensions: '120 × 35 × 15 cm', weight: '16 kg', description: '餐桌/玄关两用实木长凳' },
+        { boxId: 'b5', title: '5 号箱：SnapBed 床架侧梁', dimensions: '215 × 25 × 18 cm', weight: '22 kg', description: 'Queen 双人床边框与重力卡榫' },
+        { boxId: 'b6', title: '6 号箱：SnapBed 床排骨架与悬浮床头柜', dimensions: '165 × 40 × 15 cm', weight: '20 kg', description: '桦木排骨架 + 两个悬浮置物床头柜' },
+      ],
+    }, 'zh-CN'),
+
+    payload.updateGlobal({
+      slug: 'announcement',
+      data: {
+        message: '免费面料色卡盒附赠 $50 抵用券 — 全球 DDP 包税专线配送',
+        linkLabel: '探索一居室全套方案',
+        linkURL: '/1-bedroom-kit-builder',
+      },
+      locale: 'zh-CN' as never,
+      overrideAccess: true,
+    }),
+    payload.updateGlobal({
+      slug: 'homepage',
+      data: {
+        hero: {
+          eyebrow: '日式极简全屋系统',
+          headline: '6 个扁平包装箱装下你的整套家',
+          body: '精选 FSC 认证欧洲白橡木与北美黑胡桃木，无需螺丝工具即可组装。',
+        },
+      },
+      locale: 'zh-CN' as never,
       overrideAccess: true,
     }),
   ])
