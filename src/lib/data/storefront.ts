@@ -6,6 +6,22 @@ import { getPayload } from 'payload'
 import { cache } from 'react'
 
 /**
+ * Every product query here runs with `overrideAccess: true`, which bypasses the
+ * field-level access control on Products. Strip the internal economics on the
+ * way out instead, so a caller that spreads a whole document — rather than
+ * hand-picking fields, as the pages happen to do today — still cannot leak
+ * factory cost data to the browser.
+ */
+const INTERNAL_PRODUCT_FIELDS = ['targetBOMUSD', 'targetBOMRMB', 'ikeaBenchmarkPrice', 'supplierSKU']
+
+function stripInternalFields<T>(doc: T): T {
+  if (!doc || typeof doc !== 'object') return doc
+  const out = { ...(doc as Record<string, unknown>) }
+  for (const field of INTERNAL_PRODUCT_FIELDS) delete out[field]
+  return out as T
+}
+
+/**
  * Retrieve homepage data with 5-minute data cache and in-flight deduplication.
  */
 export const getHomePageData = cache(async (locale: string) => {
@@ -54,7 +70,7 @@ export const getHomePageData = cache(async (locale: string) => {
         return {
           announcement: a,
           homepage: resolvedHome,
-          kitProduct: kitProductRes?.docs?.[0] || null,
+          kitProduct: stripInternalFields(kitProductRes?.docs?.[0] || null),
         }
       } catch (err) {
         console.error('[storefront:getHomePageData]', err)
@@ -88,7 +104,7 @@ export const getProductData = cache(async (slug: string, locale: string) => {
             slug: { equals: slug },
           },
         })
-        return productResult?.docs?.[0] || null
+        return stripInternalFields(productResult?.docs?.[0] || null)
       } catch (err) {
         console.error('[storefront:getProductData]', err)
         return null
@@ -135,9 +151,9 @@ export const getKitBuilderData = cache(async (locale: string) => {
         ])
 
         return {
-          bedProduct: productsRes?.docs?.find((p) => p.slug === 'snapbed') || null,
-          bundleProduct: productsRes?.docs?.find((p) => p.slug === '1-bedroom-kit') || null,
-          livingProduct: productsRes?.docs?.find((p) => p.slug === 'modusofa') || null,
+          bedProduct: stripInternalFields(productsRes?.docs?.find((p) => p.slug === 'snapbed') || null),
+          bundleProduct: stripInternalFields(productsRes?.docs?.find((p) => p.slug === '1-bedroom-kit') || null),
+          livingProduct: stripInternalFields(productsRes?.docs?.find((p) => p.slug === 'modusofa') || null),
           materials: materialsRes?.docs || [],
           spaces: spacesRes?.docs || [],
         }

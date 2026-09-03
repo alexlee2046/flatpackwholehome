@@ -40,7 +40,7 @@ function PolicyDialog({
   return (
     <dialog
       aria-labelledby={titleId}
-      className="moduliv-policy-dialog m-auto w-full max-w-2xl rounded-2xl border border-outline-variant/50 bg-surface-container-low p-0 text-on-surface shadow-2xl dark:bg-inverse-surface dark:text-surface-bright"
+      className="moduliv-policy-dialog m-auto w-full max-w-2xl rounded-2xl border border-outline-variant/50 bg-surface-container-low p-0 text-on-surface shadow-2xl"
       data-moduliv-policy=""
       onClick={(e) => {
         if (e.target === dialogRef.current) dialogRef.current?.close()
@@ -48,13 +48,13 @@ function PolicyDialog({
       ref={dialogRef}
     >
       <div className="flex max-h-[85vh] flex-col">
-        <div className="flex items-center justify-between border-b border-outline-variant/40 bg-surface-container-lowest px-6 py-5 dark:bg-surface-container">
-          <h3 className="font-headline-sm text-xl text-on-surface dark:text-surface-bright" id={titleId}>
+        <div className="flex items-center justify-between border-b border-outline-variant/40 bg-surface-container-lowest px-6 py-5">
+          <h3 className="font-headline-sm text-xl text-on-surface" id={titleId}>
             {t('title')}
           </h3>
           <button
             aria-label={tPolicies('close')}
-            className="rounded-full p-1.5 text-on-surface-variant transition-colors hover:bg-surface-container-highest hover:text-on-surface dark:text-surface-dim"
+            className="rounded-full p-1.5 text-on-surface-variant transition-colors hover:bg-surface-container-highest hover:text-on-surface"
             onClick={() => dialogRef.current?.close()}
             type="button"
           >
@@ -65,7 +65,7 @@ function PolicyDialog({
         </div>
         <div className="flex-1 overflow-y-auto px-6 py-6 md:px-8">
           <p className="mb-4 text-xs font-label-md uppercase tracking-wider text-outline">{t('updated')}</p>
-          <p className="whitespace-pre-line font-body-md text-sm text-on-surface-variant dark:text-surface-dim">
+          <p className="whitespace-pre-line font-body-md text-sm text-on-surface-variant">
             {t('body')}
           </p>
         </div>

@@ -48,21 +48,21 @@ export function ModulivFooter({
   }
 
   return (
-    <footer className="bg-surface-container-low dark:bg-inverse-surface w-full px-margin-mobile md:px-margin-desktop py-16 md:py-section-gap flex flex-col md:flex-row justify-between items-start gap-gutter max-w-[1440px] mx-auto border-t border-outline-variant dark:border-outline flat no shadows mt-section-gap">
+    <footer className="bg-surface-container-low w-full px-margin-mobile md:px-margin-desktop py-16 md:py-section-gap flex flex-col md:flex-row justify-between items-start gap-gutter max-w-[1440px] mx-auto border-t border-outline-variant mt-section-gap">
       <div className="flex flex-col gap-4">
         <Link
-          className="group flex items-baseline gap-1.5 shrink-0 text-on-surface dark:text-surface-bright hover:opacity-85 transition-opacity"
+          className="group flex items-baseline gap-1.5 shrink-0 text-on-surface hover:opacity-85 transition-opacity"
           href="/"
           aria-label="The Flat Set — Home"
         >
-          <span className="font-headline-md italic font-normal text-[17px] tracking-wider text-on-surface/80 dark:text-surface-dim">
+          <span className="font-headline-md italic font-normal text-[17px] tracking-wider text-on-surface/80">
             The
           </span>
-          <span className="font-headline-md font-semibold text-[23px] tracking-[-0.02em] text-on-surface dark:text-surface-bright">
+          <span className="font-headline-md font-semibold text-[23px] tracking-[-0.02em] text-on-surface">
             Flat Set
           </span>
         </Link>
-        <p className="font-body-md text-body-md text-on-surface-variant dark:text-surface-dim">
+        <p className="font-body-md text-body-md text-on-surface-variant">
           {resolvedCopyright}
         </p>
         <p className="font-label-md text-[12px] tracking-widest uppercase text-outline mt-2">
@@ -91,37 +91,37 @@ export function ModulivFooter({
         </span>
         <nav aria-label="Furniture System Navigation" className="flex flex-wrap gap-x-8 gap-y-4 items-center font-label-md text-label-md">
           <Link
-            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+            className="text-on-surface-variant hover:text-primary hover:underline transition-all duration-200"
             href="/products/modusofa"
           >
             {tNav('modusofa')}
           </Link>
           <Link
-            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+            className="text-on-surface-variant hover:text-primary hover:underline transition-all duration-200"
             href="/products/snapbed"
           >
             {tNav('snapbed')}
           </Link>
           <Link
-            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+            className="text-on-surface-variant hover:text-primary hover:underline transition-all duration-200"
             href="/products/1-bedroom-kit"
           >
             {tNav('oneBedroomKitProduct')}
           </Link>
           <Link
-            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+            className="text-on-surface-variant hover:text-primary hover:underline transition-all duration-200"
             href="/1-bedroom-kit-builder"
           >
             {tNav('kitBuilder')}
           </Link>
           <Link
-            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+            className="text-on-surface-variant hover:text-primary hover:underline transition-all duration-200"
             href="/free-swatch-box-material-discovery"
           >
             {tNav('swatchBox')}
           </Link>
           <Link
-            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+            className="text-on-surface-variant hover:text-primary hover:underline transition-all duration-200"
             href="/how-it-works-craft-logistics"
           >
             {tNav('howItWorks')}
@@ -133,7 +133,7 @@ export function ModulivFooter({
             {tNav('usVsIkea')} (-20%)
           </Link>
           <Link
-            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+            className="text-on-surface-variant hover:text-primary hover:underline transition-all duration-200"
             href="/faq"
           >
             {tNav('faq')}
@@ -156,7 +156,7 @@ export function ModulivFooter({
               .map((item) => (
                 <Link
                   key={item.url}
-                  className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+                  className="text-on-surface-variant hover:text-primary hover:underline transition-all duration-200"
                   href={item.url}
                 >
                   {item.label}
@@ -165,14 +165,14 @@ export function ModulivFooter({
           <button
             type="button"
             onClick={() => openPolicy('moduliv-privacy-modal')}
-            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200 cursor-pointer"
+            className="text-on-surface-variant hover:text-primary hover:underline transition-all duration-200 cursor-pointer"
           >
             {tFooter('privacyPolicy')}
           </button>
           <button
             type="button"
             onClick={() => openPolicy('moduliv-terms-modal')}
-            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200 cursor-pointer"
+            className="text-on-surface-variant hover:text-primary hover:underline transition-all duration-200 cursor-pointer"
           >
             {tFooter('termsOfService')}
           </button>

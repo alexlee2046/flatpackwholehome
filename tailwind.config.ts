@@ -5,7 +5,6 @@ import type { Config } from 'tailwindcss'
 // without checking against git history, className usage was written against these exact tokens.
 export default {
   content: ['./src/**/*.{ts,tsx}'],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
