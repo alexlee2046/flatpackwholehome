@@ -1,4 +1,4 @@
-import { HowToJsonLd } from '@/components/seo/JsonLd'
+import { BreadcrumbJsonLd, HowToJsonLd } from '@/components/seo/JsonLd'
 import { HowItWorksView } from '@/components/moduliv/HowItWorksView'
 import { SiteFooter } from '@/components/moduliv/SiteFooter'
 import { SiteHeader } from '@/components/moduliv/SiteHeader'
@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return buildPageMetadata({
     description: hero?.subtitle || t('subtitle'),
+    image: '/assets/how-it-works-craft-logistics/how-it-works-craft-logistics.png',
     locale,
     pathname: '/how-it-works-craft-logistics',
     title: hero?.title || t('title'),
@@ -33,10 +34,21 @@ export default async function HowItWorksPage({ params }: Props) {
   const { locale: rawLocale } = await params
   const locale = (hasLocale(locales, rawLocale) ? rawLocale : defaultLocale) as AppLocale
   setRequestLocale(locale)
-  const { hero, steps } = await getHowItWorksData(locale)
+  const [{ hero, steps }, tCommon, tNav] = await Promise.all([
+    getHowItWorksData(locale),
+    getTranslations({ locale, namespace: 'Common' }),
+    getTranslations({ locale, namespace: 'Navigation' }),
+  ])
 
   return (
     <>
+      <BreadcrumbJsonLd
+        locale={locale}
+        items={[
+          { name: tCommon('home'), url: '/' },
+          { name: tNav('howItWorks'), url: '/how-it-works-craft-logistics' },
+        ]}
+      />
       <HowToJsonLd
         description={hero?.subtitle || 'From workshop to living room in 6 flat boxes. 100% tool-free assembly.'}
         locale={locale}

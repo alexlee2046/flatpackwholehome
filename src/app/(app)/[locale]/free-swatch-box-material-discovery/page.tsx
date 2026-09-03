@@ -1,3 +1,4 @@
+import { BreadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { SiteFooter } from '@/components/moduliv/SiteFooter'
 import { SiteHeader } from '@/components/moduliv/SiteHeader'
 import { SwatchView } from '@/components/moduliv/SwatchView'
@@ -21,6 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return buildPageMetadata({
     description: t('subtitle'),
+    image: '/assets/free-swatch-box-material-discovery/asset-swatch-box-hero.png',
     locale,
     pathname: '/free-swatch-box-material-discovery',
     title: t('title'),
@@ -31,10 +33,21 @@ export default async function SwatchPage({ params }: Props) {
   const { locale: rawLocale } = await params
   const locale = (hasLocale(locales, rawLocale) ? rawLocale : defaultLocale) as AppLocale
   setRequestLocale(locale)
-  const materials = await getMaterialsData(locale)
+  const [materials, tCommon, tSwatch] = await Promise.all([
+    getMaterialsData(locale),
+    getTranslations({ locale, namespace: 'Common' }),
+    getTranslations({ locale, namespace: 'Swatch' }),
+  ])
 
   return (
     <>
+      <BreadcrumbJsonLd
+        locale={locale}
+        items={[
+          { name: tCommon('home'), url: '/' },
+          { name: tSwatch('breadcrumb'), url: '/free-swatch-box-material-discovery' },
+        ]}
+      />
       <SiteHeader locale={locale} />
       <SwatchView materials={materials as any} />
       <SiteFooter locale={locale} />

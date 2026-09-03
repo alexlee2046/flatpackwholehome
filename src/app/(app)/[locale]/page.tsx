@@ -1,3 +1,4 @@
+import { BreadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { SiteFooter } from '@/components/moduliv/SiteFooter'
 import { SiteHeader } from '@/components/moduliv/SiteHeader'
 import { ModulivHomepage } from '@/components/moduliv/ModulivHomepage'
@@ -21,6 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return buildPageMetadata({
     description: t('metadataDescription'),
+    image: '/assets/homepage/hero-split.png',
     locale,
     pathname: '/',
     title: t('metadataTitle'),
@@ -31,11 +33,19 @@ export default async function HomePage({ params }: Props) {
   const { locale: rawLocale } = await params
   const locale = (hasLocale(locales, rawLocale) ? rawLocale : defaultLocale) as AppLocale
   setRequestLocale(locale)
-  const { homepage, announcement, kitProduct } = await getHomePageData(locale)
+  const [homepageData, tCommon] = await Promise.all([
+    getHomePageData(locale),
+    getTranslations({ locale, namespace: 'Common' }),
+  ])
+  const { homepage, announcement, kitProduct } = homepageData
   const hp = homepage as any
 
   return (
     <>
+      <BreadcrumbJsonLd
+        locale={locale}
+        items={[{ name: tCommon('home'), url: '/' }]}
+      />
       <SiteHeader locale={locale} />
       <ModulivHomepage
         announcement={announcement?.message || undefined}

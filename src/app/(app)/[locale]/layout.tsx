@@ -10,7 +10,9 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import Script from 'next/script'
 import React from 'react'
 
-const siteURL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+import { getCanonicalSiteURL } from '@/utilities/canonicalUrl'
+
+const siteURL = getCanonicalSiteURL()
 
 type LayoutProps = {
   children: ReactNode

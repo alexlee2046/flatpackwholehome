@@ -4,7 +4,7 @@ import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import React from 'react'
 
-type FooterProps = {
+export type FooterProps = {
   brandSlogan?: string | null
   copyrightText?: string | null
   navItems?: Array<{ label: string; url: string }> | null
@@ -85,72 +85,99 @@ export function ModulivFooter({
         )}
       </div>
 
-      <nav className="flex flex-wrap gap-x-8 gap-y-4 items-center font-label-md text-label-md">
-        {navItems && navItems.length > 0 ? (
-          navItems.map((item) => (
-            <Link
-              key={item.url}
-              className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
-              href={item.url}
-            >
-              {item.label}
-            </Link>
-          ))
-        ) : (
-          <>
-            <Link
-              className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
-              href="/1-bedroom-kit-builder"
-            >
-              {tNav('kitBuilder')}
-            </Link>
-            <Link
-              className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
-              href="/products/modusofa"
-            >
-              {tNav('modusofa')}
-            </Link>
-            <Link
-              className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
-              href="/how-it-works-craft-logistics"
-            >
-              {tNav('howItWorks')}
-            </Link>
-            <Link
-              className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
-              href="/free-swatch-box-material-discovery"
-            >
-              {tNav('swatchBox')}
-            </Link>
-            <Link
-              className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
-              href="/faq"
-            >
-              {tNav('faq')}
-            </Link>
-            <Link
-              className="text-primary font-semibold hover:underline transition-all duration-200"
-              href="/us-vs-ikea"
-            >
-              {tNav('usVsIkea')} (-20%)
-            </Link>
-          </>
-        )}
-        <button
-          type="button"
-          onClick={() => openPolicy('moduliv-privacy-modal')}
-          className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200 cursor-pointer"
-        >
-          {tFooter('privacyPolicy')}
-        </button>
-        <button
-          type="button"
-          onClick={() => openPolicy('moduliv-terms-modal')}
-          className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200 cursor-pointer"
-        >
-          {tFooter('termsOfService')}
-        </button>
-      </nav>
+      <div className="flex flex-col gap-3">
+        <span className="font-label-md text-xs uppercase tracking-widest text-outline font-semibold">
+          Furniture System
+        </span>
+        <nav aria-label="Furniture System Navigation" className="flex flex-wrap gap-x-8 gap-y-4 items-center font-label-md text-label-md">
+          <Link
+            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+            href="/products/modusofa"
+          >
+            The ModuSofa
+          </Link>
+          <Link
+            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+            href="/products/snapbed"
+          >
+            The SnapBed
+          </Link>
+          <Link
+            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+            href="/products/1-bedroom-kit"
+          >
+            The 1-Bedroom Kit
+          </Link>
+          <Link
+            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+            href="/1-bedroom-kit-builder"
+          >
+            Move-In Kit Builder
+          </Link>
+          <Link
+            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+            href="/free-swatch-box-material-discovery"
+          >
+            Free Swatch Box
+          </Link>
+          <Link
+            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+            href="/how-it-works-craft-logistics"
+          >
+            Tool-Free Assembly
+          </Link>
+          <Link
+            className="text-primary font-semibold hover:underline transition-all duration-200"
+            href="/us-vs-ikea"
+          >
+            Vs IKEA (-20%)
+          </Link>
+          <Link
+            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+            href="/faq"
+          >
+            FAQ
+          </Link>
+          {navItems &&
+            navItems
+              .filter(
+                (item) =>
+                  ![
+                    '/products/modusofa',
+                    '/products/snapbed',
+                    '/products/1-bedroom-kit',
+                    '/1-bedroom-kit-builder',
+                    '/free-swatch-box-material-discovery',
+                    '/how-it-works-craft-logistics',
+                    '/us-vs-ikea',
+                    '/faq',
+                  ].includes(item.url)
+              )
+              .map((item) => (
+                <Link
+                  key={item.url}
+                  className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+                  href={item.url}
+                >
+                  {item.label}
+                </Link>
+              ))}
+          <button
+            type="button"
+            onClick={() => openPolicy('moduliv-privacy-modal')}
+            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200 cursor-pointer"
+          >
+            {tFooter('privacyPolicy')}
+          </button>
+          <button
+            type="button"
+            onClick={() => openPolicy('moduliv-terms-modal')}
+            className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200 cursor-pointer"
+          >
+            {tFooter('termsOfService')}
+          </button>
+        </nav>
+      </div>
     </footer>
   )
 }

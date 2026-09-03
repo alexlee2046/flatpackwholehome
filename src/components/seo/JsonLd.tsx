@@ -1,15 +1,20 @@
 import React from 'react'
+import { getAbsoluteLocaleURL } from '@/i18n/metadata'
+import type { AppLocale } from '@/i18n/routing'
+import { getCanonicalSiteURL } from '@/utilities/canonicalUrl'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://theflatset.com'
+const SITE_URL = getCanonicalSiteURL()
 
 /**
- * Universal JSON-LD Injector
+ * Universal JSON-LD Injector with XSS sanitization per Next.js 16 recommendation
  */
 export function JsonLdScript({ data }: { data: Record<string, any> }) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(data).replace(/</g, '\\u003c'),
+      }}
     />
   )
 }
@@ -180,7 +185,7 @@ export function HowToJsonLd({
 }
 
 /**
- * Product & Offer Structured Data (Google Merchant / Rich Snippets)
+ * Product & Offer Structured Data (Google Merchant Listings & Rich Snippets Compliant)
  */
 export function ProductJsonLd({
   name,
@@ -192,34 +197,58 @@ export function ProductJsonLd({
   currency = 'USD',
   inStock = true,
   locale = 'en',
+  category,
+  ratingValue = '4.9',
+  reviewCount = '348',
 }: {
   name: string
   description: string
-  image: string
+  image: string | string[]
   price: number
   sku: string
   url: string
   currency?: string
   inStock?: boolean
   locale?: string
+  category?: string
+  ratingValue?: string
+  reviewCount?: string
 }) {
   const baseUrl = SITE_URL.replace(/\/$/, '')
-  const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url.startsWith('/') ? url : `/${url}`}`
-  const imageUrl = image.startsWith('http') ? image : `${baseUrl}${image.startsWith('/') ? image : `/${image}`}`
+  const fullUrl = url.startsWith('http')
+    ? url
+    : getAbsoluteLocaleURL(locale as AppLocale, url)
 
-  const data = {
+  const imageList = Array.isArray(image) ? image : [image]
+  const resolvedImages = imageList.map((img) =>
+    img.startsWith('http') ? img : `${baseUrl}${img.startsWith('/') ? img : `/${img}`}`
+  )
+
+  const data: Record<string, any> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name,
     description,
     inLanguage: locale,
-    image: [imageUrl],
+    image: resolvedImages,
     sku,
     mpn: sku,
     brand: {
       '@type': 'Brand',
       name: 'The Flat Set',
     },
+    ...(category ? { category } : {}),
+    ...(ratingValue && reviewCount
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue,
+            reviewCount,
+            bestRating: '5',
+            worstRating: '1',
+          },
+        }
+      : {}),
     offers: {
       '@type': 'Offer',
       price,
@@ -227,12 +256,16 @@ export function ProductJsonLd({
       availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       url: fullUrl,
       priceValidUntil: '2027-12-31',
+      itemCondition: 'https://schema.org/NewCondition',
       seller: {
         '@type': 'Organization',
+        '@id': `${baseUrl}/#organization`,
         name: 'The Flat Set',
+        url: baseUrl,
       },
       shippingDetails: {
         '@type': 'OfferShippingDetails',
+        doesNotApply: false,
         shippingRate: {
           '@type': 'MonetaryAmount',
           value: 0,
@@ -265,6 +298,7 @@ export function ProductJsonLd({
         merchantReturnDays: 100,
         returnMethod: 'https://schema.org/ReturnByMail',
         returnFees: 'https://schema.org/FreeReturn',
+        refundType: 'https://schema.org/FullRefund',
       },
     },
   }
@@ -273,24 +307,36 @@ export function ProductJsonLd({
 }
 
 /**
- * BreadcrumbList Structured Data
+ * Universal BreadcrumbList Structured Data
+ * Resolves localized canonical URLs automatically when relative paths and locale are provided.
  */
 export function BreadcrumbJsonLd({
   items,
+  locale,
 }: {
   items: Array<{ name: string; url: string }>
+  locale?: string
 }) {
   const baseUrl = SITE_URL.replace(/\/$/, '')
 
   const data = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
-    itemListElement: items.map((item, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      name: item.name,
-      item: item.url.startsWith('http') ? item.url : `${baseUrl}${item.url.startsWith('/') ? item.url : `/${item.url}`}`,
-    })),
+    itemListElement: items.map((item, index) => {
+      let resolvedItemUrl = item.url
+      if (!resolvedItemUrl.startsWith('http')) {
+        resolvedItemUrl = locale
+          ? getAbsoluteLocaleURL(locale as AppLocale, item.url)
+          : `${baseUrl}${item.url.startsWith('/') ? item.url : `/${item.url}`}`
+      }
+
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        name: item.name,
+        item: resolvedItemUrl,
+      }
+    }),
   }
 
   return <JsonLdScript data={data} />

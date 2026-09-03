@@ -1,11 +1,7 @@
 import type { Metadata } from 'next'
 
 import { defaultLocale, localeDetails, locales, type AppLocale } from './routing'
-
-const siteURL =
-  process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
-    ? process.env.NEXT_PUBLIC_SITE_URL
-    : 'https://theflatset.com'
+import { getCanonicalSiteURL } from '@/utilities/canonicalUrl'
 
 const normalizePathname = (pathname: string) => {
   if (!pathname || pathname === '/') return ''
@@ -18,7 +14,7 @@ export const getLocalePathname = (locale: AppLocale, pathname = '/') => {
 }
 
 export const getAbsoluteLocaleURL = (locale: AppLocale, pathname = '/') =>
-  new URL(getLocalePathname(locale, pathname), siteURL).toString()
+  new URL(getLocalePathname(locale, pathname), getCanonicalSiteURL()).toString()
 
 export const getLanguageAlternates = (
   pathname = '/',

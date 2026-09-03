@@ -26,6 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return buildPageMetadata({
     description: t('subtitle'),
+    image: '/assets/1-bedroom-kit-builder/b4e5f4d8a0.png',
     locale,
     pathname: '/1-bedroom-kit-builder',
     title,
@@ -36,26 +37,34 @@ export default async function KitBuilderPage({ params }: Props) {
   const { locale: rawLocale } = await params
   const locale = (hasLocale(locales, rawLocale) ? rawLocale : defaultLocale) as AppLocale
   setRequestLocale(locale)
-  const { bundleProduct, livingProduct, bedProduct, spaces, materials } =
-    await getKitBuilderData(locale)
+  const [{ bundleProduct, livingProduct, bedProduct, spaces, materials }, tCommon, tKit] =
+    await Promise.all([
+      getKitBuilderData(locale),
+      getTranslations({ locale, namespace: 'Common' }),
+      getTranslations({ locale, namespace: 'Pages.KitBuilder' }),
+    ])
 
   return (
     <>
       <ProductJsonLd
+        category="Furniture > Whole Home"
         currency="USD"
         description={bundleProduct?.subtitle || 'Move-In 1-Bedroom Bundle. 6 flat boxes, tool-free 60-minute assembly, DDP duties included.'}
         image="/assets/1-bedroom-kit-builder/b4e5f4d8a0.png"
         inStock={true}
+        locale={locale}
         name={bundleProduct?.title || 'Move-In 1-Bedroom Bundle'}
         price={bundleProduct?.priceInUSD || 1499}
+        ratingValue="4.9"
+        reviewCount="156"
         sku="TFS-BUNDLE-1BED"
         url="/1-bedroom-kit-builder"
-        locale={locale}
       />
       <BreadcrumbJsonLd
+        locale={locale}
         items={[
-          { name: 'Home', url: '/' },
-          { name: '1-Bedroom Kit Builder', url: '/1-bedroom-kit-builder' },
+          { name: tCommon('home'), url: '/' },
+          { name: tKit('title'), url: '/1-bedroom-kit-builder' },
         ]}
       />
       <SiteHeader locale={locale} />

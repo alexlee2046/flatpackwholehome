@@ -22,6 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return buildPageMetadata({
     description: t('subtitle'),
+    image: '/assets/homepage/hero-split.png',
     locale,
     pathname: '/faq',
     title: t('title'),
@@ -32,15 +33,20 @@ export default async function FaqPage({ params }: Props) {
   const { locale: rawLocale } = await params
   const locale = (hasLocale(locales, rawLocale) ? rawLocale : defaultLocale) as AppLocale
   setRequestLocale(locale)
-  const { faqs } = await getFaqData(locale)
+  const [{ faqs }, tCommon, tFaq] = await Promise.all([
+    getFaqData(locale),
+    getTranslations({ locale, namespace: 'Common' }),
+    getTranslations({ locale, namespace: 'Pages.FAQ' }),
+  ])
 
   return (
     <>
       <FaqJsonLd items={faqs} locale={locale} />
       <BreadcrumbJsonLd
+        locale={locale}
         items={[
-          { name: 'Home', url: '/' },
-          { name: 'Frequently Asked Questions', url: '/faq' },
+          { name: tCommon('home'), url: '/' },
+          { name: tFaq('title'), url: '/faq' },
         ]}
       />
       <SiteHeader locale={locale} />

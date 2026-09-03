@@ -301,6 +301,22 @@ export function ModulivHeader({
                 <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
               </Link>
               <Link
+                href="/products/snapbed"
+                onClick={() => setIsDrawerOpen(false)}
+                className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
+              >
+                <span>The SnapBed</span>
+                <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
+              </Link>
+              <Link
+                href="/products/1-bedroom-kit"
+                onClick={() => setIsDrawerOpen(false)}
+                className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
+              >
+                <span>The 1-Bedroom Kit</span>
+                <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
+              </Link>
+              <Link
                 href="/how-it-works-craft-logistics"
                 onClick={() => setIsDrawerOpen(false)}
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
