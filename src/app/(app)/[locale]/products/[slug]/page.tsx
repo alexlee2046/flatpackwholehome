@@ -59,8 +59,8 @@ const FALLBACK_PRODUCTS: Record<
     gallery: [
       { image: { alt: 'ModuSofa 3-Seater', url: '/assets/modusofa-product-detail-page/e38c85e68d.png' } },
       { image: { alt: 'ModuSofa packaging and room split', url: '/screenshots/asset-boxes-to-room-split.png' } },
-      { image: { alt: 'ModuSofa side angle', url: '/assets/modusofa-product-detail-page/b354f66f79.png' } },
-      { image: { alt: 'ModuSofa living room layout', url: '/assets/modusofa-product-detail-page/d3a3e93b3d.png' } },
+      { image: { alt: 'Snap-joint connector shown exploded between four oak beams', url: '/assets/modusofa-product-detail-page/b354f66f79.png' } },
+      { image: { alt: 'ModuSofa upholstery and modular seam detail', url: '/assets/modusofa-product-detail-page/d3a3e93b3d.png' } },
     ],
     id: 'fallback-modusofa',
     joineryType: 'Tool-Free Japandi Mortise & Tenon',

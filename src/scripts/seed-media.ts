@@ -22,9 +22,9 @@ export const ALT_MAP: Record<string, string> = {
   'how-it-works-craft-logistics.png': 'Craft joinery and global DDP logistics preview',
 
   // ModuSofa PDP Assets
-  'e38c85e68d.png': 'ModuSofa 3-seater modular sofa in rich caramel corduroy fabric',
+  'e38c85e68d.png': 'ModuSofa three-seater modular sofa in terracotta fabric with matching ottoman',
   'b354f66f79.png': 'Close up detail of stainless steel snap bracket connecting solid oak beams',
-  'd3a3e93b3d.png': 'Curated fabric swatch box open on light oak coffee table',
+  'd3a3e93b3d.png': 'Close detail of the ModuSofa upholstery weave and the seam between two modular seat units',
 
   // Kit Builder / Whole Home Assets
   'da48e93272.png': 'Japandi whole-home living room featuring ModuSofa and oak coffee table',
@@ -46,7 +46,7 @@ export const ALT_MAP: Record<string, string> = {
   'hero-split.png': 'Six flat-pack The Flat Set boxes beside the same room fully furnished in warm minimalist style',
   'dac92d496c.svg': 'The Flat Set architectural modular system diagram',
   '64099eb7b3.png': 'Material discovery tactile fabric and wood chips display',
-  '83b98d3f9e.png': 'Precision CNC-cut mortise and tenon joinery craftsmanship',
+  '83b98d3f9e.png': 'Vacuum press compressing a sealed foam and fabric cushion core in the workshop',
   'b99895568b.png': 'Global DDP door-to-door delivery in standard apartment elevator-ready boxes',
 
   // Brand SVGs

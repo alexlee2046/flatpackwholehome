@@ -457,7 +457,7 @@ function KitBuilderInner({
               <div className="flex gap-6">
                 {[
                   { label: defaultWood, img: '/assets/1-bedroom-kit-builder/ebd8892f4c.png' },
-                  { label: walnutLabel, img: '/assets/1-bedroom-kit-builder/188581c175.png' },
+                  { label: walnutLabel, img: '/assets/1-bedroom-kit-builder/wood-walnut.png' },
                 ].map((item) => {
                   const sel = wood === item.label
                   return (
