@@ -218,7 +218,7 @@ export function ModulivHeader({
               </span>
             </div>
             <button
-              aria-label="Search"
+              aria-label={tNav('search')}
               type="button"
               onClick={openSearch}
               className="p-2 hover:opacity-80 transition-opacity duration-300"

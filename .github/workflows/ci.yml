@@ -30,4 +30,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec tsc --noEmit
+      # Errors only: the remaining ~112 warnings are mostly `any` and are not a
+      # gate yet. This keeps the count from growing back.
+      - run: pnpm exec eslint --max-warnings=-1
       - run: pnpm build

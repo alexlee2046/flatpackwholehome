@@ -65,6 +65,10 @@ export default function GlobalError({
           >
             Try Again
           </button>
+          {/* global-error replaces the root layout, so there is no router to
+              navigate with — a full document load is the right behaviour when
+              the app shell itself has failed. */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a
             href="/"
             style={{

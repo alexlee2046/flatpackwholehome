@@ -238,8 +238,6 @@ function KitBuilderInner({
   // Add-ons are separate catalog products so the server can price them. Keeping
   // them as a surcharge folded into one line item meant the cart showed a total
   // the checkout had no way to charge.
-  const KING_UPGRADE_PRICE = 15000
-  const MATTRESS_PRICE = 39900
   const addOns = isLiving
     ? []
     : [
@@ -261,8 +259,8 @@ function KitBuilderInner({
     }
 
     const variantParts = [fabric, wood]
-    if (!isLiving) variantParts.push(bed === 'king' ? `King Bed (${tKit('kingUpgrade')})` : tKit('queen'))
-    if (!isLiving && hasMattress) variantParts.push(`${tKit('mattressTitle')} (${tKit('mattressPrice')})`)
+    if (!isLiving) variantParts.push(bed === 'king' ? `${tKit('kingUpgradeTitle')} (+${formatCurrency(KING_UPGRADE_PRICE, { locale })})` : tKit('queen'))
+    if (!isLiving && hasMattress) variantParts.push(`${tKit('mattressTitle')} (+${formatCurrency(MATTRESS_PRICE, { locale })})`)
 
     for (const addOn of addOns) {
       cart.add(1, { id: addOn.id, name: addOn.name, price: addOn.price, qty: 1, variant: '' })
@@ -528,7 +526,7 @@ function KitBuilderInner({
                     type="button"
                   >
                     <span className="font-medium text-lg">{tKit('king')}</span>
-                    <span className="text-[13px] text-on-surface-variant">{tKit('kingUpgrade')}</span>
+                    <span className="text-[13px] text-on-surface-variant">{`+${formatCurrency(KING_UPGRADE_PRICE, { locale })}`}</span>
                   </button>
                 </div>
               </section>
@@ -561,7 +559,7 @@ function KitBuilderInner({
                         <span className="font-body-md font-medium text-on-surface text-[16px]">
                           {tKit('mattressTitle')}
                         </span>
-                        <span className="font-body-md text-on-surface">{tKit('mattressPrice')}</span>
+                        <span className="font-body-md text-on-surface">{`+${formatCurrency(MATTRESS_PRICE, { locale })}`}</span>
                       </div>
                       <p className="font-body-md text-sm text-on-surface-variant pe-8">
                         {tKit('mattressDesc')}
@@ -680,6 +678,9 @@ function KitBuilderInner({
     </div>
   )
 }
+
+const KING_UPGRADE_PRICE = 15000
+const MATTRESS_PRICE = 39900
 
 export function KitBuilder(props: KitBuilderProps = {}) {
   return (

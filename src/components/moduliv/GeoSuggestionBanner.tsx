@@ -59,42 +59,40 @@ const LOCALE_PROMPTS: Record<
  * Follows Apple, Nike, and Google International SEO best practices.
  * Allows search engine crawlers 100% crawlability while elegantly guiding international shoppers.
  */
+function geoDismissed(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    return localStorage.getItem('tfs_geo_dismissed') === 'true'
+  } catch {
+    return false
+  }
+}
+
 export function GeoSuggestionBanner({ currentLocale }: GeoBannerProps) {
   const [targetLocale, setTargetLocale] = useState<string | null>(null)
   // 'checking' reserves the banner's height so that showing it later never
   // shifts already-rendered content (CLS). It collapses to 'hidden' once we
   // know no suggestion is coming.
-  const [status, setStatus] = useState<'checking' | 'hidden' | 'visible'>('checking')
+  const [status, setStatus] = useState<'checking' | 'hidden' | 'visible'>(() =>
+    geoDismissed() ? 'hidden' : 'checking',
+  )
 
   useEffect(() => {
-    try {
-      // 1. If user previously dismissed the geo banner, do not disturb
-      if (localStorage.getItem('tfs_geo_dismissed') === 'true') {
-        setStatus('hidden')
-        return
-      }
+    if (geoDismissed()) return
 
-      // 2. Query lightweight Geo API
-      fetch('/api/geo')
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data) => {
-          const rec = data?.recommendedLocale
-          // Only suggest if recommended locale is different from current page locale
-          if (rec && rec !== currentLocale && LOCALE_PROMPTS[rec]) {
-            setTargetLocale(rec)
-            setStatus('visible')
-          } else {
-            setStatus('hidden')
-          }
-        })
-        .catch(() => {
-          // Gracefully ignore geo check failures
+    fetch('/api/geo')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        const rec = data?.recommendedLocale
+        // Only suggest if the recommended locale differs from the current page.
+        if (rec && rec !== currentLocale && LOCALE_PROMPTS[rec]) {
+          setTargetLocale(rec)
+          setStatus('visible')
+        } else {
           setStatus('hidden')
-        })
-    } catch {
-      // LocalStorage or SSR security boundary
-      setStatus('hidden')
-    }
+        }
+      })
+      .catch(() => setStatus('hidden'))
   }, [currentLocale])
 
   if (status === 'hidden') {

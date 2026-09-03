@@ -1,34 +1,25 @@
-// @ts-nocheck
-
 /**
- * Simple object check.
- * @param item
- * @returns {boolean}
+ * Narrowing check for plain objects. Declared as a type predicate so callers
+ * (and deepMerge below) can index the value afterwards — without it the file
+ * needed a @ts-nocheck, which switched off type checking for everything here.
  */
-export function isObject(item: unknown): boolean {
-  return item && typeof item === 'object' && !Array.isArray(item)
+export function isObject(item: unknown): item is Record<string, unknown> {
+  return Boolean(item) && typeof item === 'object' && !Array.isArray(item)
 }
 
 /**
  * Deep merge two objects.
- * @param target
- * @param ...sources
  */
 export function deepMerge<T, R>(target: T, source: R): T {
-  const output = { ...target }
+  const output = { ...target } as Record<string, unknown>
+
   if (isObject(target) && isObject(source)) {
-    Object.keys(source).forEach((key) => {
-      if (isObject(source[key])) {
-        if (!(key in target)) {
-          Object.assign(output, { [key]: source[key] })
-        } else {
-          output[key] = deepMerge(target[key], source[key])
-        }
-      } else {
-        Object.assign(output, { [key]: source[key] })
-      }
-    })
+    for (const key of Object.keys(source)) {
+      const sourceValue = source[key]
+      output[key] =
+        isObject(sourceValue) && key in target ? deepMerge(target[key], sourceValue) : sourceValue
+    }
   }
 
-  return output
+  return output as T
 }
