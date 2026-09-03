@@ -262,20 +262,28 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
   // Resolves local cart items (synthetic ids) to real Payload `products` document ids so
   // a real cart/transaction can be created. Throws if any item can't be resolved rather
   // than silently dropping it from the order.
-  const resolveCartItems = async (): Promise<{ product: number; quantity: number }[]> => {
+  const resolveCartItems = async (): Promise<
+    { catalogPrice: number; product: number; quantity: number }[]
+  > => {
     const slugs = [...new Set(items.map((it) => PRODUCT_SLUG_ALIASES[it.id] || it.id))]
     const res = await fetch(
       `/api/products?where[slug][in]=${slugs.map(encodeURIComponent).join(',')}&depth=0&limit=${slugs.length}`,
     )
     if (!res.ok) throw new Error(t('itemUnavailable'))
     const data = await res.json()
-    const bySlug = new Map<string, number>((data?.docs || []).map((doc: any) => [doc.slug, doc.id]))
+    const bySlug = new Map<string, { id: number; priceInUSD: number }>(
+      (data?.docs || []).map((doc: any) => [doc.slug, { id: doc.id, priceInUSD: doc.priceInUSD }]),
+    )
 
     return items.map((it) => {
       const slug = PRODUCT_SLUG_ALIASES[it.id] || it.id
-      const productId = bySlug.get(slug)
-      if (!productId) throw new Error(t('itemUnavailable'))
-      return { product: productId, quantity: Math.max(1, it.qty || 1) }
+      const found = bySlug.get(slug)
+      if (!found) throw new Error(t('itemUnavailable'))
+      return {
+        catalogPrice: found.priceInUSD ?? 0,
+        product: found.id,
+        quantity: Math.max(1, it.qty || 1),
+      }
     })
   }
 
@@ -317,8 +325,23 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
     try {
       const resolvedItems = await resolveCartItems()
 
-      // The provider owns the Payload cart; mirror the local browsing cart into it
-      // so initiatePayment prices exactly what the shopper just reviewed.
+      // Stripe is charged cart.subtotal, which the server recomputes from catalog
+      // prices alone (see the ecommerce plugin's carts/beforeChange). It knows
+      // nothing about the KitBuilder surcharges or the voucher, both of which are
+      // applied locally — so the amount shown here and the amount charged can
+      // diverge in either direction. Refuse instead of letting them.
+      const catalogTotal = resolvedItems.reduce(
+        (sum, item) => sum + item.catalogPrice * item.quantity,
+        0,
+      )
+      if (Math.round(catalogTotal * 100) !== Math.round(total * 100)) {
+        console.error(
+          `[checkout] price mismatch — displayed ${total}, server would charge ${catalogTotal}. ` +
+            'KitBuilder surcharges and the voucher are not modelled in the catalog.',
+        )
+        throw new Error(t('checkoutErrorGeneric'))
+      }
+
       await clearCart()
       for (const item of resolvedItems) {
         await addItem({ product: item.product }, item.quantity)
