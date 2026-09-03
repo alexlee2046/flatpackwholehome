@@ -3,6 +3,7 @@
 import { Link, usePathname, useRouter } from '@/i18n/navigation'
 import { localeDetails } from '@/i18n/routing'
 import Image from 'next/image'
+import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 import React, { Suspense, useEffect, useState } from 'react'
@@ -118,6 +119,7 @@ function KitBuilderInner({
   const isRtl = localeDetails[locale as keyof typeof localeDetails]?.dir === 'rtl'
   const tKit = useTranslations('Pages.KitBuilder')
   const tCommon = useTranslations('Common')
+  const { formatCurrency } = useCurrency()
 
   const spaceParam = searchParams.get('space')
   const [space, setSpace] = useState<SpaceKey>(
@@ -602,7 +604,7 @@ function KitBuilderInner({
           <div aria-live="polite" className="flex flex-col items-center md:items-start w-full md:w-auto">
             <div className="flex items-end gap-3">
               <span className="font-headline-md text-3xl text-on-surface" dir="ltr" id="kit-total">
-                ${total.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {formatCurrency(total * 100, { locale })}
               </span>
               {space === 'full' && (
                 <>

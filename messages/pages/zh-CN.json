@@ -1,4 +1,11 @@
 {
+  "Search": {
+    "categoryProduct": "家具",
+    "categoryGuide": "指南",
+    "resultsCount": "{count, plural, =0 {未找到相关结果} other {找到 {count} 条结果}}",
+    "noResultsFor": "没有找到与“{query}”相关的结果",
+    "noResultsHint": "换个关键词试试。"
+  },
   "Home": {
     "metadataTitle": "The Flat Set | 6 个扁平包装箱装下你的整套家",
     "metadataDescription": "The Flat Set 6 个扁平箱装载全屋家具 — 零工具 60 分钟免钉拼装，免费样板盒送 $50 抵用券，DDP 完税包邮到门，100 天安心试用。",

@@ -2,6 +2,7 @@
 
 import { Link } from '@/i18n/navigation'
 import { localeDetails, type AppLocale } from '@/i18n/routing'
+import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
 import { useLocale, useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
@@ -25,6 +26,7 @@ export function IkeaComparisonView() {
   const tCommon = useTranslations('Common')
   const locale = useLocale() as AppLocale
   const isRtl = localeDetails[locale].dir === 'rtl'
+  const { formatCurrency } = useCurrency()
   const [selectedCityIndex, setSelectedCityIndex] = useState(0)
   const [selectedTransportId, setSelectedTransportId] = useState<(typeof TRANSPORT_DATA)[number]['id']>('uhaul')
 
@@ -109,7 +111,13 @@ export function IkeaComparisonView() {
                 >
                   {TRANSPORT_DATA.map((m) => (
                     <option key={m.id} value={m.id}>
-                      {t('transportOption', { name: t(`transportModes.${m.id}`), cost: m.cost })}
+                      {t('transportOption', {
+                        // transportOption's message text carries a hardcoded "$" prefix
+                        // (messages/ is out of scope here), so this is a plain locale-formatted
+                        // integer, not a currency string.
+                        cost: new Intl.NumberFormat(locale).format(m.cost),
+                        name: t(`transportModes.${m.id}`),
+                      })}
                     </option>
                   ))}
                 </select>
@@ -133,19 +141,19 @@ export function IkeaComparisonView() {
                 <div className="flex justify-between">
                   <span>{t('ikeaLineSubtotal')}</span>
                   <span dir="ltr" className="font-semibold text-on-surface">
-                    ${ikeaSubtotal.toFixed(2)}
+                    {formatCurrency(ikeaSubtotal * 100, { locale })}
                   </span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant">
                   <span>{t('ikeaLineTax', { rate: taxRatePercent })}</span>
                   <span dir="ltr" className="font-semibold">
-                    +${ikeaTax.toFixed(2)}
+                    +{formatCurrency(ikeaTax * 100, { locale })}
                   </span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant">
                   <span>{t('ikeaLineTransport')}</span>
                   <span dir="ltr" className="font-semibold">
-                    +${currentTransport.cost.toFixed(2)}
+                    +{formatCurrency(currentTransport.cost * 100, { locale })}
                   </span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant/70 text-xs">
@@ -156,7 +164,7 @@ export function IkeaComparisonView() {
               <div className="border-t border-outline-variant pt-4 flex justify-between items-baseline">
                 <span className="text-sm font-bold text-on-surface">{t('ikeaLandedLabel')}</span>
                 <span dir="ltr" className="text-2xl font-extrabold text-on-surface">
-                  ${ikeaLandedTotal.toFixed(2)}
+                  {formatCurrency(ikeaLandedTotal * 100, { locale })}
                 </span>
               </div>
             </div>
@@ -175,7 +183,7 @@ export function IkeaComparisonView() {
                 <div className="flex justify-between">
                   <span>{t('flatSetLineSubtotal')}</span>
                   <span dir="ltr" className="font-semibold text-on-surface">
-                    ${flatSetSubtotal.toFixed(2)}
+                    {formatCurrency(flatSetSubtotal * 100, { locale })}
                   </span>
                 </div>
                 <div className="flex justify-between text-tertiary">
@@ -195,10 +203,19 @@ export function IkeaComparisonView() {
                 <span className="text-sm font-bold text-primary">{t('flatSetPayLabel')}</span>
                 <div className="text-end">
                   <span dir="ltr" className="text-3xl font-extrabold text-primary">
-                    ${flatSetSubtotal.toFixed(2)}
+                    {formatCurrency(flatSetSubtotal * 100, { locale })}
                   </span>
                   <div className="text-xs font-bold text-tertiary mt-1">
-                    {t('flatSetSavingsLine', { amount: totalLandedSavings.toFixed(2), percent: landedSavingsPercent })}
+                    {t('flatSetSavingsLine', {
+                      // flatSetSavingsLine's message text carries a hardcoded "$" prefix
+                      // (messages/ is out of scope here), so this is a plain locale-formatted
+                      // decimal, not a currency string.
+                      amount: new Intl.NumberFormat(locale, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(totalLandedSavings),
+                      percent: landedSavingsPercent,
+                    })}
                   </div>
                 </div>
               </div>
@@ -245,10 +262,10 @@ export function IkeaComparisonView() {
                     <span className="text-xs font-normal text-on-surface-variant">{t('boxSofaDesc')}</span>
                   </th>
                   <td dir="ltr" className="py-4 px-4 text-end text-on-surface-variant">
-                    $699.00
+                    {formatCurrency(69900, { locale })}
                   </td>
                   <td dir="ltr" className="py-4 px-6 text-end font-bold text-primary">
-                    $599.00
+                    {formatCurrency(59900, { locale })}
                   </td>
                 </tr>
 
@@ -259,10 +276,10 @@ export function IkeaComparisonView() {
                     <span className="text-xs font-normal text-on-surface-variant">{t('boxCoffeeDesc')}</span>
                   </th>
                   <td dir="ltr" className="py-4 px-4 text-end text-on-surface-variant">
-                    $149.00
+                    {formatCurrency(14900, { locale })}
                   </td>
                   <td dir="ltr" className="py-4 px-6 text-end font-bold text-primary">
-                    $129.00
+                    {formatCurrency(12900, { locale })}
                   </td>
                 </tr>
 
@@ -273,10 +290,10 @@ export function IkeaComparisonView() {
                     <span className="text-xs font-normal text-on-surface-variant">{t('boxMediaDesc')}</span>
                   </th>
                   <td dir="ltr" className="py-4 px-4 text-end text-on-surface-variant">
-                    $249.00
+                    {formatCurrency(24900, { locale })}
                   </td>
                   <td dir="ltr" className="py-4 px-6 text-end font-bold text-primary">
-                    $219.00
+                    {formatCurrency(21900, { locale })}
                   </td>
                 </tr>
 
@@ -287,10 +304,10 @@ export function IkeaComparisonView() {
                     <span className="text-xs font-normal text-on-surface-variant">{t('boxBedDesc')}</span>
                   </th>
                   <td dir="ltr" className="py-4 px-4 text-end text-on-surface-variant">
-                    $349.00
+                    {formatCurrency(34900, { locale })}
                   </td>
                   <td dir="ltr" className="py-4 px-6 text-end font-bold text-primary">
-                    $379.00
+                    {formatCurrency(37900, { locale })}
                   </td>
                 </tr>
 
@@ -301,10 +318,10 @@ export function IkeaComparisonView() {
                     <span className="text-xs font-normal text-on-surface-variant">{t('boxNightstandDesc')}</span>
                   </th>
                   <td dir="ltr" className="py-4 px-4 text-end text-on-surface-variant">
-                    $199.00
+                    {formatCurrency(19900, { locale })}
                   </td>
                   <td dir="ltr" className="py-4 px-6 text-end font-bold text-primary">
-                    $173.00
+                    {formatCurrency(17300, { locale })}
                   </td>
                 </tr>
 
@@ -319,10 +336,10 @@ export function IkeaComparisonView() {
                     dir="ltr"
                     className="py-5 px-4 text-end font-semibold text-on-surface-variant line-through"
                   >
-                    $1,645.00
+                    {formatCurrency(164500, { locale })}
                   </td>
                   <td dir="ltr" className="py-5 px-6 text-end font-extrabold text-xl text-primary">
-                    $1,499.00
+                    {formatCurrency(149900, { locale })}
                   </td>
                 </tr>
               </tbody>
@@ -365,7 +382,16 @@ export function IkeaComparisonView() {
                 {t('ctaCardTitle')}
               </div>
               <p>
-                {t('ctaCardBody', { amount: totalLandedSavings.toFixed(2), percent: landedSavingsPercent })}
+                {t('ctaCardBody', {
+                  // ctaCardBody's message text carries a hardcoded "$" prefix (messages/ is
+                  // out of scope here), so this is a plain locale-formatted decimal, not a
+                  // currency string.
+                  amount: new Intl.NumberFormat(locale, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(totalLandedSavings),
+                  percent: landedSavingsPercent,
+                })}
               </p>
               <div className="pt-3">
                 <Link

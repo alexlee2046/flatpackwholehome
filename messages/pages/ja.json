@@ -226,5 +226,12 @@
     "ctaCardTitle": "計算してみてください——総支払額がすべてを物語ります",
     "ctaCardBody": "上記でお選びいただいた都市と引き取り方法をもとに計算すると、The Flat Setを選ぶことで総額 ${amount}（{percent}%）お得になります。価格はすべて公開されているので、ご自身で確認いただけます。",
     "ctaButton": "今すぐ1ベッドルームセットを作る（$1,499）"
+  },
+  "Search": {
+    "categoryProduct": "家具",
+    "categoryGuide": "ガイド",
+    "resultsCount": "{count, plural, =0 {検索結果がありません} other {検索結果 {count}件}}",
+    "noResultsFor": "「{query}」の検索結果は見つかりませんでした",
+    "noResultsHint": "別のキーワードでお試しください。"
   }
 }

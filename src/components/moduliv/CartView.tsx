@@ -2,7 +2,7 @@
 
 import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
-import { useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
+import { useCart, useCurrency, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
 import { useLocale, useTranslations } from 'next-intl'
 import React, { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -100,6 +100,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
   const [undoState, setUndoState] = useState<{ index: number; item: any } | null>(null)
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  const { formatCurrency } = useCurrency()
   const { addItem, clearCart } = useCart()
   const { confirmOrder, initiatePayment, paymentMethods } = usePayments()
   const stripeReady = paymentMethods.some((m) => m.name === 'stripe') && Boolean(publishableKey)
@@ -232,7 +233,12 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
       setVoucherApplied(true)
       localStorage.setItem('moduliv-voucher-applied', '1')
       setPromoMessage({
-        text: t('promoSuccess', { amount: '50.00', code: trimmed }),
+        // promoSuccess's message text carries a hardcoded "−$" prefix (messages/ is out of
+        // scope here), so this is a plain locale-formatted decimal, not a currency string.
+        text: t('promoSuccess', {
+          amount: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(50),
+          code: trimmed,
+        }),
         type: 'success',
       })
     } else {
@@ -488,7 +494,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                     <div className="flex justify-between gap-4 items-baseline">
                       <h3 className="font-headline-sm text-[19px] text-on-surface">{it.name}</h3>
                       <span className="font-medium text-on-surface whitespace-nowrap" dir="ltr">
-                        ${((it.price || 0) * (it.qty || 1)).toFixed(2)}
+                        {formatCurrency((it.price || 0) * (it.qty || 1) * 100, { locale })}
                       </span>
                     </div>
                     {it.variant && (
@@ -536,7 +542,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
             <dl className="space-y-4 font-body-md text-sm">
               <div className="flex justify-between gap-4">
                 <dt className="text-on-surface-variant">{t('subtotal')}</dt>
-                <dd className="font-medium text-on-surface" dir="ltr">${subtotal.toFixed(2)}</dd>
+                <dd className="font-medium text-on-surface" dir="ltr">{formatCurrency(subtotal * 100, { locale })}</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-on-surface-variant flex items-center gap-1">
@@ -544,7 +550,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                   <span className="text-[11px] text-neutral-600 font-normal">{t('shippingDdpNote')}</span>
                 </dt>
                 <dd className="text-primary font-medium">
-                  {t('included')} <span dir="ltr">($0.00)</span>
+                  {t('included')} <span dir="ltr">({formatCurrency(0, { locale })})</span>
                 </dd>
               </div>
 
@@ -552,7 +558,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
               <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg text-xs space-y-1.5">
                 <div className="flex items-center gap-1.5 font-semibold text-primary">
                   <span className="material-symbols-outlined text-[15px]">verified</span>
-                  <span>{t('freeShippingBadge', { amount: '$255.00' })}</span>
+                  <span>{t('freeShippingBadge', { amount: formatCurrency(25500, { locale }) })}</span>
                 </div>
                 <p className="text-neutral-600 leading-relaxed text-[11px]">
                   {t('freeShippingDetail', { boxes: 6, weight: 102 })}
@@ -560,7 +566,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                 <div className="pt-1 border-t border-primary/10 flex justify-between items-center text-[11px]">
                   <span className="text-neutral-600">{t('ikeaCompareLabel')}</span>
                   <Link href="/us-vs-ikea" className="font-bold text-emerald-700 hover:underline">
-                    {t('ikeaCompareCta', { amount: '$690' })}
+                    {t('ikeaCompareCta', { amount: formatCurrency(69000, { locale }) })}
                   </Link>
                 </div>
               </div>
@@ -571,7 +577,9 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                     {t('voucher')} <span className="font-label-md text-[12px] uppercase tracking-wider text-primary">SWATCH50</span>
                   </dt>
                   <dd className="flex items-center gap-3">
-                    <span className="text-primary font-medium" dir="ltr">−$50.00</span>
+                    <span className="text-primary font-medium" dir="ltr">
+                      −{formatCurrency(discount * 100, { locale })}
+                    </span>
                     <button
                       aria-label={t('removeVoucher')}
                       className="p-2 text-on-surface-variant hover:text-error transition-colors cursor-pointer"
@@ -627,7 +635,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
               <div className="flex justify-between gap-4 pt-4 border-t border-outline-variant/40 text-lg">
                 <dt className="font-medium text-on-surface">{t('total')}</dt>
                 <dd className="font-headline-sm text-headline-sm text-on-surface" dir="ltr" id="sum-total">
-                  ${total.toFixed(2)}
+                  {formatCurrency(total * 100, { locale })}
                 </dd>
               </div>
             </dl>
@@ -854,7 +862,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                 <div className="flex justify-between text-sm">
                   <span className="text-on-surface-variant">{t('amountDueLabel')}</span>
                   <span className="font-medium text-on-surface" dir={amountDueCents === null ? undefined : 'ltr'}>
-                    {amountDueCents === null ? t('calculatingTotal') : `$${(amountDueCents / 100).toFixed(2)}`}
+                    {amountDueCents === null ? t('calculatingTotal') : formatCurrency(amountDueCents, { locale })}
                   </span>
                 </div>
                 <div id="checkout-payment-element" />

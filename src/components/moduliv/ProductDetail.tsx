@@ -3,6 +3,7 @@
 import { Link, useRouter } from '@/i18n/navigation'
 import { localeDetails } from '@/i18n/routing'
 import Image from 'next/image'
+import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
 import { useLocale, useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
@@ -57,6 +58,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
   const isRtl = localeDetails[locale as keyof typeof localeDetails]?.dir === 'rtl'
   const t = useTranslations('PDP')
   const tCommon = useTranslations('Common')
+  const { formatCurrency } = useCurrency()
   const isSofa = !product?.slug || product.slug === 'modusofa'
 
   const activeFabrics =
@@ -252,7 +254,9 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
           </div>
 
           <div className="flex items-baseline gap-3 mb-8">
-            <span className="font-headline-lg text-[36px] text-on-surface" dir="ltr">${price}.00</span>
+            <span className="font-headline-lg text-[36px] text-on-surface" dir="ltr">
+              {formatCurrency(price * 100, { locale })}
+            </span>
             <span className="font-body-md text-sm text-on-surface-variant">{t('deliveryIncluded')}</span>
           </div>
 
@@ -367,7 +371,19 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
               onClick={handleAddToCart}
               type="button"
             >
-              <span>{isAdded ? t('addedToCart') : t('addToCartWithPrice', { price: (price * qty).toFixed(2) })}</span>
+              <span>
+                {isAdded
+                  ? t('addedToCart')
+                  : t('addToCartWithPrice', {
+                      // addToCartWithPrice's message text carries a hardcoded "$" prefix
+                      // (messages/ is out of scope here), so this is a plain locale-formatted
+                      // decimal, not a currency string.
+                      price: new Intl.NumberFormat(locale, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(price * qty),
+                    })}
+              </span>
               <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
                 {isRtl ? 'arrow_back' : 'arrow_forward'}
               </span>

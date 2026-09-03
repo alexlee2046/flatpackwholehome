@@ -355,6 +355,42 @@ export const getSiteLayoutData = cache(async (locale: string) => {
   )()
 })
 
+export type SearchIndexProduct = {
+  title: string
+  subtitle?: string | null
+  slug: string
+}
+
+/**
+ * Retrieve the lightweight product index used by the header search modal
+ * (title/subtitle/slug only — never the cost fields stripInternalFields guards).
+ */
+export const getSearchIndexData = cache(async (locale: string) => {
+  return unstable_cache(
+    async () => {
+      try {
+        const payload = await getPayload({ config: configPromise })
+        const res = await payload.find({
+          collection: 'products',
+          depth: 0,
+          limit: 20,
+          locale: locale as any,
+          overrideAccess: true,
+          select: { title: true, subtitle: true, slug: true },
+        })
+        return (res?.docs || [])
+          .filter((doc) => doc.slug)
+          .map((doc) => stripInternalFields(doc)) as SearchIndexProduct[]
+      } catch (err) {
+        console.error('[storefront:getSearchIndexData]', err)
+        return []
+      }
+    },
+    ['storefront-search-index', locale],
+    { revalidate: 300, tags: ['products', `products-${locale}`] },
+  )()
+})
+
 /**
  * Retrieve materials (fabrics, woods) from CMS
  */

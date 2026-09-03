@@ -1,7 +1,9 @@
 'use client'
 
 import { Link } from '@/i18n/navigation'
+import type { SearchIndexProduct } from '@/lib/data/storefront'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { SearchModal } from './SearchModal'
 import { localeDetails, type AppLocale } from '@/i18n/routing'
 import { useLocale, useTranslations } from 'next-intl'
 import React, { useState, useEffect, useRef } from 'react'
@@ -11,6 +13,7 @@ type HeaderProps = {
   showAnnouncement?: boolean | null
   announcementMessage?: string | null
   announcementUrl?: string | null
+  searchProducts?: SearchIndexProduct[]
 }
 
 export function ModulivHeader({
@@ -18,8 +21,10 @@ export function ModulivHeader({
   showAnnouncement,
   announcementMessage,
   announcementUrl,
+  searchProducts,
 }: HeaderProps = {}) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const locale = useLocale() as AppLocale
   const isRtl = localeDetails[locale]?.dir === 'rtl'
   const tNav = useTranslations('Navigation')
@@ -28,15 +33,17 @@ export function ModulivHeader({
   const drawerCloseRef = useRef<HTMLButtonElement>(null)
   const hasOpenedDrawerRef = useRef(false)
 
-  // Move focus into the drawer on open, back to the trigger on close
+  // Move focus into the drawer on open, back to the trigger on close.
+  // Skipped when the drawer is closing to hand off to the search modal
+  // (openSearch below) — the dialog manages its own focus restore then.
   useEffect(() => {
     if (isDrawerOpen) {
       hasOpenedDrawerRef.current = true
       drawerCloseRef.current?.focus()
-    } else if (hasOpenedDrawerRef.current) {
+    } else if (hasOpenedDrawerRef.current && !isSearchOpen) {
       menuTriggerRef.current?.focus()
     }
-  }, [isDrawerOpen])
+  }, [isDrawerOpen, isSearchOpen])
 
   // Lock body scroll when drawer is open
   useEffect(() => {
@@ -62,15 +69,10 @@ export function ModulivHeader({
   }, [isDrawerOpen])
 
   const openSearch = () => {
+    // Same-tick state flip — no transition to wait out, so no setTimeout.
+    // The drawer-close focus effect above defers to the modal when isSearchOpen is true.
     setIsDrawerOpen(false)
-    setTimeout(() => {
-      if (typeof window !== 'undefined' && (window as unknown as { modulivOpenSearch?: () => void }).modulivOpenSearch) {
-        (window as unknown as { modulivOpenSearch: () => void }).modulivOpenSearch()
-      } else {
-        const searchBtn = document.querySelector('button[aria-label="Search"]') as HTMLButtonElement | null
-        searchBtn?.click()
-      }
-    }, 200)
+    setIsSearchOpen(true)
   }
 
   const openPolicyModal = (modalId: string) => {
@@ -431,6 +433,8 @@ export function ModulivHeader({
           </div>
         </aside>
       </div>
+
+      <SearchModal onClose={() => setIsSearchOpen(false)} open={isSearchOpen} products={searchProducts || []} />
     </>
   )
 }

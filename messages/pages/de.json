@@ -226,5 +226,12 @@
     "ctaCardTitle": "Rechnen Sie selbst nach — der Gesamtpreis spricht für sich",
     "ctaCardBody": "Basierend auf der oben gewählten Stadt und Abholoption sparen Sie mit The Flat Set {amount} $ ({percent} %) an Gesamtkosten — transparent und von Ihnen selbst nachprüfbar.",
     "ctaButton": "Jetzt Ihr 1-Zimmer-Set konfigurieren (1.499 $)"
+  },
+  "Search": {
+    "categoryProduct": "Möbel",
+    "categoryGuide": "Ratgeber",
+    "resultsCount": "{count, plural, =0 {Keine Ergebnisse gefunden} one {# Ergebnis gefunden} other {# Ergebnisse gefunden}}",
+    "noResultsFor": "Keine Ergebnisse für „{query}“",
+    "noResultsHint": "Versuchen Sie einen anderen Suchbegriff."
   }
 }
