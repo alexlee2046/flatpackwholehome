@@ -1,4 +1,5 @@
 import { FAQ_ITEMS, type FaqItem } from '@/data/faq'
+import { I18N_DICTIONARY } from '@/utilities/i18nDictionary'
 import configPromise from '@payload-config'
 import { unstable_cache } from 'next/cache'
 import { getPayload } from 'payload'
@@ -10,6 +11,7 @@ import { cache } from 'react'
 export const getHomePageData = cache(async (locale: string) => {
   return unstable_cache(
     async () => {
+      const dict = I18N_DICTIONARY[locale]
       try {
         const payload = await getPayload({ config: configPromise })
         const [h, a, kitProductRes] = await Promise.all([
@@ -35,15 +37,29 @@ export const getHomePageData = cache(async (locale: string) => {
           }),
         ])
 
+        const isEnglishFallback =
+          locale !== 'en' && (h as any)?.trustPillars?.[0]?.label === 'Whole Apartment Suite'
+
+        const resolvedHome =
+          isEnglishFallback && dict?.homepage
+            ? {
+                ...h,
+                bundlePromo: dict.homepage.bundlePromo,
+                comparisonMatrix: dict.homepage.comparisonMatrix,
+                testimonials: dict.homepage.testimonials,
+                trustPillars: dict.homepage.trustPillars,
+              }
+            : h || (dict ? dict.homepage : null)
+
         return {
           announcement: a,
-          homepage: h,
+          homepage: resolvedHome,
           kitProduct: kitProductRes?.docs?.[0] || null,
         }
-      } catch (err) {
+      } catch {
         return {
           announcement: null,
-          homepage: null,
+          homepage: dict ? dict.homepage : null,
           kitProduct: null,
         }
       }
@@ -144,6 +160,7 @@ export const getKitBuilderData = cache(async (locale: string) => {
 export const getFaqData = cache(async (locale: string) => {
   return unstable_cache(
     async () => {
+      const dict = I18N_DICTIONARY[locale]
       try {
         const payload = await getPayload({ config: configPromise })
         const res = await payload.find({
@@ -156,16 +173,21 @@ export const getFaqData = cache(async (locale: string) => {
         })
 
         if (res?.docs?.length) {
-          const items: FaqItem[] = res.docs.map((doc: any) => ({
-            q: doc.question,
-            a: doc.answer,
-          }))
+          const items: FaqItem[] = res.docs.map((doc: any, idx: number) => {
+            const isEnglishFallback =
+              locale !== 'en' && doc.question === FAQ_ITEMS[idx]?.q
+            const localized = dict?.faqs?.[idx]
+            return {
+              q: isEnglishFallback && localized ? localized.q : doc.question || localized?.q || FAQ_ITEMS[idx]?.q,
+              a: isEnglishFallback && localized ? localized.a : doc.answer || localized?.a || FAQ_ITEMS[idx]?.a,
+            }
+          })
           return { faqs: items }
         }
       } catch {
         // Fall back gracefully
       }
-      return { faqs: FAQ_ITEMS }
+      return { faqs: dict?.faqs || FAQ_ITEMS }
     },
     ['storefront-faqs', locale],
     { revalidate: 300, tags: ['faqs', `faqs-${locale}`] },
@@ -178,6 +200,7 @@ export const getFaqData = cache(async (locale: string) => {
 export const getHowItWorksData = cache(async (locale: string) => {
   return unstable_cache(
     async () => {
+      const dict = I18N_DICTIONARY[locale]
       try {
         const payload = await getPayload({ config: configPromise })
         const hiw = await payload.findGlobal({
@@ -187,8 +210,16 @@ export const getHowItWorksData = cache(async (locale: string) => {
           overrideAccess: true,
         })
         if (hiw?.steps && hiw.steps.length > 0) {
+          const isEnglishFallback =
+            locale !== 'en' && hiw.steps[0]?.title === 'Made-to-Order & Fresh-Pressed'
+          if (isEnglishFallback && dict?.howItWorks) {
+            return {
+              hero: dict.howItWorks.hero,
+              steps: dict.howItWorks.steps,
+            }
+          }
           return {
-            hero: hiw.hero || null,
+            hero: hiw.hero || dict?.howItWorks.hero || null,
             steps: hiw.steps,
           }
         }
@@ -196,8 +227,8 @@ export const getHowItWorksData = cache(async (locale: string) => {
         // Fall back gracefully
       }
       return {
-        hero: null,
-        steps: [],
+        hero: dict?.howItWorks.hero || null,
+        steps: dict?.howItWorks.steps || [],
       }
     },
     ['storefront-how-it-works', locale],
@@ -211,6 +242,7 @@ export const getHowItWorksData = cache(async (locale: string) => {
 export const getSiteLayoutData = cache(async (locale: string) => {
   return unstable_cache(
     async () => {
+      const dict = I18N_DICTIONARY[locale]
       try {
         const payload = await getPayload({ config: configPromise })
         const [h, f, a] = await Promise.all([
@@ -234,16 +266,51 @@ export const getSiteLayoutData = cache(async (locale: string) => {
           }),
         ])
 
+        const isHeaderFallback =
+          locale !== 'en' && h?.navItems?.[0]?.label === '1-Bedroom Kit'
+        const resolvedHeader =
+          isHeaderFallback && dict?.header
+            ? { ...h, navItems: dict.header.navItems, showAnnouncement: true }
+            : h || (dict ? { navItems: dict.header.navItems, showAnnouncement: true } : null)
+
+        const isFooterFallback =
+          locale !== 'en' && f?.brandSlogan?.includes('6 Boxes')
+        const resolvedFooter: any =
+          isFooterFallback && dict?.footer
+            ? {
+                ...f,
+                brandSlogan: dict.footer.brandSlogan,
+                copyrightText: dict.footer.copyrightText,
+                navItems: dict.footer.navItems,
+                socialLinks: (f as any)?.socialLinks || [],
+              }
+            : f ||
+              (dict
+                ? {
+                    brandSlogan: dict.footer.brandSlogan,
+                    copyrightText: dict.footer.copyrightText,
+                    navItems: dict.footer.navItems,
+                    socialLinks: [],
+                  }
+                : null)
+
         return {
           announcement: a || null,
-          footer: f || null,
-          header: h || null,
+          footer: resolvedFooter,
+          header: resolvedHeader,
         }
       } catch {
         return {
           announcement: null,
-          footer: null,
-          header: null,
+          footer: dict
+            ? {
+                brandSlogan: dict.footer.brandSlogan,
+                copyrightText: dict.footer.copyrightText,
+                navItems: dict.footer.navItems,
+                socialLinks: [],
+              }
+            : null,
+          header: dict ? { navItems: dict.header.navItems, showAnnouncement: true } : null,
         }
       }
     },

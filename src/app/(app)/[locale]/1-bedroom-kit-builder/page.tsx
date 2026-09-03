@@ -2,16 +2,23 @@ import { BreadcrumbJsonLd, ProductJsonLd } from '@/components/seo/JsonLd'
 import { KitBuilder } from '@/components/moduliv/KitBuilder'
 import { SiteFooter } from '@/components/moduliv/SiteFooter'
 import { SiteHeader } from '@/components/moduliv/SiteHeader'
-import { getPayloadLocale } from '@/i18n/getPayloadLocale'
+import { defaultLocale, locales, type AppLocale } from '@/i18n/routing'
 import { buildPageMetadata } from '@/i18n/pageMetadata'
 import { getKitBuilderData } from '@/lib/data/storefront'
 import type { Metadata } from 'next'
-import { getTranslations } from 'next-intl/server'
+import { hasLocale } from 'next-intl'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import React from 'react'
 
-export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getPayloadLocale()
-  const t = await getTranslations('Pages.KitBuilder')
+type Props = {
+  params: Promise<{ locale: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale: rawLocale } = await params
+  const locale = (hasLocale(locales, rawLocale) ? rawLocale : defaultLocale) as AppLocale
+  setRequestLocale(locale)
+  const t = await getTranslations({ locale, namespace: 'Pages.KitBuilder' })
   let title = t('title')
   if (title === '1-Bedroom Move-In Kit Builder') {
     title = '1-Bedroom Flat-Pack Furniture Kit Builder | ModuSofa & SnapBed'
@@ -25,8 +32,10 @@ export async function generateMetadata(): Promise<Metadata> {
   })
 }
 
-export default async function KitBuilderPage() {
-  const locale = await getPayloadLocale()
+export default async function KitBuilderPage({ params }: Props) {
+  const { locale: rawLocale } = await params
+  const locale = (hasLocale(locales, rawLocale) ? rawLocale : defaultLocale) as AppLocale
+  setRequestLocale(locale)
   const { bundleProduct, livingProduct, bedProduct, spaces, materials } =
     await getKitBuilderData(locale)
 
@@ -45,7 +54,7 @@ export default async function KitBuilderPage() {
       <BreadcrumbJsonLd
         items={[
           { name: 'Home', url: '/' },
-          { name: 'Move-In 1-Bedroom Bundle', url: '/1-bedroom-kit-builder' },
+          { name: '1-Bedroom Kit Builder', url: '/1-bedroom-kit-builder' },
         ]}
       />
       <SiteHeader locale={locale} />
