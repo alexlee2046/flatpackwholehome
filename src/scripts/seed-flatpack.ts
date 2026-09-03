@@ -150,7 +150,7 @@ export async function seedFlatpack(payload: Payload) {
     upsertBySlug('products', 'modusofa', {
       title: en.products.modusofa.title,
       subtitle: en.products.modusofa.subtitle,
-      priceInUSD: 699,
+      priceInUSD: 69900,
       boxCount: 2,
       assemblyMinutes: 25,
       joineryType: en.products.modusofa.joineryType,
@@ -164,7 +164,7 @@ export async function seedFlatpack(payload: Payload) {
     upsertBySlug('products', 'snapbed', {
       title: en.products.snapbed.title,
       subtitle: en.products.snapbed.subtitle,
-      priceInUSD: 800,
+      priceInUSD: 80000,
       boxCount: 2,
       assemblyMinutes: 20,
       joineryType: en.products.snapbed.joineryType,
@@ -178,7 +178,7 @@ export async function seedFlatpack(payload: Payload) {
     upsertBySlug('products', '1-bedroom-kit', {
       title: en.products['1-bedroom-kit'].title,
       subtitle: en.products['1-bedroom-kit'].subtitle,
-      priceInUSD: 1499,
+      priceInUSD: 149900,
       boxCount: 6,
       assemblyMinutes: 60,
       joineryType: en.products['1-bedroom-kit'].joineryType,

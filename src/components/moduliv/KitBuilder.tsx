@@ -27,7 +27,7 @@ const SPACES: Record<
     caption: '2 of 6 boxes — the bedroom set (bed frame + nightstands).',
     cta: 'Bedroom Set',
     img: '/assets/1-bedroom-kit-builder/da48e93272.png',
-    price: 800,
+    price: 80000,
   },
   full: {
     alt: 'Wide render of the furnished 1-bedroom Japandi apartment included in the kit',
@@ -35,7 +35,7 @@ const SPACES: Record<
     caption: 'All 6 boxes included in the Full Home bundle.',
     cta: 'Full Bundle',
     img: '/assets/1-bedroom-kit-builder/b4e5f4d8a0.png',
-    price: 1499,
+    price: 149900,
   },
   living: {
     alt: 'Living room setup featuring the modular Japandi sofa and coffee table',
@@ -43,7 +43,7 @@ const SPACES: Record<
     caption: '2 of 6 boxes — the ModuSofa living set (sofa base + backs).',
     cta: 'Living Set',
     img: '/assets/1-bedroom-kit-builder/188581c175.png',
-    price: 699,
+    price: 69900,
   },
 }
 
@@ -237,8 +237,8 @@ function KitBuilderInner({
 
   let total = currentSpace.price
   if (!isLiving) {
-    if (bed === 'king') total += 150
-    if (hasMattress) total += 399
+    if (bed === 'king') total += 15000
+    if (hasMattress) total += 39900
   }
 
   const handleAddToCart = () => {
@@ -604,7 +604,7 @@ function KitBuilderInner({
           <div aria-live="polite" className="flex flex-col items-center md:items-start w-full md:w-auto">
             <div className="flex items-end gap-3">
               <span className="font-headline-md text-3xl text-on-surface" dir="ltr" id="kit-total">
-                {formatCurrency(total * 100, { locale })}
+                {formatCurrency(total, { locale })}
               </span>
               {space === 'full' && (
                 <>

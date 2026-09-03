@@ -214,7 +214,7 @@ export async function GET(request: NextRequest) {
             slug: doc.slug,
             name: doc.title || doc.name || loc?.name,
             category: doc.productCollection?.title || loc?.category || 'Modular Furniture',
-            priceUSD: doc.priceInUSD || 699,
+            priceUSD: (doc.priceInUSD ?? 69900) / 100,
             boxCount: doc.boxCount || 2,
             assemblyMinutes: doc.assemblyMinutes || 15,
             joineryType: doc.joineryType || 'Tool-Free Mechanical Snap-Lock',

@@ -12,7 +12,6 @@ type ModulivHomepageProps = {
   bundleTitle?: string
   bundleSubtitle?: string
   bundlePrice?: number
-  trustPillars?: Array<{ metric: string; label: string; icon?: string }>
   comparisonMatrix?: {
     eyebrow?: string
     title?: string
@@ -36,7 +35,6 @@ export async function ModulivHomepage({
   bundleTitle,
   bundleSubtitle,
   bundlePrice,
-  trustPillars,
   comparisonMatrix,
   testimonials,
 }: ModulivHomepageProps) {

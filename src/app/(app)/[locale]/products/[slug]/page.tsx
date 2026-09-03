@@ -64,7 +64,7 @@ const FALLBACK_PRODUCTS: Record<
     ],
     id: 'fallback-modusofa',
     joineryType: 'Tool-Free Japandi Mortise & Tenon',
-    price: 699,
+    price: 69900,
     slug: 'modusofa',
     specifications: [
       { label: 'Dimensions', value: '220 cm W × 90 cm D × 78 cm H' },
@@ -102,7 +102,7 @@ const FALLBACK_PRODUCTS: Record<
     ],
     id: 'fallback-snapbed',
     joineryType: 'Zero-Screw Gravity Lock',
-    price: 899,
+    price: 89900,
     slug: 'snapbed',
     specifications: [
       { label: 'Dimensions (Queen)', value: '160 cm W × 210 cm L × 28 cm H' },
@@ -168,7 +168,7 @@ const FALLBACK_PRODUCTS: Record<
     ],
     id: 'fallback-1-bedroom-kit',
     joineryType: 'Full Japandi Tool-Free System',
-    price: 1598,
+    price: 159800,
     slug: '1-bedroom-kit',
     specifications: [
       { label: 'Coverage', value: 'Living, Bedroom, & Dining essentials' },
@@ -241,7 +241,7 @@ export default async function ProductPage({ params }: Props) {
         id: doc.id,
         joineryType: doc.joineryType,
         meta: doc.meta as any,
-        price: doc.priceInUSD || fallback?.price || 699,
+        price: doc.priceInUSD || fallback?.price || 69900,
         slug: doc.slug,
         specifications: doc.specifications || fallback?.specifications,
         subtitle: doc.subtitle || fallback?.subtitle,

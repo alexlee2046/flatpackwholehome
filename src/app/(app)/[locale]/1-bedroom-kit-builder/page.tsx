@@ -54,7 +54,7 @@ export default async function KitBuilderPage({ params }: Props) {
         inStock={true}
         locale={locale}
         name={bundleProduct?.title || 'Move-In 1-Bedroom Bundle'}
-        price={bundleProduct?.priceInUSD || 1499}
+        price={bundleProduct?.priceInUSD || 149900}
         ratingValue="4.9"
         reviewCount="156"
         sku="TFS-BUNDLE-1BED"

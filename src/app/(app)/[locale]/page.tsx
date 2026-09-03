@@ -49,7 +49,7 @@ export default async function HomePage({ params }: Props) {
       <SiteHeader locale={locale} />
       <ModulivHomepage
         announcement={announcement?.message || undefined}
-        bundlePrice={kitProduct?.priceInUSD || undefined}
+        bundlePrice={kitProduct?.priceInUSD ? kitProduct.priceInUSD / 100 : undefined}
         bundleSubtitle={kitProduct?.subtitle || undefined}
         bundleTitle={kitProduct?.title || undefined}
         comparisonMatrix={hp?.comparisonMatrix || undefined}
@@ -58,7 +58,6 @@ export default async function HomePage({ params }: Props) {
         heroHeadline={hp?.hero?.headline || undefined}
         heroImage={hp?.hero?.image || undefined}
         testimonials={hp?.testimonials || undefined}
-        trustPillars={hp?.trustPillars || undefined}
       />
       <SiteFooter locale={locale} />
     </>

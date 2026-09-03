@@ -255,7 +255,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
 
           <div className="flex items-baseline gap-3 mb-8">
             <span className="font-headline-lg text-[36px] text-on-surface" dir="ltr">
-              {formatCurrency(price * 100, { locale })}
+              {formatCurrency(price, { locale })}
             </span>
             <span className="font-body-md text-sm text-on-surface-variant">{t('deliveryIncluded')}</span>
           </div>

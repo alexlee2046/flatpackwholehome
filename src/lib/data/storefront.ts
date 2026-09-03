@@ -30,13 +30,25 @@ export const getHomePageData = cache(async (locale: string) => {
       const dict = I18N_DICTIONARY[locale]
       try {
         const payload = await getPayload({ config: configPromise })
-        const [h, a, kitProductRes] = await Promise.all([
+        const [h, hUnfallen, a, kitProductRes] = await Promise.all([
           payload.findGlobal({
             slug: 'homepage',
             depth: 2,
             locale: locale as any,
             overrideAccess: true,
           }),
+          // Same global without Payload's locale fallback: fields come back empty
+          // when this locale has no stored value, which is how we tell "showing
+          // English because it was never translated" from "translated to this".
+          locale === 'en'
+            ? Promise.resolve(null)
+            : payload.findGlobal({
+                slug: 'homepage',
+                depth: 0,
+                fallbackLocale: false,
+                locale: locale as any,
+                overrideAccess: true,
+              }),
           payload.findGlobal({
             slug: 'announcement',
             depth: 1,
@@ -53,17 +65,21 @@ export const getHomePageData = cache(async (locale: string) => {
           }),
         ])
 
+        const untranslated = (value: unknown) =>
+          value === null || value === undefined || (Array.isArray(value) && value.length === 0)
+
+        const raw = hUnfallen as any
         const isEnglishFallback =
-          locale !== 'en' && (h as any)?.trustPillars?.[0]?.label === 'Whole Apartment Suite'
+          locale !== 'en' &&
+          untranslated(raw?.comparisonMatrix) &&
+          untranslated(raw?.testimonials)
 
         const resolvedHome =
           isEnglishFallback && dict?.homepage
             ? {
                 ...h,
-                bundlePromo: dict.homepage.bundlePromo,
                 comparisonMatrix: dict.homepage.comparisonMatrix,
                 testimonials: dict.homepage.testimonials,
-                trustPillars: dict.homepage.trustPillars,
               }
             : h || (dict ? dict.homepage : null)
 

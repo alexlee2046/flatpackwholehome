@@ -19,6 +19,13 @@ const THUMBS: Record<string, string> = {
 // Local cart items carry synthetic ids from KitBuilder/ProductDetail (e.g. 'bundle-1bed'),
 // which don't always match the real Payload `products.slug`. Individual products already
 // use their real slug as the cart item id — only the bundle needs an alias.
+// Money is handled in cents end to end — the catalog stores cents, the DDP quote
+// requires cents, and Stripe is charged cents. The v1 key held dollar amounts, so
+// it is abandoned rather than reinterpreted: reading an old cart as cents would
+// price a $699 sofa at $6.99.
+const CART_ITEMS_KEY = 'moduliv-cart-items-v2'
+const VOUCHER_DISCOUNT_CENTS = 5000
+
 const PRODUCT_SLUG_ALIASES: Record<string, string> = {
   'bundle-1bed': '1-bedroom-kit',
 }
@@ -65,7 +72,7 @@ function loadStripeJs(): Promise<any> {
 function readCartFromStorage(): any[] {
   if (typeof window === 'undefined') return []
   try {
-    const raw = localStorage.getItem('moduliv-cart-items')
+    const raw = localStorage.getItem(CART_ITEMS_KEY)
     return raw ? JSON.parse(raw) : []
   } catch {
     return []
@@ -256,7 +263,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
   }
 
   const subtotal = items.reduce((sum, item) => sum + (item.price || 0) * (item.qty || 1), 0)
-  const discount = voucherApplied ? 50 : 0
+  const discount = voucherApplied ? VOUCHER_DISCOUNT_CENTS : 0
   const total = Math.max(0, subtotal - discount)
 
   // Resolves local cart items (synthetic ids) to real Payload `products` document ids so
@@ -334,9 +341,9 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
         (sum, item) => sum + item.catalogPrice * item.quantity,
         0,
       )
-      if (Math.round(catalogTotal * 100) !== Math.round(total * 100)) {
+      if (catalogTotal !== subtotal) {
         console.error(
-          `[checkout] price mismatch — displayed ${total}, server would charge ${catalogTotal}. ` +
+          `[checkout] price mismatch — cart subtotal ${subtotal} cents, catalog says ${catalogTotal} cents. ` +
             'KitBuilder surcharges and the voucher are not modelled in the catalog.',
         )
         throw new Error(t('checkoutErrorGeneric'))
@@ -517,7 +524,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                     <div className="flex justify-between gap-4 items-baseline">
                       <h3 className="font-headline-sm text-[19px] text-on-surface">{it.name}</h3>
                       <span className="font-medium text-on-surface whitespace-nowrap" dir="ltr">
-                        {formatCurrency((it.price || 0) * (it.qty || 1) * 100, { locale })}
+                        {formatCurrency((it.price || 0) * (it.qty || 1), { locale })}
                       </span>
                     </div>
                     {it.variant && (
@@ -565,7 +572,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
             <dl className="space-y-4 font-body-md text-sm">
               <div className="flex justify-between gap-4">
                 <dt className="text-on-surface-variant">{t('subtotal')}</dt>
-                <dd className="font-medium text-on-surface" dir="ltr">{formatCurrency(subtotal * 100, { locale })}</dd>
+                <dd className="font-medium text-on-surface" dir="ltr">{formatCurrency(subtotal, { locale })}</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-on-surface-variant flex items-center gap-1">
@@ -601,7 +608,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                   </dt>
                   <dd className="flex items-center gap-3">
                     <span className="text-primary font-medium" dir="ltr">
-                      −{formatCurrency(discount * 100, { locale })}
+                      −{formatCurrency(discount, { locale })}
                     </span>
                     <button
                       aria-label={t('removeVoucher')}
@@ -658,7 +665,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
               <div className="flex justify-between gap-4 pt-4 border-t border-outline-variant/40 text-lg">
                 <dt className="font-medium text-on-surface">{t('total')}</dt>
                 <dd className="font-headline-sm text-headline-sm text-on-surface" dir="ltr" id="sum-total">
-                  {formatCurrency(total * 100, { locale })}
+                  {formatCurrency(total, { locale })}
                 </dd>
               </div>
             </dl>

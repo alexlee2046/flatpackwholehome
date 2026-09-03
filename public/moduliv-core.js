@@ -24,7 +24,7 @@
        1. UNIFIED CART SYSTEM
        ========================================================================== */
     var CART_COUNT_KEY = 'moduliv-cart-count';
-    var CART_ITEMS_KEY = 'moduliv-cart-items';
+    var CART_ITEMS_KEY = 'moduliv-cart-items-v2'; // v1 held dollars; money is cents now
 
     function getCount() {
         try {
