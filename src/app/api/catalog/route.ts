@@ -201,22 +201,34 @@ export async function GET(request: NextRequest) {
     if (res?.docs?.length) {
       const validDocs = res.docs.filter((doc: any) => Boolean(doc.slug))
       if (validDocs.length > 0) {
-        products = validDocs.map((doc: any) => ({
-          id: String(doc.id),
-          slug: doc.slug,
-          name: doc.title || doc.name,
-          category: doc.productCollection?.title || 'Modular Furniture',
-          priceUSD: doc.priceInUSD || 699,
-          boxCount: doc.boxCount || 2,
-          assemblyMinutes: doc.assemblyMinutes || 15,
-          joineryType: doc.joineryType || 'Tool-Free Mechanical Snap-Lock',
-          toolsRequired: 'None (0 Screws, 0 Allen Keys)',
-          shippingType: 'DDP Doorstep Express (Duties & Taxes Included)',
-          trialPeriodDays: 100,
-          returnPolicy: 'Donation-Over-Return (Full refund on charity pickup receipt)',
-          url: `${baseUrl}${locale === 'en' ? '' : `/${locale}`}/products/${doc.slug}`,
-          description: doc.subtitle || 'Whole-Home flat-pack living piece engineered for tool-free assembly.',
-        }))
+        products = validDocs.map((doc: any) => {
+          const locKey =
+            doc.slug === '1-bedroom-kit'
+              ? 'bundle-1bed'
+              : doc.slug === 'modusofa'
+                ? 'prod-modusofa'
+                : doc.slug === 'snapbed'
+                  ? 'prod-snapbed'
+                  : doc.slug
+          const loc = localizedItems[locKey] || localizedItems[doc.slug]
+
+          return {
+            id: String(doc.id),
+            slug: doc.slug,
+            name: loc?.name || doc.title || doc.name,
+            category: loc?.category || doc.productCollection?.title || 'Modular Furniture',
+            priceUSD: doc.priceInUSD || 699,
+            boxCount: doc.boxCount || 2,
+            assemblyMinutes: doc.assemblyMinutes || 15,
+            joineryType: doc.joineryType || 'Tool-Free Mechanical Snap-Lock',
+            toolsRequired: 'None (0 Screws, 0 Allen Keys)',
+            shippingType: 'DDP Doorstep Express (Duties & Taxes Included)',
+            trialPeriodDays: 100,
+            returnPolicy: 'Donation-Over-Return (Full refund on charity pickup receipt)',
+            url: `${baseUrl}${locale === 'en' ? '' : `/${locale}`}/products/${doc.slug}`,
+            description: loc?.description || doc.subtitle || 'Whole-Home flat-pack living piece engineered for tool-free assembly.',
+          }
+        })
       }
     }
   } catch {
