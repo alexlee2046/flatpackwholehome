@@ -1,11 +1,15 @@
 'use client'
 import { FAQ_ITEMS, type FaqItem } from '@/data/faq'
 import { Link } from '@/i18n/navigation'
+import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
 export { FAQ_ITEMS }
 
 export function FaqView({ items = FAQ_ITEMS }: { items?: FaqItem[] }) {
+  const t = useTranslations('Pages.FAQ')
+  const tCommon = useTranslations('Common')
+  const tNav = useTranslations('Navigation')
   const [search, setSearch] = useState('')
   const activeItems = items && items.length > 0 ? items : FAQ_ITEMS
 
@@ -22,22 +26,18 @@ export function FaqView({ items = FAQ_ITEMS }: { items?: FaqItem[] }) {
     >
       <nav className="flex items-center gap-2 text-sm font-label-md text-on-surface-variant mb-8">
         <Link className="hover:text-primary transition-colors" href="/">
-          Home
+          {tCommon('home')}
         </Link>
         <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-        <span className="text-on-surface font-medium">FAQ</span>
+        <span className="text-on-surface font-medium">{tNav('faq')}</span>
       </nav>
 
       <header className="mb-12 max-w-2xl">
         <span className="block font-label-md text-label-md text-primary tracking-[0.1em] uppercase mb-4">
-          THE PLAIN-LANGUAGE VERSION
+          {t('eyebrow')}
         </span>
-        <h1 className="font-headline-lg text-headline-lg text-on-surface mb-4">
-          Questions, Answered Without a Sales Call.
-        </h1>
-        <p className="font-body-lg text-body-lg text-on-surface-variant">
-          Shipping times, assembly, returns, materials, duties, and your $50 swatch voucher — the eight things people actually ask, answered the way we&apos;d answer a friend.
-        </p>
+        <h1 className="font-headline-lg text-headline-lg text-on-surface mb-4">{t('title')}</h1>
+        <p className="font-body-lg text-body-lg text-on-surface-variant">{t('subtitle')}</p>
       </header>
 
       <div className="max-w-md mb-8">
@@ -46,9 +46,10 @@ export function FaqView({ items = FAQ_ITEMS }: { items?: FaqItem[] }) {
             search
           </span>
           <input
+            aria-label={t('searchPlaceholder')}
             className="w-full pl-10 pr-4 py-2.5 border border-outline-variant/60 bg-surface-container-low text-on-surface text-sm rounded focus:outline-none focus:border-primary"
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Filter questions (e.g. shipping, duties, refund)..."
+            placeholder={t('searchPlaceholder')}
             type="search"
             value={search}
           />
@@ -73,8 +74,8 @@ export function FaqView({ items = FAQ_ITEMS }: { items?: FaqItem[] }) {
         ))}
 
         {filtered.length === 0 && (
-          <div className="py-12 text-center text-on-surface-variant">
-            No questions matching &ldquo;{search}&rdquo;. Feel free to email our studio directly at hello@moduliv.studio.
+          <div aria-live="polite" className="py-12 text-center text-on-surface-variant" role="status">
+            {t('noResults', { query: search })}
           </div>
         )}
       </div>

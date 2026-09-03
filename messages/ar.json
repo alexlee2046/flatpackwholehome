@@ -16,7 +16,9 @@
     "cart": "Cart",
     "search": "Search",
     "searchPlaceholder": "Search furniture, spaces, materials...",
-    "currency": "USD"
+    "currency": "USD",
+    "snapbed": "SnapBed",
+    "oneBedroomKitProduct": "طقم غرفة النوم الواحدة الكامل"
   },
   "Announcement": {
     "bar": "Free Swatch Box with $50 Voucher — Worldwide DDP Delivery & Duties Included",
@@ -52,7 +54,44 @@
     "increaseQuantity": "زيادة الكمية",
     "remove": "إزالة",
     "voucher": "قسيمة الخصم",
-    "removeVoucher": "إزالة القسيمة"
+    "removeVoucher": "إزالة القسيمة",
+    "shippingDdpNote": "(DDP، شامل الرسوم الجمركية)",
+    "freeShippingBadge": "سياسة الشحن المجاني · إعفاء من رسوم الشحن البحري DDP بقيمة {amount}",
+    "freeShippingDetail": "الطقم الكامل المكوَّن من {boxes} صناديق ({weight} كجم) يُشحن DDP مع تخليص جمركي عابر للحدود بالكامل — دون أي رسوم استيراد أو رسوم إضافية في مرحلة التسليم الأخيرة.",
+    "ikeaCompareLabel": "التوفير المقدَّر مقارنةً بالاستلام الذاتي من إيكيا المحلي:",
+    "ikeaCompareCta": "وفِّر أكثر من {amount} (عرض التفاصيل)",
+    "shippingAddressTitle": "عنوان الشحن",
+    "emailLabel": "البريد الإلكتروني",
+    "emailPlaceholder": "you@example.com",
+    "firstNameLabel": "الاسم الأول",
+    "lastNameLabel": "اسم العائلة",
+    "companyLabel": "الشركة (اختياري)",
+    "addressLine1Label": "عنوان الشارع",
+    "addressLine2Label": "الشقة أو الوحدة (اختياري)",
+    "cityLabel": "المدينة",
+    "stateLabel": "الولاية / المقاطعة",
+    "stateHint": "مطلوب للطلبات من الولايات المتحدة وكندا وأستراليا.",
+    "postalCodeLabel": "الرمز البريدي",
+    "countryLabel": "الدولة",
+    "countryPlaceholder": "اختر الدولة",
+    "phoneLabel": "رقم الهاتف (اختياري)",
+    "fieldRequired": "هذا الحقل مطلوب.",
+    "emailInvalid": "يرجى إدخال بريد إلكتروني صحيح.",
+    "continueToPayment": "المتابعة إلى الدفع",
+    "resolvingCart": "جارٍ تجهيز طلبك…",
+    "backToCart": "العودة إلى السلة",
+    "backToAddress": "رجوع",
+    "paymentTitle": "الدفع",
+    "amountDueLabel": "المبلغ المستحق اليوم",
+    "calculatingTotal": "جارٍ حساب الإجمالي…",
+    "payNow": "ادفع الآن",
+    "paying": "جارٍ معالجة الدفع…",
+    "paymentMethodsNote": "نقبل جميع بطاقات الائتمان والخصم الرئيسية، بالإضافة إلى Apple Pay وGoogle Pay حيثما توفَّرا — تتم المعالجة بأمان عبر Stripe.",
+    "checkoutUnavailable": "خدمة الدفع غير متاحة مؤقتاً. يرجى المحاولة لاحقاً.",
+    "checkoutErrorGeneric": "حدث خطأ ما أثناء الدفع. يرجى المحاولة مرة أخرى.",
+    "itemUnavailable": "لم يعد عنصر واحد أو أكثر في سلتك متاحاً لإتمام الشراء.",
+    "itemRemoved": "تمت إزالة العنصر.",
+    "undo": "تراجع"
   },
   "Common": {
     "addToCart": "أضف إلى السلة",
@@ -66,7 +105,8 @@
     "boxes": "{count} صناديق",
     "freeDelivery": "شحن مجاني DDP شامل الرسوم",
     "home": "الرئيسية",
-    "skipToContent": "انتقل إلى المحتوى الرئيسي"
+    "skipToContent": "انتقل إلى المحتوى الرئيسي",
+    "cartError": "السلة غير جاهزة بعد — يرجى المحاولة مرة أخرى بعد قليل."
   },
   "Footer": {
     "tagline": "Your entire home. Delivered in 6 flat boxes.",
@@ -75,7 +115,8 @@
     "termsOfService": "Terms of Service",
     "trial": "100-Night Trial",
     "warranty": "10-Year Warranty",
-    "copyright": "© 2026 The Flat Set Inc. All rights reserved."
+    "copyright": "© 2026 The Flat Set Inc. All rights reserved.",
+    "furnitureSystemHeading": "نظام الأثاث"
   },
   "PDP": {
     "home": "الرئيسية",
@@ -154,6 +195,8 @@
     "reservedTitle": "Your swatch box is reserved.",
     "reservedDesc": "يغادر الصندوق ورشتنا خلال 48 ساعة. ستجد داخل الغطاء بطاقة قسيمة 50 دولار صالحة لمدة 60 يوماً على جميع طلبات الأثاث.",
     "voucherCode": "رمز القسيمة: SWATCH50",
-    "goToCart": "الذهاب إلى السلة"
+    "goToCart": "الذهاب إلى السلة",
+    "rateLimitError": "لقد وصلت إلى الحد الأقصى للطلبات. يرجى المحاولة مرة أخرى بعد قليل.",
+    "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
   }
 }

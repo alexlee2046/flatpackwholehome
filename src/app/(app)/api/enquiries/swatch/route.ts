@@ -46,7 +46,13 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json()
-    const { name, email, address, city, postal, room } = body || {}
+    const { name, email, address, city, postal, room, website } = body || {}
+
+    // Honeypot: only bots fill this. Answer as if it worked rather than 400,
+    // so a scripted submitter gets no signal to retry without the field.
+    if (website) {
+      return NextResponse.json({ message: 'Swatch box request received successfully.', success: true })
+    }
 
     if (!name || !email || !address || !city || !postal) {
       return NextResponse.json(

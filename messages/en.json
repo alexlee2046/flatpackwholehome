@@ -9,6 +9,8 @@
     "brand": "The Flat Set",
     "kitBuilder": "1-Bedroom Kit",
     "modusofa": "ModuSofa",
+    "snapbed": "SnapBed",
+    "oneBedroomKitProduct": "The 1-Bedroom Kit",
     "howItWorks": "How It Works",
     "swatchBox": "Free Swatch Box",
     "faq": "FAQ",
@@ -52,7 +54,44 @@
     "increaseQuantity": "Increase quantity",
     "remove": "Remove",
     "voucher": "Voucher",
-    "removeVoucher": "Remove voucher"
+    "removeVoucher": "Remove voucher",
+    "shippingDdpNote": "(DDP, duties included)",
+    "freeShippingBadge": "Free shipping policy · {amount} DDP ocean freight waived",
+    "freeShippingDetail": "The full {boxes}-box set ({weight}kg) ships DDP with cross-border duties cleared — no import tariffs or last-mile surcharges.",
+    "ikeaCompareLabel": "Estimated savings vs. local IKEA self-pickup:",
+    "ikeaCompareCta": "Save {amount}+ (see breakdown)",
+    "shippingAddressTitle": "Shipping Address",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "firstNameLabel": "First name",
+    "lastNameLabel": "Last name",
+    "companyLabel": "Company (optional)",
+    "addressLine1Label": "Street address",
+    "addressLine2Label": "Apt, suite, unit (optional)",
+    "cityLabel": "City",
+    "stateLabel": "State / Province",
+    "stateHint": "Required for US, Canada, and Australia.",
+    "postalCodeLabel": "Postal / ZIP code",
+    "countryLabel": "Country",
+    "countryPlaceholder": "Select a country",
+    "phoneLabel": "Phone (optional)",
+    "fieldRequired": "This field is required.",
+    "emailInvalid": "Enter a valid email address.",
+    "continueToPayment": "Continue to Payment",
+    "resolvingCart": "Preparing your order…",
+    "backToCart": "Back to cart",
+    "backToAddress": "Back",
+    "paymentTitle": "Payment",
+    "amountDueLabel": "Amount due today",
+    "calculatingTotal": "Calculating total…",
+    "payNow": "Pay Now",
+    "paying": "Processing payment…",
+    "paymentMethodsNote": "All major credit and debit cards accepted, plus Apple Pay and Google Pay where available — securely processed by Stripe.",
+    "checkoutUnavailable": "Checkout is temporarily unavailable. Please try again later.",
+    "checkoutErrorGeneric": "Something went wrong with checkout. Please try again.",
+    "itemUnavailable": "One or more items in your cart are no longer available for checkout.",
+    "itemRemoved": "Item removed.",
+    "undo": "Undo"
   },
   "Common": {
     "addToCart": "Add to Cart",
@@ -66,7 +105,8 @@
     "boxes": "{count} boxes",
     "freeDelivery": "Free DDP Delivery",
     "home": "Home",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "cartError": "Cart isn't ready yet — please try again in a moment."
   },
   "Footer": {
     "tagline": "Your entire home. Delivered in 6 flat boxes.",
@@ -75,7 +115,8 @@
     "termsOfService": "Terms of Service",
     "trial": "100-Night Trial",
     "warranty": "10-Year Warranty",
-    "copyright": "© 2026 The Flat Set Inc. All rights reserved."
+    "copyright": "© 2026 The Flat Set Inc. All rights reserved.",
+    "furnitureSystemHeading": "Furniture System"
   },
   "PDP": {
     "home": "Home",
@@ -154,6 +195,8 @@
     "reservedTitle": "Your swatch box is reserved.",
     "reservedDesc": "It leaves the workshop within 48 hours. Inside the lid you’ll find your $50 voucher card — valid 60 days toward any furniture order, on top of Move-In Bundle pricing.",
     "voucherCode": "Voucher code: SWATCH50",
-    "goToCart": "Go to Cart"
+    "goToCart": "Go to Cart",
+    "rateLimitError": "You've reached the request limit. Please try again in a little while.",
+    "genericError": "Something went wrong. Please try again."
   }
 }

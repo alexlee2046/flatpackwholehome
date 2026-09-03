@@ -1,9 +1,10 @@
 'use client'
 
-import { Link, useRouter } from '@/i18n/navigation'
+import { Link, usePathname, useRouter } from '@/i18n/navigation'
 import Image from 'next/image'
-import { useTranslations } from 'next-intl'
-import React, { useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
+import { useSearchParams } from 'next/navigation'
+import React, { Suspense, useEffect, useState } from 'react'
 
 type SpaceKey = 'full' | 'living' | 'bedroom'
 
@@ -102,7 +103,7 @@ export type KitBuilderProps = {
   spaces?: KitBuilderSpaceData[] | null
 }
 
-export function KitBuilder({
+function KitBuilderInner({
   bedProduct,
   bundleProduct,
   livingProduct,
@@ -110,20 +111,29 @@ export function KitBuilder({
   spaces,
 }: KitBuilderProps = {}) {
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const locale = useLocale()
   const tKit = useTranslations('Pages.KitBuilder')
   const tCommon = useTranslations('Common')
-  const [space, setSpace] = useState<SpaceKey>('full')
-  const [bed, setBed] = useState<'queen' | 'king'>('queen')
-  const [fabric, setFabric] = useState('Caramel Corduroy')
+
+  const spaceParam = searchParams.get('space')
+  const [space, setSpace] = useState<SpaceKey>(
+    spaceParam === 'living' || spaceParam === 'bedroom' ? spaceParam : 'full',
+  )
+  const [bed, setBed] = useState<'queen' | 'king'>(searchParams.get('bed') === 'king' ? 'king' : 'queen')
+  const initialFabricItem = FABRIC_ITEMS.find((f) => f.id === searchParams.get('fabric'))
+  const [fabric, setFabric] = useState(initialFabricItem?.label || 'Caramel Corduroy')
 
   const oakMaterial = materials?.find((m) => m.slug === 'white-oak')
   const walnutMaterial = materials?.find((m) => m.slug === 'black-walnut')
   const defaultWood = oakMaterial?.title || 'Natural White Oak'
   const walnutLabel = walnutMaterial?.title || 'Smoked Walnut'
-  const [wood, setWood] = useState(defaultWood)
+  const [wood, setWood] = useState(searchParams.get('wood') === 'walnut' ? walnutLabel : defaultWood)
 
-  const [hasMattress, setHasMattress] = useState(false)
+  const [hasMattress, setHasMattress] = useState(searchParams.get('mattress') === '1')
   const [isAdded, setIsAdded] = useState(false)
+  const [cartError, setCartError] = useState(false)
 
   const spaceWholeHome = spaces?.find((s) => s.slug === 'whole-home')
   const spaceLivingDoc = spaces?.find((s) => s.slug === 'living-room')
@@ -189,6 +199,24 @@ export function KitBuilder({
   const currentSpace = dynamicSpaces[space]
   const isLiving = space === 'living'
 
+  // Keep the customizer selection shareable/restorable via the URL query string.
+  useEffect(() => {
+    const query: Record<string, string> = {}
+    if (space !== 'full') query.space = space
+    const fabricId = FABRIC_ITEMS.find((f) => f.label === fabric)?.id
+    if (fabricId && fabricId !== 'corduroy') query.fabric = fabricId
+    if (wood === walnutLabel) query.wood = 'walnut'
+    if (!isLiving) {
+      if (bed !== 'queen') query.bed = bed
+      if (hasMattress) query.mattress = '1'
+    }
+    router.replace(
+      Object.keys(query).length > 0 ? { pathname, query } : { pathname },
+      { scroll: false },
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [space, bed, fabric, wood, hasMattress, isLiving])
+
   const boxBreakdownMap = new Map(
     (bundleProduct?.boxBreakdown || []).map((b) => [b.boxId, b]),
   )
@@ -210,22 +238,28 @@ export function KitBuilder({
   }
 
   const handleAddToCart = () => {
+    const cart = typeof window !== 'undefined' ? (window as any).modulivCart : null
+    if (!cart || typeof cart.add !== 'function') {
+      setCartError(true)
+      setTimeout(() => setCartError(false), 4000)
+      return
+    }
+
     const variantParts = [fabric, wood]
     if (!isLiving) variantParts.push(bed === 'king' ? `King Bed (${tKit('kingUpgrade')})` : tKit('queen'))
     if (!isLiving && hasMattress) variantParts.push(`${tKit('mattressTitle')} (${tKit('mattressPrice')})`)
 
-    if (typeof window !== 'undefined' && (window as any).modulivCart) {
-      ;(window as any).modulivCart.add(1, {
-        id: 'bundle-1bed',
-        name: bundleProduct?.title
-          ? `${bundleProduct.title} (${currentSpace.cta})`
-          : `The Flat Set 1-Bedroom (${currentSpace.cta})`,
-        price: total,
-        qty: 1,
-        variant: variantParts.join(' · '),
-      })
-    }
+    cart.add(1, {
+      id: 'bundle-1bed',
+      name: bundleProduct?.title
+        ? `${bundleProduct.title} (${currentSpace.cta})`
+        : `The Flat Set 1-Bedroom (${currentSpace.cta})`,
+      price: total,
+      qty: 1,
+      variant: variantParts.join(' · '),
+    })
 
+    setCartError(false)
     setIsAdded(true)
     setTimeout(() => {
       router.push('/cart')
@@ -244,7 +278,7 @@ export function KitBuilder({
           <Link className="hover:text-primary transition-colors" href="/">
             {tCommon('home')}
           </Link>
-          <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[16px]">chevron_right</span>
           <span className="text-on-surface font-medium">{tKit('title')}</span>
         </nav>
 
@@ -253,7 +287,7 @@ export function KitBuilder({
           <span className="block font-label-md text-label-md text-primary tracking-[0.1em] uppercase mb-4">
             {tKit('headerEyebrow')}
           </span>
-          <h1 className="font-display-lg text-[36px] leading-[1.15] md:text-[64px] md:leading-[1.1] text-on-surface mb-6">
+          <h1 className="font-display-lg text-headline-lg-mobile md:text-display-lg text-on-surface mb-6">
             {bundleProduct?.title || tKit('title')}
           </h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant">
@@ -278,7 +312,7 @@ export function KitBuilder({
               {/* Space Toggles */}
               <div
                 aria-label={tKit('roomView')}
-                className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md rounded-full p-1.5 flex shadow-sm border border-outline-variant/30 z-10"
+                className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-surface-container-lowest/80 backdrop-blur-md rounded-full p-1.5 flex shadow-sm border border-outline-variant/30 z-10"
                 role="group"
               >
                 {(['full', 'living', 'bedroom'] as const).map((sKey) => {
@@ -289,7 +323,7 @@ export function KitBuilder({
                       aria-pressed={active}
                       className={`px-5 py-2 rounded-full font-label-md text-[12px] uppercase tracking-wider transition-colors cursor-pointer ${
                         active
-                          ? 'bg-on-surface text-white'
+                          ? 'bg-on-surface text-on-primary'
                           : 'text-on-surface-variant hover:text-on-surface'
                       }`}
                       key={sKey}
@@ -428,7 +462,7 @@ export function KitBuilder({
                       <div className="flex justify-between items-center px-1">
                         <span className="font-body-md text-[15px]">{item.label}</span>
                         {sel && (
-                          <span className="material-symbols-outlined text-primary text-[20px]">
+                          <span aria-hidden="true" className="material-symbols-outlined text-primary text-[20px]">
                             check_circle
                           </span>
                         )}
@@ -519,7 +553,7 @@ export function KitBuilder({
 
                 <div className="flex items-start gap-4 p-5 rounded-xl border border-outline-variant bg-surface-container-low">
                   <div className="flex items-center h-6 pt-1">
-                    <span className="material-symbols-outlined text-primary text-[24px]">redeem</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-primary text-[24px]">redeem</span>
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-center mb-1">
@@ -544,15 +578,15 @@ export function KitBuilder({
             {/* Mini Trust Strip */}
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2 pb-4 text-on-surface-variant">
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
-                <span className="material-symbols-outlined text-[16px] text-primary">handyman</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-primary">handyman</span>
                 {tKit('zeroScrews')}
               </span>
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
-                <span className="material-symbols-outlined text-[16px] text-primary">nights_stay</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-primary">nights_stay</span>
                 {tKit('trial')}
               </span>
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
-                <span className="material-symbols-outlined text-[16px] text-primary">local_shipping</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-primary">local_shipping</span>
                 {tKit('dutiesIncluded')}
               </span>
             </div>
@@ -561,12 +595,12 @@ export function KitBuilder({
       </main>
 
       {/* Sticky Bottom Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-md border-t border-outline-variant shadow-[0_-4px_20px_rgba(26,28,29,0.04)] z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-md border-t border-outline-variant shadow-[0_-4px_20px_rgba(26,28,29,0.04)] z-50 pb-[env(safe-area-inset-bottom)]">
         <div className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-4 flex flex-col md:flex-row justify-between items-center gap-4">
           <div aria-live="polite" className="flex flex-col items-center md:items-start w-full md:w-auto">
             <div className="flex items-end gap-3">
               <span className="font-headline-md text-3xl text-on-surface" id="kit-total">
-                ${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ${total.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
               {space === 'full' && (
                 <>
@@ -579,17 +613,22 @@ export function KitBuilder({
                     title="Compare item-by-item with local US IKEA"
                   >
                     <span>{tKit('saveBadge')} vs IKEA (-20.8%)</span>
-                    <span className="material-symbols-outlined text-[13px]">info</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[13px]">info</span>
                   </Link>
                 </>
               )}
             </div>
             <div className="flex items-center gap-1.5 mt-1 text-on-surface-variant">
-              <span className="material-symbols-outlined text-[16px]">local_shipping</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[16px]">local_shipping</span>
               <span className="font-body-md text-[13px]">
                 {tKit('deliveryNotice', { count: currentSpace.boxes.length })}
               </span>
             </div>
+            {cartError && (
+              <p aria-live="assertive" className="font-body-md text-[13px] text-error mt-1" role="alert">
+                {tCommon('cartError')}
+              </p>
+            )}
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <Link
@@ -610,11 +649,19 @@ export function KitBuilder({
                   ? tKit('addedOpeningCart')
                   : tKit('addToCartButton', { space: currentSpace.cta, count: currentSpace.boxes.length })}
               </span>
-              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
           </div>
         </div>
       </div>
     </div>
+  )
+}
+
+export function KitBuilder(props: KitBuilderProps = {}) {
+  return (
+    <Suspense fallback={null}>
+      <KitBuilderInner {...props} />
+    </Suspense>
   )
 }

@@ -16,7 +16,9 @@
     "cart": "Cart",
     "search": "Search",
     "searchPlaceholder": "Search furniture, spaces, materials...",
-    "currency": "USD"
+    "currency": "USD",
+    "snapbed": "SnapBed",
+    "oneBedroomKitProduct": "Полный комплект для 1-комнатной квартиры"
   },
   "Announcement": {
     "bar": "Free Swatch Box with $50 Voucher — Worldwide DDP Delivery & Duties Included",
@@ -52,7 +54,44 @@
     "increaseQuantity": "Увеличить количество",
     "remove": "Удалить",
     "voucher": "Купон",
-    "removeVoucher": "Удалить купон"
+    "removeVoucher": "Удалить купон",
+    "shippingDdpNote": "(DDP, пошлины включены)",
+    "freeShippingBadge": "Бесплатная доставка · Морской DDP-фрахт на сумму {amount} — за наш счёт",
+    "freeShippingDetail": "Полный комплект из {boxes} коробок ({weight} кг) отправляется по схеме DDP с уже уплаченными таможенными пошлинами — без импортных тарифов и доплат за финальный этап доставки.",
+    "ikeaCompareLabel": "Расчётная экономия по сравнению с самовывозом из местной IKEA:",
+    "ikeaCompareCta": "Экономия {amount}+ (подробнее)",
+    "shippingAddressTitle": "Адрес доставки",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "firstNameLabel": "Имя",
+    "lastNameLabel": "Фамилия",
+    "companyLabel": "Компания (необязательно)",
+    "addressLine1Label": "Адрес (улица, дом)",
+    "addressLine2Label": "Квартира, офис (необязательно)",
+    "cityLabel": "Город",
+    "stateLabel": "Штат / провинция",
+    "stateHint": "Обязательно для США, Канады и Австралии.",
+    "postalCodeLabel": "Почтовый индекс",
+    "countryLabel": "Страна",
+    "countryPlaceholder": "Выберите страну",
+    "phoneLabel": "Телефон (необязательно)",
+    "fieldRequired": "Это поле обязательно для заполнения.",
+    "emailInvalid": "Введите корректный адрес электронной почты.",
+    "continueToPayment": "Перейти к оплате",
+    "resolvingCart": "Готовим ваш заказ…",
+    "backToCart": "Назад в корзину",
+    "backToAddress": "Назад",
+    "paymentTitle": "Оплата",
+    "amountDueLabel": "Сумма к оплате сегодня",
+    "calculatingTotal": "Рассчитываем сумму…",
+    "payNow": "Оплатить",
+    "paying": "Обработка платежа…",
+    "paymentMethodsNote": "Принимаем все основные кредитные и дебетовые карты, а также Apple Pay и Google Pay, где они доступны, — безопасная обработка через Stripe.",
+    "checkoutUnavailable": "Оформление заказа временно недоступно. Попробуйте позже.",
+    "checkoutErrorGeneric": "При оформлении заказа произошла ошибка. Попробуйте ещё раз.",
+    "itemUnavailable": "Один или несколько товаров в вашей корзине больше недоступны для оформления заказа.",
+    "itemRemoved": "Товар удалён.",
+    "undo": "Отменить"
   },
   "Common": {
     "addToCart": "В корзину",
@@ -66,7 +105,8 @@
     "boxes": "{count} кор.",
     "freeDelivery": "Бесплатная доставка DDP с пошлинами",
     "home": "Главная",
-    "skipToContent": "Перейти к основному контенту"
+    "skipToContent": "Перейти к основному контенту",
+    "cartError": "Корзина ещё не готова — попробуйте ещё раз через минуту."
   },
   "Footer": {
     "tagline": "Your entire home. Delivered in 6 flat boxes.",
@@ -75,7 +115,8 @@
     "termsOfService": "Terms of Service",
     "trial": "100-Night Trial",
     "warranty": "10-Year Warranty",
-    "copyright": "© 2026 The Flat Set Inc. All rights reserved."
+    "copyright": "© 2026 The Flat Set Inc. All rights reserved.",
+    "furnitureSystemHeading": "Система мебели"
   },
   "PDP": {
     "home": "Главная",
@@ -154,6 +195,8 @@
     "reservedTitle": "Your swatch box is reserved.",
     "reservedDesc": "Набор покинет мастерскую в течение 48 часов. Под крышкой вас ждет купон на 50 $, действующий 60 дней на весь ассортимент мебели поверх спеццен.",
     "voucherCode": "Промокод: SWATCH50",
-    "goToCart": "Перейти в корзину"
+    "goToCart": "Перейти в корзину",
+    "rateLimitError": "Вы достигли лимита запросов. Попробуйте немного позже.",
+    "genericError": "Что-то пошло не так. Попробуйте ещё раз."
   }
 }

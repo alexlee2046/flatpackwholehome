@@ -16,7 +16,9 @@
     "cart": "Cart",
     "search": "Search",
     "searchPlaceholder": "Search furniture, spaces, materials...",
-    "currency": "USD"
+    "currency": "USD",
+    "snapbed": "SnapBed",
+    "oneBedroomKitProduct": "Das 1-Zimmer-Komplettset"
   },
   "Announcement": {
     "bar": "Free Swatch Box with $50 Voucher — Worldwide DDP Delivery & Duties Included",
@@ -52,7 +54,44 @@
     "increaseQuantity": "Menge erhöhen",
     "remove": "Entfernen",
     "voucher": "Gutschein",
-    "removeVoucher": "Gutschein entfernen"
+    "removeVoucher": "Gutschein entfernen",
+    "shippingDdpNote": "(DDP, Zölle inbegriffen)",
+    "freeShippingBadge": "Kostenlose Versandrichtlinie · DDP-Seefracht im Wert von {amount} entfällt",
+    "freeShippingDetail": "Das komplette {boxes}-Karton-Set ({weight}kg) wird per DDP mit bereits verzollten Grenzabgaben geliefert — ohne Einfuhrzölle oder Zustellzuschläge.",
+    "ikeaCompareLabel": "Geschätzte Ersparnis gegenüber Selbstabholung bei IKEA vor Ort:",
+    "ikeaCompareCta": "{amount}+ sparen (Details ansehen)",
+    "shippingAddressTitle": "Lieferadresse",
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "sie@beispiel.de",
+    "firstNameLabel": "Vorname",
+    "lastNameLabel": "Nachname",
+    "companyLabel": "Firma (optional)",
+    "addressLine1Label": "Straße und Hausnummer",
+    "addressLine2Label": "Wohnung, Adresszusatz (optional)",
+    "cityLabel": "Stadt",
+    "stateLabel": "Bundesland / Provinz",
+    "stateHint": "Erforderlich für die USA, Kanada und Australien.",
+    "postalCodeLabel": "Postleitzahl",
+    "countryLabel": "Land",
+    "countryPlaceholder": "Land auswählen",
+    "phoneLabel": "Telefon (optional)",
+    "fieldRequired": "Dieses Feld ist erforderlich.",
+    "emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "continueToPayment": "Weiter zur Zahlung",
+    "resolvingCart": "Ihre Bestellung wird vorbereitet …",
+    "backToCart": "Zurück zum Warenkorb",
+    "backToAddress": "Zurück",
+    "paymentTitle": "Zahlung",
+    "amountDueLabel": "Heute fälliger Betrag",
+    "calculatingTotal": "Gesamtbetrag wird berechnet …",
+    "payNow": "Jetzt bezahlen",
+    "paying": "Zahlung wird verarbeitet …",
+    "paymentMethodsNote": "Alle gängigen Kredit- und Debitkarten werden akzeptiert, ebenso Apple Pay und Google Pay, wo verfügbar — sicher abgewickelt über Stripe.",
+    "checkoutUnavailable": "Der Checkout ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.",
+    "checkoutErrorGeneric": "Beim Checkout ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "itemUnavailable": "Ein oder mehrere Artikel in Ihrem Warenkorb sind für den Checkout nicht mehr verfügbar.",
+    "itemRemoved": "Artikel entfernt.",
+    "undo": "Rückgängig"
   },
   "Common": {
     "addToCart": "In den Warenkorb",
@@ -66,7 +105,8 @@
     "boxes": "{count} Kartons",
     "freeDelivery": "Kostenlose DDP-Lieferung",
     "home": "Startseite",
-    "skipToContent": "Zum Inhalt springen"
+    "skipToContent": "Zum Inhalt springen",
+    "cartError": "Warenkorb ist noch nicht bereit — bitte versuchen Sie es gleich noch einmal."
   },
   "Footer": {
     "tagline": "Your entire home. Delivered in 6 flat boxes.",
@@ -75,7 +115,8 @@
     "termsOfService": "Terms of Service",
     "trial": "100-Night Trial",
     "warranty": "10-Year Warranty",
-    "copyright": "© 2026 The Flat Set Inc. All rights reserved."
+    "copyright": "© 2026 The Flat Set Inc. All rights reserved.",
+    "furnitureSystemHeading": "Möbelsystem"
   },
   "PDP": {
     "home": "Startseite",
@@ -154,6 +195,8 @@
     "reservedTitle": "Your swatch box is reserved.",
     "reservedDesc": "Ihre Box verlässt die Werkstatt innerhalb von 48 Stunden. Im Deckel finden Sie Ihre 50 $-Gutscheinkarte — gültig für 60 Tage auf alle Möbelbestellungen.",
     "voucherCode": "Gutscheincode: SWATCH50",
-    "goToCart": "Zum Warenkorb"
+    "goToCart": "Zum Warenkorb",
+    "rateLimitError": "Sie haben das Anfragelimit erreicht. Bitte versuchen Sie es in Kürze erneut.",
+    "genericError": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
   }
 }

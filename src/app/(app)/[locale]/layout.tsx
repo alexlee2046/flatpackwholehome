@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 
 import { OrganizationJsonLd, WebSiteJsonLd } from '@/components/seo/JsonLd'
@@ -11,12 +11,18 @@ import Script from 'next/script'
 import React from 'react'
 
 import { getCanonicalSiteURL } from '@/utilities/canonicalUrl'
+import { PolicyModal } from '@/components/moduliv/PolicyModal'
 
 const siteURL = getCanonicalSiteURL()
 
 type LayoutProps = {
   children: ReactNode
   params: Promise<{ locale: string }>
+}
+
+export const viewport: Viewport = {
+  // Required for env(safe-area-inset-*) (iOS notch/home-indicator padding, e.g. KitBuilder) to resolve to non-zero values.
+  viewportFit: 'cover',
 }
 
 export function generateStaticParams() {
@@ -75,8 +81,9 @@ export default async function RootLayout({ children, params }: LayoutProps) {
       <head>
         <OrganizationJsonLd locale={locale} />
         <WebSiteJsonLd locale={locale} />
-        <link rel="preload" href="/vendor/fonts/f305d441dc1.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-        <link rel="preload" href="/vendor/fonts/f49e0be9626.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        {/* latin subset (unicode-range U+0000-00FF) of each family — what English body copy actually renders with */}
+        <link rel="preload" href="/vendor/fonts/fbe25729b3d.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/vendor/fonts/f9deeae7719.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/vendor/tailwind.js" as="script" />
         <link href="/vendor/fonts/fonts-a39f5c6f.css" rel="stylesheet" />
         <link href="/vendor/fonts/fonts-7cdb80a7.css" rel="stylesheet" />
@@ -215,6 +222,7 @@ export default async function RootLayout({ children, params }: LayoutProps) {
       <body className="bg-background text-on-background font-body-md antialiased overflow-x-hidden">
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
+          <PolicyModal />
         </NextIntlClientProvider>
       </body>
     </html>

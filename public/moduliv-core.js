@@ -2,9 +2,16 @@
  * MODULIV Core Shared Engine (Warm Japandi Editorial)
  * - Unified Shopping Cart State Machine & LocalStorage Persistence
  * - Global Instant Search Modal
- * - Multi-Currency Selector (USD, EUR, GBP, CAD, AUD)
- * - Accessible Privacy Policy & Terms of Service Modals (Eliminating Dead Spans)
  * - Announcement Bar & Scroll Reveal Observers
+ *
+ * Privacy Policy / Terms of Service are rendered by the React
+ * <PolicyModal> component (src/components/moduliv/PolicyModal.tsx), which
+ * reads messages/policies/<locale>.json. It opens itself via
+ * window.modulivOpenPolicy(modalId) — this file only calls that bridge,
+ * it does not own any modal markup or content.
+ *
+ * Currency is single-currency (USD) only — there is no working multi-
+ * currency checkout, so this file does not render a currency switcher.
  */
 
 (function () {
@@ -326,247 +333,7 @@
     }
 
     /* ==========================================================================
-       3. GLOBAL CURRENCY SWITCHER
-       ========================================================================== */
-    var CURRENCIES = [
-        { code: 'USD', symbol: '$', rate: 1.0, label: 'USD ($) — United States' },
-        { code: 'EUR', symbol: '€', rate: 0.92, label: 'EUR (€) — European Union' },
-        { code: 'GBP', symbol: '£', rate: 0.79, label: 'GBP (£) — United Kingdom' },
-        { code: 'CAD', symbol: 'CA$', rate: 1.36, label: 'CAD (CA$) — Canada' },
-        { code: 'AUD', symbol: 'A$', rate: 1.52, label: 'AUD (A$) — Australia' }
-    ];
-
-    function initCurrencySwitcher() {
-        var savedCode = 'USD';
-        try {
-            savedCode = localStorage.getItem('moduliv-currency') || 'USD';
-        } catch (e) {}
-
-        var currencyTriggers = document.querySelectorAll('header span.font-label-md:not([data-cart-link] *)');
-        currencyTriggers.forEach(function (el) {
-            if (el.textContent.trim() === 'USD' || el.hasAttribute('data-currency-trigger')) {
-                el.setAttribute('data-currency-trigger', 'true');
-                el.setAttribute('role', 'button');
-                el.setAttribute('tabindex', '0');
-                el.setAttribute('aria-haspopup', 'true');
-                el.className = 'font-label-md text-label-md cursor-pointer hover:text-[#8a4725] transition-colors duration-300 inline-flex items-center gap-1 select-none';
-                el.innerHTML = '<span class="currency-label">' + savedCode + '</span><span class="material-symbols-outlined text-[14px]">expand_more</span>';
-
-                el.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    toggleCurrencyDropdown(el);
-                });
-                el.addEventListener('keydown', function (e) {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        toggleCurrencyDropdown(el);
-                    }
-                });
-            }
-        });
-    }
-
-    function toggleCurrencyDropdown(triggerEl) {
-        var existing = document.getElementById('moduliv-currency-menu');
-        if (existing) {
-            existing.remove();
-            return;
-        }
-
-        var rect = triggerEl.getBoundingClientRect();
-        var menu = document.createElement('div');
-        menu.id = 'moduliv-currency-menu';
-        menu.className = 'fixed z-[9999] bg-white border border-[#d9c2b8] rounded-xl shadow-xl py-2 min-w-[220px] text-left animate-in fade-in duration-150 font-body-md text-sm';
-        menu.style.top = (rect.bottom + 8) + 'px';
-        menu.style.left = Math.max(16, rect.right - 220) + 'px';
-
-        var activeCode = 'USD';
-        try { activeCode = localStorage.getItem('moduliv-currency') || 'USD'; } catch (e) {}
-
-        var html = '<div class="px-3 py-1.5 text-[11px] font-label-md uppercase tracking-wider text-[#86736b] border-b border-[#d9c2b8]/30">Select Currency (DDP)</div>';
-        for (var i = 0; i < CURRENCIES.length; i++) {
-            var c = CURRENCIES[i];
-            var isCurrent = c.code === activeCode;
-            html += '<button type="button" data-cur="' + c.code + '" class="w-full px-3 py-2 text-left hover:bg-[#F9F8F6] flex items-center justify-between transition-colors ' + (isCurrent ? 'text-[#8a4725] font-semibold bg-[#F9F8F6]' : 'text-[#1a1c1d]') + '">' +
-                    '  <span>' + c.label + '</span>' +
-                    (isCurrent ? '  <span class="material-symbols-outlined text-sm">check</span>' : '') +
-                    '</button>';
-        }
-        menu.innerHTML = html;
-        document.body.appendChild(menu);
-
-        menu.addEventListener('click', function (e) {
-            var btn = e.target.closest('button[data-cur]');
-            if (!btn) return;
-            var newCode = btn.dataset.cur;
-            try { localStorage.setItem('moduliv-currency', newCode); } catch (e) {}
-            document.querySelectorAll('[data-currency-trigger] .currency-label').forEach(function (s) {
-                s.textContent = newCode;
-            });
-            menu.remove();
-        });
-
-        function outsideClick(e) {
-            if (!menu.contains(e.target) && e.target !== triggerEl) {
-                menu.remove();
-                document.removeEventListener('click', outsideClick);
-            }
-        }
-        setTimeout(function () { document.addEventListener('click', outsideClick); }, 50);
-    }
-
-    /* ==========================================================================
-       4. GLOBAL POLICY & TERMS MODALS (ELIMINATING DEAD SPANS)
-       ========================================================================== */
-    var PRIVACY_CONTENT = 
-        '<div class="space-y-4 text-sm font-body-md text-[#54433c]">' +
-        '  <p class="font-medium text-[#1a1c1d]">Effective Date: January 1, 2026 · Compliant with GDPR, CCPA, and Global Consumer Protection Standards.</p>' +
-        '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">1. Plain-Language Data Promise</h4>' +
-        '  <p>The Flat Set collects only the information required to build, ship, and deliver your flat-pack living system to your door. We will never sell, rent, or trade your personal data to data brokers or advertising networks.</p>' +
-        '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">2. What We Collect</h4>' +
-        '  <p>• Delivery Coordinates: Physical address and contact telephone number required exclusively for DDP customs clearing and FedEx/UPS doorstep parcel drops.<br>' +
-        '     • Order Configuration: Fabric selections, module dimensions, and room preferences stored locally to facilitate seamless assembly support.<br>' +
-        '     • Payment Security: All live payments are processed via end-to-end PCI-DSS Level 1 certified gateways. The Flat Set never stores raw credit card numbers.</p>' +
-        '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">3. 100-Night Return Anonymity</h4>' +
-        '  <p>Should you utilize our donation-over-return protocol, donation receipts from our local verified charity partners are processed privately with zero public disclosure.</p>' +
-        '</div>';
-
-    var TERMS_CONTENT = 
-        '<div class="space-y-4 text-sm font-body-md text-[#54433c]">' +
-        '  <p class="font-medium text-[#1a1c1d]">The Flat Set Global Customer Agreement · Whole-Home Flat-Pack Systems</p>' +
-        '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">1. Zero-Surprise DDP Delivery Guarantee</h4>' +
-        '  <p>Every price listed on The Flat Set is Delivered Duty Paid (DDP). All import taxes, ocean freight, customs clearance tariffs, and final-mile doorstep delivery are paid in full by The Flat Set. No freight fees or broker bills will ever be owed at delivery.</p>' +
-        '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">2. 100-Night In-Home Trial & Donation Guarantee</h4>' +
-        '  <p>From the date your 6 boxes arrive, you have 100 nights to live with the furniture. If you decide it does not suit your space, notify our concierge team. We coordinate free pickup by an accredited local housing charity and issue a 100% full refund upon donation confirmation.</p>' +
-        '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">3. 5-Year Solid Oak Frame Warranty</h4>' +
-        '  <p>All precision-milled FSC®-certified solid oak structural frames and Snap-Lock stainless-steel joints are guaranteed against structural failure for five full years. Fabric covers and zippers carry a 2-year warranty.</p>' +
-        '  <h4 class="font-headline-sm text-base text-[#1a1c1d] pt-2">4. 60-Minute Assembly & Free Replacement Parts</h4>' +
-        '  <p>Our pieces require 0 screws, 0 Allen keys, and 0 frustration. If any module, bracket, or fabric component sustains shipping wear, replacement parts dispatch via express air within 48 hours free of charge.</p>' +
-        '</div>';
-
-    function openPolicyModalById(modalId) {
-        if (!document.getElementById('moduliv-privacy-modal') || !document.getElementById('moduliv-terms-modal')) {
-            createPolicyModal('moduliv-privacy-modal', 'Privacy Policy', PRIVACY_CONTENT);
-            createPolicyModal('moduliv-terms-modal', 'Terms of Service & Guarantees', TERMS_CONTENT);
-        }
-        var modal = document.getElementById(modalId);
-        if (!modal) return;
-        var container = modal.firstElementChild;
-        modal.style.display = 'flex';
-        modal.classList.remove('hidden');
-        setTimeout(function () {
-            modal.classList.remove('opacity-0');
-            if (container) {
-                container.classList.remove('scale-95');
-                container.classList.add('scale-100');
-            }
-        }, 10);
-        document.body.style.overflow = 'hidden';
-    }
-
-    window.modulivOpenPolicy = openPolicyModalById;
-
-    function createPolicyModal(id, title, bodyHtml) {
-        if (document.getElementById(id)) return;
-
-        var modal = document.createElement('div');
-        modal.id = id;
-        modal.setAttribute('role', 'dialog');
-        modal.setAttribute('aria-modal', 'true');
-        modal.setAttribute('aria-label', title);
-        modal.className = 'fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-200 hidden opacity-0';
-        modal.style.display = 'none';
-
-        modal.innerHTML = 
-            '<div class="bg-[#F9F8F6] text-[#1a1c1d] w-full max-w-2xl rounded-2xl shadow-2xl border border-[#d9c2b8]/50 overflow-hidden transform transition-transform duration-200 scale-95 flex flex-col max-h-[85vh]">' +
-            '  <div class="px-6 py-5 border-b border-[#d9c2b8]/40 flex items-center justify-between bg-white">' +
-            '    <div class="flex items-center gap-2">' +
-            '      <span class="material-symbols-outlined text-[#8a4725]">verified_user</span>' +
-            '      <h3 class="font-headline-sm text-xl text-[#1a1c1d]">' + title + '</h3>' +
-            '    </div>' +
-            '    <button type="button" class="modal-close text-[#54433c] hover:text-[#1a1c1d] p-1.5 rounded-full hover:bg-[#e2e2e3]/40 transition-colors">' +
-            '      <span class="material-symbols-outlined text-xl">close</span>' +
-            '    </button>' +
-            '  </div>' +
-            '  <div class="p-6 md:p-8 overflow-y-auto flex-1">' + bodyHtml + '</div>' +
-            '  <div class="px-6 py-4 border-t border-[#d9c2b8]/40 bg-white flex justify-end">' +
-            '    <button type="button" class="modal-close bg-[#1a1c1d] text-white px-6 py-2.5 rounded-full font-label-md text-xs uppercase tracking-wider hover:bg-[#8a4725] transition-colors">Understood</button>' +
-            '  </div>' +
-            '</div>';
-
-        document.body.appendChild(modal);
-
-        var container = modal.firstElementChild;
-        function open() {
-            modal.style.display = 'flex';
-            modal.classList.remove('hidden');
-            setTimeout(function () {
-                modal.classList.remove('opacity-0');
-                container.classList.remove('scale-95');
-                container.classList.add('scale-100');
-            }, 10);
-            document.body.style.overflow = 'hidden';
-        }
-        function close() {
-            modal.classList.add('opacity-0');
-            container.classList.remove('scale-100');
-            container.classList.add('scale-95');
-            setTimeout(function () {
-                modal.classList.add('hidden');
-                modal.style.display = 'none';
-                document.body.style.overflow = '';
-            }, 200);
-        }
-
-        modal.querySelectorAll('.modal-close').forEach(function (btn) {
-            btn.addEventListener('click', close);
-        });
-        modal.addEventListener('click', function (e) {
-            if (e.target === modal) close();
-        });
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) close();
-        });
-
-        return { open: open, close: close };
-    }
-
-    function wireFooterPolicies() {
-        var privacyModal = createPolicyModal('moduliv-privacy-modal', 'Privacy Policy', PRIVACY_CONTENT);
-        var termsModal = createPolicyModal('moduliv-terms-modal', 'Terms of Service & Guarantees', TERMS_CONTENT);
-
-        // Find all dead spans across footers and convert to interactive buttons
-        var deadSpans = document.querySelectorAll('footer span[aria-disabled="true"], footer span:not([class*="text-outline"]):not([class*="dark:text-surface-dim"])');
-        deadSpans.forEach(function (span) {
-            var text = span.textContent.trim();
-            if (text === 'Privacy Policy') {
-                var btn = document.createElement('button');
-                btn.type = 'button';
-                btn.setAttribute('data-policy-trigger', 'privacy');
-                btn.className = 'text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200 cursor-pointer font-label-md text-label-md';
-                btn.textContent = 'Privacy Policy';
-                btn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    if (privacyModal) privacyModal.open();
-                });
-                span.parentNode.replaceChild(btn, span);
-            } else if (text === 'Terms of Service') {
-                var btn2 = document.createElement('button');
-                btn2.type = 'button';
-                btn2.setAttribute('data-policy-trigger', 'terms');
-                btn2.className = 'text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200 cursor-pointer font-label-md text-label-md';
-                btn2.textContent = 'Terms of Service';
-                btn2.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    if (termsModal) termsModal.open();
-                });
-                span.parentNode.replaceChild(btn2, span);
-            }
-        });
-    }
-
-    /* ==========================================================================
-       5. WIRE SEARCH BUTTONS & CHROME
+       3. WIRE SEARCH BUTTONS & CHROME
        ========================================================================== */
     function wireSearchButtons() {
         createSearchModal();
@@ -599,7 +366,7 @@
     }
 
     /* ==========================================================================
-       6. MOBILE DRAWER NAVIGATION (DEF-08)
+       4. MOBILE DRAWER NAVIGATION (DEF-08)
        ========================================================================== */
     function initMobileDrawer() {
         var existing = document.getElementById('moduliv-mobile-drawer') || document.getElementById('mobile-nav-drawer');
@@ -754,24 +521,16 @@
             });
         }
 
+        // Privacy/Terms content live in the React <PolicyModal> component
+        // (src/components/moduliv/PolicyModal.tsx); it opens itself via
+        // window.modulivOpenPolicy(modalId), so this drawer just calls that
+        // bridge instead of owning any modal markup itself.
         var drawerPrivacyBtn = document.getElementById('moduliv-drawer-privacy');
         if (drawerPrivacyBtn) {
             drawerPrivacyBtn.addEventListener('click', function () {
                 closeDrawer();
                 setTimeout(function () {
-                    var m = document.getElementById('moduliv-privacy-modal');
-                    if (m) {
-                        m.style.display = 'flex';
-                        m.classList.remove('hidden');
-                        setTimeout(function () {
-                            m.classList.remove('opacity-0');
-                            if (m.firstElementChild) {
-                                m.firstElementChild.classList.remove('scale-95');
-                                m.firstElementChild.classList.add('scale-100');
-                            }
-                        }, 10);
-                        document.body.style.overflow = 'hidden';
-                    }
+                    if (window.modulivOpenPolicy) window.modulivOpenPolicy('moduliv-privacy-modal');
                 }, 200);
             });
         }
@@ -781,19 +540,7 @@
             drawerTermsBtn.addEventListener('click', function () {
                 closeDrawer();
                 setTimeout(function () {
-                    var m = document.getElementById('moduliv-terms-modal');
-                    if (m) {
-                        m.style.display = 'flex';
-                        m.classList.remove('hidden');
-                        setTimeout(function () {
-                            m.classList.remove('opacity-0');
-                            if (m.firstElementChild) {
-                                m.firstElementChild.classList.remove('scale-95');
-                                m.firstElementChild.classList.add('scale-100');
-                            }
-                        }, 10);
-                        document.body.style.overflow = 'hidden';
-                    }
+                    if (window.modulivOpenPolicy) window.modulivOpenPolicy('moduliv-terms-modal');
                 }, 200);
             });
         }
@@ -859,8 +606,6 @@
         setTimeout(ensureTailwindCompiled, 500);
         paintCartBadges(false);
         wireSearchButtons();
-        initCurrencySwitcher();
-        wireFooterPolicies();
         wireAnnouncementDismiss();
         initMobileDrawer();
         wireScrollReveal();

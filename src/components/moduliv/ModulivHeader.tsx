@@ -3,7 +3,7 @@
 import { Link } from '@/i18n/navigation'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { useTranslations } from 'next-intl'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 type HeaderProps = {
   navItems?: Array<{ label: string; url: string; badge?: string | null }> | null
@@ -21,6 +21,19 @@ export function ModulivHeader({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const tNav = useTranslations('Navigation')
   const tFooter = useTranslations('Footer')
+  const menuTriggerRef = useRef<HTMLButtonElement>(null)
+  const drawerCloseRef = useRef<HTMLButtonElement>(null)
+  const hasOpenedDrawerRef = useRef(false)
+
+  // Move focus into the drawer on open, back to the trigger on close
+  useEffect(() => {
+    if (isDrawerOpen) {
+      hasOpenedDrawerRef.current = true
+      drawerCloseRef.current?.focus()
+    } else if (hasOpenedDrawerRef.current) {
+      menuTriggerRef.current?.focus()
+    }
+  }, [isDrawerOpen])
 
   // Lock body scroll when drawer is open
   useEffect(() => {
@@ -86,6 +99,7 @@ export function ModulivHeader({
       {showAnnouncement && announcementMessage && (
         <aside
           aria-label="Site Announcement"
+          inert={isDrawerOpen}
           className="bg-primary text-on-primary py-2 px-margin-mobile md:px-margin-desktop text-center text-xs font-label-md tracking-wider flex items-center justify-center gap-2"
         >
           <span>{announcementMessage}</span>
@@ -97,12 +111,16 @@ export function ModulivHeader({
         </aside>
       )}
 
-      <header className="sticky top-0 z-50 w-full bg-surface/90 backdrop-blur-md border-b border-outline-variant/30">
+      <header
+        inert={isDrawerOpen}
+        className="sticky top-0 z-50 w-full bg-surface/90 backdrop-blur-md border-b border-outline-variant/30"
+      >
         <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4 w-full px-margin-mobile md:px-margin-desktop py-3">
           {/* Mobile Menu Trigger & Logo */}
           <div className="flex items-center gap-3">
             <button
               id="mobile-menu-trigger"
+              ref={menuTriggerRef}
               type="button"
               aria-label="Open navigation menu"
               aria-expanded={isDrawerOpen}
@@ -110,7 +128,7 @@ export function ModulivHeader({
               onClick={() => setIsDrawerOpen(true)}
               className="md:hidden flex items-center justify-center w-10 h-10 -ml-2 rounded-full text-on-surface hover:bg-surface-container-highest transition-colors"
             >
-              <span className="material-symbols-outlined text-[24px]">menu</span>
+              <span className="material-symbols-outlined text-[24px]" aria-hidden="true">menu</span>
             </button>
             <Link
               className="group flex items-baseline gap-1.5 shrink-0 text-on-surface dark:text-surface-bright hover:opacity-85 transition-opacity"
@@ -198,9 +216,9 @@ export function ModulivHeader({
               aria-label="Search"
               type="button"
               onClick={openSearch}
-              className="hover:opacity-80 transition-opacity duration-300"
+              className="p-2 hover:opacity-80 transition-opacity duration-300"
             >
-              <span className="material-symbols-outlined" data-icon="search">
+              <span className="material-symbols-outlined" data-icon="search" aria-hidden="true">
                 search
               </span>
             </button>
@@ -208,9 +226,9 @@ export function ModulivHeader({
               href="/cart"
               data-cart-link
               aria-label="Cart"
-              className="hover:opacity-80 transition-opacity duration-300 relative inline-block text-primary dark:text-primary-fixed-dim"
+              className="p-2 hover:opacity-80 transition-opacity duration-300 relative inline-block text-primary dark:text-primary-fixed-dim"
             >
-              <span className="material-symbols-outlined" data-icon="shopping_cart">
+              <span className="material-symbols-outlined" data-icon="shopping_cart" aria-hidden="true">
                 shopping_cart
               </span>
             </Link>
@@ -247,7 +265,7 @@ export function ModulivHeader({
               <Link
                 href="/"
                 onClick={() => setIsDrawerOpen(false)}
-                className="group flex items-baseline gap-1.5 focus:outline-none"
+                className="group flex items-baseline gap-1.5"
                 aria-label="The Flat Set — Home"
               >
                 <span className="font-serif italic text-xl tracking-tight text-on-surface dark:text-surface-bright group-hover:text-primary transition-colors">
@@ -259,11 +277,12 @@ export function ModulivHeader({
               </Link>
               <button
                 type="button"
+                ref={drawerCloseRef}
                 aria-label="Close navigation menu"
                 onClick={() => setIsDrawerOpen(false)}
                 className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors"
               >
-                <span className="material-symbols-outlined text-[22px]">close</span>
+                <span className="material-symbols-outlined text-[22px]" aria-hidden="true">close</span>
               </button>
             </div>
 
@@ -274,7 +293,7 @@ export function ModulivHeader({
                 onClick={openSearch}
                 className="w-full flex items-center gap-3 px-4 py-2.5 rounded-full bg-surface-container-lowest dark:bg-surface-container border border-outline-variant/40 text-on-surface-variant text-sm font-label-md hover:border-primary transition-colors text-left"
               >
-                <span className="material-symbols-outlined text-[20px] text-primary">search</span>
+                <span className="material-symbols-outlined text-[20px] text-primary" aria-hidden="true">search</span>
                 <span>{tNav('searchPlaceholder')}</span>
               </button>
             </div>
@@ -290,7 +309,7 @@ export function ModulivHeader({
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>{tNav('kitBuilder')}</span>
-                <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
+                <span className="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/products/modusofa"
@@ -298,7 +317,7 @@ export function ModulivHeader({
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>{tNav('modusofa')}</span>
-                <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
+                <span className="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/products/snapbed"
@@ -306,7 +325,7 @@ export function ModulivHeader({
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>The SnapBed</span>
-                <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
+                <span className="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/products/1-bedroom-kit"
@@ -314,7 +333,7 @@ export function ModulivHeader({
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>The 1-Bedroom Kit</span>
-                <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
+                <span className="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/how-it-works-craft-logistics"
@@ -322,7 +341,7 @@ export function ModulivHeader({
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>{tNav('howItWorks')}</span>
-                <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
+                <span className="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/free-swatch-box-material-discovery"
@@ -330,7 +349,7 @@ export function ModulivHeader({
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>{tNav('swatchBox')}</span>
-                <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
+                <span className="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/faq"
@@ -338,7 +357,7 @@ export function ModulivHeader({
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>{tNav('faq')}</span>
-                <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
+                <span className="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/us-vs-ikea"
@@ -349,20 +368,15 @@ export function ModulivHeader({
                   <span>{tNav('usVsIkea')}</span>
                   <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">-20%</span>
                 </div>
-                <span className="material-symbols-outlined text-[18px] text-primary">arrow_forward</span>
+                <span className="material-symbols-outlined text-[18px] text-primary" aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/cart"
+                data-cart-link
                 onClick={() => setIsDrawerOpen(false)}
-                className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
+                className="relative flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>{tNav('cart')}</span>
-                <span
-                  data-cart-badge
-                  className="text-xs px-2 py-0.5 rounded-full bg-primary text-on-primary font-sans font-bold"
-                >
-                  0
-                </span>
               </Link>
             </nav>
 
@@ -384,10 +398,10 @@ export function ModulivHeader({
           <div className="pt-6 border-t border-outline-variant/30 dark:border-outline/20 flex flex-col gap-4">
             <div className="bg-surface-container-low dark:bg-surface-container p-3.5 rounded-xl border border-outline-variant/30 text-xs text-on-surface-variant">
               <div className="font-semibold text-on-surface mb-1 flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[16px] text-primary">verified</span>
+                <span className="material-symbols-outlined text-[16px] text-primary" aria-hidden="true">verified</span>
                 <span>The Flat Set Guarantee</span>
               </div>
-              <p className="text-[11px] leading-relaxed text-outline">
+              <p className="text-[11px] leading-relaxed text-on-surface-variant">
                 6 Flat Boxes · 60-Minute Assembly · 0 Screws · DDP Guaranteed Delivery.
               </p>
             </div>
@@ -408,7 +422,7 @@ export function ModulivHeader({
                 {tFooter('termsOfService')}
               </button>
             </div>
-            <div className="text-[11px] text-outline/80 text-center">
+            <div className="text-[11px] text-on-surface-variant text-center">
               © 2026 The Flat Set Inc.
             </div>
           </div>

@@ -1,5 +1,6 @@
 'use client'
 
+import { localeDetails } from '@/i18n/routing'
 import React, { useEffect, useState } from 'react'
 
 type GeoBannerProps = {
@@ -60,12 +61,16 @@ const LOCALE_PROMPTS: Record<
  */
 export function GeoSuggestionBanner({ currentLocale }: GeoBannerProps) {
   const [targetLocale, setTargetLocale] = useState<string | null>(null)
-  const [isVisible, setIsVisible] = useState(false)
+  // 'checking' reserves the banner's height so that showing it later never
+  // shifts already-rendered content (CLS). It collapses to 'hidden' once we
+  // know no suggestion is coming.
+  const [status, setStatus] = useState<'checking' | 'hidden' | 'visible'>('checking')
 
   useEffect(() => {
     try {
       // 1. If user previously dismissed the geo banner, do not disturb
       if (localStorage.getItem('tfs_geo_dismissed') === 'true') {
+        setStatus('hidden')
         return
       }
 
@@ -73,29 +78,31 @@ export function GeoSuggestionBanner({ currentLocale }: GeoBannerProps) {
       fetch('/api/geo')
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
-          if (!data?.recommendedLocale) return
-          const rec = data.recommendedLocale
-
+          const rec = data?.recommendedLocale
           // Only suggest if recommended locale is different from current page locale
-          if (rec !== currentLocale && LOCALE_PROMPTS[rec]) {
+          if (rec && rec !== currentLocale && LOCALE_PROMPTS[rec]) {
             setTargetLocale(rec)
-            setIsVisible(true)
+            setStatus('visible')
+          } else {
+            setStatus('hidden')
           }
         })
         .catch(() => {
           // Gracefully ignore geo check failures
+          setStatus('hidden')
         })
     } catch {
       // LocalStorage or SSR security boundary
+      setStatus('hidden')
     }
   }, [currentLocale])
 
-  if (!isVisible || !targetLocale) {
+  if (status === 'hidden') {
     return null
   }
 
-  const prompt = LOCALE_PROMPTS[targetLocale]
-  if (!prompt) return null
+  const prompt = targetLocale ? LOCALE_PROMPTS[targetLocale] : null
+  const targetDir = targetLocale ? localeDetails[targetLocale as keyof typeof localeDetails]?.dir : undefined
 
   const handleSwitch = () => {
     try {
@@ -131,36 +138,41 @@ export function GeoSuggestionBanner({ currentLocale }: GeoBannerProps) {
     try {
       localStorage.setItem('tfs_geo_dismissed', 'true')
     } catch {}
-    setIsVisible(false)
+    setStatus('hidden')
   }
 
   return (
     <aside
+      aria-hidden={status === 'checking'}
       aria-label="Language and regional preference"
-      className="bg-on-background text-on-primary py-2.5 px-4 text-xs font-label-md transition-all duration-300 relative z-50 border-b border-outline/20"
+      className="min-h-[44px] bg-on-background text-on-primary py-2.5 px-4 text-xs font-label-md transition-all duration-300 relative z-50 border-b border-outline/20"
     >
-      <div className="max-w-[1440px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-base leading-none" role="img" aria-label="Country flag">
-            {prompt.flag}
-          </span>
-          <span className="tracking-wide text-surface-bright">{prompt.message}</span>
+      {prompt && (
+        <div className="max-w-[1440px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-start">
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-base leading-none" role="img" aria-label="Country flag">
+              {prompt.flag}
+            </span>
+            <span className="tracking-wide text-surface-bright" dir={targetDir}>
+              {prompt.message}
+            </span>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={handleSwitch}
+              className="bg-primary hover:bg-primary-container text-on-primary px-3.5 py-1 rounded-full text-xs font-medium transition-colors shadow-sm cursor-pointer"
+            >
+              {prompt.switchText}
+            </button>
+            <button
+              onClick={handleDismiss}
+              className="text-surface-variant hover:text-on-primary underline text-xs cursor-pointer ml-1"
+            >
+              {prompt.stayText}
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
-          <button
-            onClick={handleSwitch}
-            className="bg-primary hover:bg-primary-container text-on-primary px-3.5 py-1 rounded-full text-xs font-medium transition-colors shadow-sm cursor-pointer"
-          >
-            {prompt.switchText}
-          </button>
-          <button
-            onClick={handleDismiss}
-            className="text-surface-variant hover:text-on-primary underline text-xs cursor-pointer ml-1"
-          >
-            {prompt.stayText}
-          </button>
-        </div>
-      </div>
+      )}
     </aside>
   )
 }

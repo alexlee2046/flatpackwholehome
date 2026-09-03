@@ -19,17 +19,25 @@ export function SwatchView({
     name: '',
     postal: '',
     room: '',
+    // honeypot: real users never fill this, bots often do
+    website: '',
   })
   const [isSuccess, setIsSuccess] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, boolean>>({})
+
+  const REQUIRED_FIELDS = ['name', 'email', 'address', 'city', 'postal'] as const
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.name || !formData.email || !formData.address || !formData.city || !formData.postal) {
+    const missing = REQUIRED_FIELDS.filter((field) => !formData[field].trim())
+    if (missing.length > 0) {
+      setFieldErrors(Object.fromEntries(missing.map((field) => [field, true])))
       setErrorMsg(t('requiredError'))
       return
     }
+    setFieldErrors({})
     setErrorMsg('')
     setIsLoading(true)
 
@@ -41,8 +49,9 @@ export function SwatchView({
       })
 
       if (!res.ok) {
+        if (res.status === 429) throw new Error(t('rateLimitError'))
         const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || 'Failed to submit swatch request.')
+        throw new Error(data.error || t('genericError'))
       }
 
       if (typeof window !== 'undefined') {
@@ -52,7 +61,7 @@ export function SwatchView({
       }
       setIsSuccess(true)
     } catch (err: any) {
-      setErrorMsg(err.message || 'Something went wrong. Please try again.')
+      setErrorMsg(err.message || t('genericError'))
     } finally {
       setIsLoading(false)
     }
@@ -181,12 +190,29 @@ export function SwatchView({
                 onSubmit={handleSubmit}
               >
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">{t('formTitle')}</h3>
-                {errorMsg && <p className="text-sm text-error">{errorMsg}</p>}
+                {errorMsg && (
+                  <p className="text-sm text-error" role="alert">
+                    {errorMsg}
+                  </p>
+                )}
+                {/* honeypot: off-screen (not display:none) so bots that skip hidden fields still fill it */}
+                <input
+                  aria-hidden="true"
+                  autoComplete="off"
+                  className="absolute -left-[9999px] w-px h-px overflow-hidden"
+                  name="website"
+                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                  tabIndex={-1}
+                  type="text"
+                  value={formData.website}
+                />
                 <div>
                   <label className="font-label-md text-label-md text-on-surface block mb-2" htmlFor="sf-name">
                     {t('fullName')}
                   </label>
                   <input
+                    aria-describedby={fieldErrors.name ? 'sf-name-error' : undefined}
+                    aria-invalid={fieldErrors.name || undefined}
                     className="w-full px-4 py-3 font-body-md text-sm border border-outline-variant/60 rounded bg-surface"
                     id="sf-name"
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -195,12 +221,19 @@ export function SwatchView({
                     type="text"
                     value={formData.name}
                   />
+                  {fieldErrors.name && (
+                    <p className="text-error text-xs mt-1" id="sf-name-error" role="alert">
+                      {t('requiredError')}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="font-label-md text-label-md text-on-surface block mb-2" htmlFor="sf-email">
                     {t('email')}
                   </label>
                   <input
+                    aria-describedby={fieldErrors.email ? 'sf-email-error' : undefined}
+                    aria-invalid={fieldErrors.email || undefined}
                     className="w-full px-4 py-3 font-body-md text-sm border border-outline-variant/60 rounded bg-surface"
                     id="sf-email"
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -209,12 +242,19 @@ export function SwatchView({
                     type="email"
                     value={formData.email}
                   />
+                  {fieldErrors.email && (
+                    <p className="text-error text-xs mt-1" id="sf-email-error" role="alert">
+                      {t('requiredError')}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="font-label-md text-label-md text-on-surface block mb-2" htmlFor="sf-address">
                     {t('streetAddress')}
                   </label>
                   <input
+                    aria-describedby={fieldErrors.address ? 'sf-address-error' : undefined}
+                    aria-invalid={fieldErrors.address || undefined}
                     className="w-full px-4 py-3 font-body-md text-sm border border-outline-variant/60 rounded bg-surface"
                     id="sf-address"
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
@@ -223,6 +263,11 @@ export function SwatchView({
                     type="text"
                     value={formData.address}
                   />
+                  {fieldErrors.address && (
+                    <p className="text-error text-xs mt-1" id="sf-address-error" role="alert">
+                      {t('requiredError')}
+                    </p>
+                  )}
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -230,6 +275,8 @@ export function SwatchView({
                       {t('city')}
                     </label>
                     <input
+                      aria-describedby={fieldErrors.city ? 'sf-city-error' : undefined}
+                      aria-invalid={fieldErrors.city || undefined}
                       className="w-full px-4 py-3 font-body-md text-sm border border-outline-variant/60 rounded bg-surface"
                       id="sf-city"
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
@@ -238,12 +285,19 @@ export function SwatchView({
                       type="text"
                       value={formData.city}
                     />
+                    {fieldErrors.city && (
+                      <p className="text-error text-xs mt-1" id="sf-city-error" role="alert">
+                        {t('requiredError')}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="font-label-md text-label-md text-on-surface block mb-2" htmlFor="sf-zip">
                       {t('postalCode')}
                     </label>
                     <input
+                      aria-describedby={fieldErrors.postal ? 'sf-zip-error' : undefined}
+                      aria-invalid={fieldErrors.postal || undefined}
                       className="w-full px-4 py-3 font-body-md text-sm border border-outline-variant/60 rounded bg-surface"
                       id="sf-zip"
                       onChange={(e) => setFormData({ ...formData, postal: e.target.value })}
@@ -252,6 +306,11 @@ export function SwatchView({
                       type="text"
                       value={formData.postal}
                     />
+                    {fieldErrors.postal && (
+                      <p className="text-error text-xs mt-1" id="sf-zip-error" role="alert">
+                        {t('requiredError')}
+                      </p>
+                    )}
                   </div>
                 </div>
 

@@ -76,6 +76,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
   const [selectedLeg, setSelectedLeg] = useState(isSofa ? 'Natural Oak' : 'Queen')
   const [qty, setQty] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
+  const [cartError, setCartError] = useState(false)
 
   const title = product?.title || (isSofa ? t('defaultTitle') : 'SnapBed Frame')
   const price = product?.price || 699
@@ -130,24 +131,31 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
     : (product?.joineryType ? t('eyebrowOtherWithJoinery', { joinery: product.joineryType }) : t('eyebrowOther'))
 
   const handleAddToCart = () => {
-    if (typeof window !== 'undefined' && (window as any).modulivCart) {
-      ;(window as any).modulivCart.add(qty, {
-        id: product?.slug || 'modusofa',
-        name: title,
-        price,
-        qty,
-        variant: `${selectedFabric} · ${selectedLeg}`,
-      })
+    const cart = typeof window !== 'undefined' ? (window as any).modulivCart : null
+    if (!cart || typeof cart.add !== 'function') {
+      setCartError(true)
+      setTimeout(() => setCartError(false), 4000)
+      return false
     }
+    cart.add(qty, {
+      id: product?.slug || 'modusofa',
+      name: title,
+      price,
+      qty,
+      variant: `${selectedFabric} · ${selectedLeg}`,
+    })
+    setCartError(false)
     setIsAdded(true)
     setTimeout(() => {
       setIsAdded(false)
     }, 2000)
+    return true
   }
 
   const handleBuyNow = () => {
-    handleAddToCart()
-    router.push('/cart')
+    if (handleAddToCart()) {
+      router.push('/cart')
+    }
   }
 
   return (
@@ -161,11 +169,11 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
         <Link className="hover:text-primary transition-colors" href="/">
           {tCommon('home')}
         </Link>
-        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">chevron_right</span>
         <Link className="hover:text-primary transition-colors" href="/1-bedroom-kit-builder">
           {categoryName}
         </Link>
-        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">chevron_right</span>
         <span className="text-on-surface font-medium">{title}</span>
       </nav>
 
@@ -216,7 +224,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
           <span className="font-label-md text-label-md uppercase tracking-wider text-primary mb-2 block">
             {eyebrowText}
           </span>
-          <h1 className="font-display-lg text-[32px] md:text-[44px] leading-tight text-on-surface mb-3">
+          <h1 className="font-display-lg text-headline-md md:text-headline-lg text-on-surface mb-3">
             {title}
           </h1>
           {product?.subtitle && (
@@ -230,7 +238,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
               className="flex items-center gap-1.5 font-label-md text-sm text-primary hover:underline"
               href="#reviews"
             >
-              <span className="material-symbols-outlined text-[18px] text-amber-500">star</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-amber-500">star</span>
               <span className="font-medium text-on-surface">4.9</span>
               <span className="text-on-surface-variant">{t('reviewsCount', { count: 348 })}</span>
             </a>
@@ -306,7 +314,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
                     aria-pressed={sel}
                     className={`flex-1 py-3 rounded-lg font-label-md text-sm transition-all cursor-pointer border ${
                       sel
-                        ? 'bg-on-surface text-white border-on-surface'
+                        ? 'bg-on-surface text-on-primary border-on-surface'
                         : 'border-outline-variant text-on-surface hover:border-on-surface'
                     }`}
                     key={leg.key}
@@ -350,14 +358,21 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
             </div>
 
             <button
-              className="w-full bg-[#1A1C1D] text-white py-4 rounded-full uppercase tracking-wider text-label-md font-label-md hover:bg-primary transition-colors flex justify-center items-center gap-2 cursor-pointer"
+              className="w-full bg-on-background text-on-primary py-4 rounded-full uppercase tracking-wider text-label-md font-label-md hover:bg-primary transition-colors flex justify-center items-center gap-2 cursor-pointer disabled:opacity-75"
+              disabled={isAdded}
               id="pdp-add"
               onClick={handleAddToCart}
               type="button"
             >
               <span>{isAdded ? t('addedToCart') : t('addToCartWithPrice', { price: (price * qty).toFixed(2) })}</span>
-              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
+
+            {cartError && (
+              <p aria-live="assertive" className="text-sm text-error text-center" role="alert">
+                {tCommon('cartError')}
+              </p>
+            )}
 
             <button
               className="w-full rounded-full border border-on-background text-on-background hover:bg-on-background hover:text-on-primary transition-colors py-3 font-label-md flex justify-center items-center gap-2 cursor-pointer"
@@ -366,21 +381,21 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
               type="button"
             >
               {t('buyNow')}
-              <span className="material-symbols-outlined text-[18px]">bolt</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">bolt</span>
             </button>
 
             {/* Mini Trust Strip */}
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-1 pt-2 text-on-surface-variant">
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
-                <span className="material-symbols-outlined text-[16px] text-primary">handyman</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-primary">handyman</span>
                 {t('zeroScrews')}
               </span>
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
-                <span className="material-symbols-outlined text-[16px] text-primary">nights_stay</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-primary">nights_stay</span>
                 {t('trial')}
               </span>
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
-                <span className="material-symbols-outlined text-[16px] text-primary">local_shipping</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-primary">local_shipping</span>
                 {t('dutiesIncluded')}
               </span>
             </div>
@@ -388,7 +403,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
 
           {/* Swatch Promo Card */}
           <div className="bg-surface-container rounded-xl p-4 flex items-start gap-4 mb-8">
-            <span className="material-symbols-outlined text-primary mt-1">palette</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-primary mt-1">palette</span>
             <div>
               <Link
                 className="font-label-md text-sm underline hover:text-primary transition-colors block mb-1 text-on-surface"

@@ -1,4 +1,5 @@
 import { Link } from '@/i18n/navigation'
+import { getTranslations } from 'next-intl/server'
 import React from 'react'
 
 type HowItWorksProps = {
@@ -17,12 +18,12 @@ type HowItWorksProps = {
   }> | null
 }
 
-export function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
-  const eyebrow = hero?.eyebrow || 'CRAFTED ON-DEMAND · DELIVERED DIRECT'
-  const title = hero?.title || 'How Precision Engineering Meets Ocean Express.'
-  const subtitle =
-    hero?.subtitle ||
-    'From CNC-cut solid white oak in our zero-waste workshop to your living room in 14–18 days. No showrooms. No middlemen. Just honest craft and seamless DDP doorstep delivery.'
+export async function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
+  const t = await getTranslations('Pages.HowItWorks')
+
+  const eyebrow = hero?.eyebrow || t('heroEyebrow')
+  const title = hero?.title || t('title')
+  const subtitle = hero?.subtitle || t('subtitle')
 
   return (
     <main id="main" tabIndex={-1}>
@@ -58,10 +59,10 @@ export function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
                 01
               </span>
               <h2 className="font-headline-sm text-headline-sm text-on-surface mb-2">
-                The Fresh-Pressed Revolution
+                {t('pillar1Title')}
               </h2>
               <p className="font-body-md text-sm text-on-surface-variant">
-                We compress our high-density foam on-demand, straight from the mold to the vacuum bag. No sitting in dusty warehouse racks for months. Freshness you can feel.
+                {t('pillar1Body')}
               </p>
             </div>
           </div>
@@ -80,10 +81,10 @@ export function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
                 02
               </span>
               <h2 className="font-headline-sm text-headline-sm text-on-surface mb-2">
-                The 0-Tool Snap Hardware
+                {t('pillar2Title')}
               </h2>
               <p className="font-body-md text-sm text-on-surface-variant">
-                Japanese-inspired CNC interlocking joinery. No Allen keys, no missing screws. Just satisfying, structural integrity that clicks into place in seconds.
+                {t('pillar2Body')}
               </p>
             </div>
           </div>
@@ -95,19 +96,19 @@ export function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
                 03
               </span>
               <h2 className="font-headline-sm text-headline-sm text-on-surface mb-3">
-                Global DDP Doorstep Logistics
+                {t('pillar3Title')}
               </h2>
               <p className="font-body-md text-body-md text-on-surface-variant mb-6">
-                Delivered Duty Paid (DDP). We handle all customs, duties, and freight. Our modular components are specifically sized to navigate tight stairwells and fit elegantly into standard urban elevators. From our workshop directly to your door.
+                {t('pillar3Body')}
               </p>
               <div className="flex gap-4">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary">check_circle</span>
-                  <span className="font-label-md text-xs uppercase tracking-wider">Duties Covered</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-primary">check_circle</span>
+                  <span className="font-label-md text-xs uppercase tracking-wider">{t('badgeDutiesCovered')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary">elevator</span>
-                  <span className="font-label-md text-xs uppercase tracking-wider">Elevator Ready</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-primary">elevator</span>
+                  <span className="font-label-md text-xs uppercase tracking-wider">{t('badgeElevatorReady')}</span>
                 </div>
               </div>
             </div>
@@ -125,9 +126,9 @@ export function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
       <section className="py-section-gap bg-surface-container-low border-t border-outline-variant/30">
         <div className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
           <div className="text-center mb-16">
-            <h2 className="font-headline-lg text-headline-lg text-on-surface mb-3">The DDP Journey</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface mb-3">{t('journeyTitle')}</h2>
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
-              From raw materials in our workshop to the final click in your living room.
+              {t('journeySubtitle')}
             </p>
           </div>
 
@@ -141,34 +142,34 @@ export function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
                 }))
               : [
                   {
-                    desc: 'Your order is cut the morning it’s placed. CNC-milled oak to 0.1 mm tolerances, hand-sanded edges.',
+                    desc: t('step1Desc'),
                     icon: 'handyman',
-                    stage: 'Day 1–3',
-                    title: 'Workshop Crafting',
+                    stage: t('step1Stage'),
+                    title: t('step1Title'),
                   },
                   {
-                    desc: 'Foam is poured, cured and vacuum-sealed the same day — fresh-pressed, never warehouse-stale.',
+                    desc: t('step2Desc'),
                     icon: 'compress',
-                    stage: 'Day 4',
-                    title: 'Vacuum-Seal',
+                    stage: t('step2Stage'),
+                    title: t('step2Title'),
                   },
                   {
-                    desc: 'Carbon-offset freight, sized to standard pallets and apartment elevators.',
+                    desc: t('step3Desc'),
                     icon: 'directions_boat',
-                    stage: 'Day 5–14',
-                    title: 'Ocean Express',
+                    stage: t('step3Stage'),
+                    title: t('step3Title'),
                   },
                   {
-                    desc: 'Our broker clears your boxes and pays every duty and tax. Nothing is owed at the door — ever.',
+                    desc: t('step4Desc'),
                     icon: 'task_alt',
-                    stage: 'Day 15',
-                    title: 'Customs Cleared',
+                    stage: t('step4Stage'),
+                    title: t('step4Title'),
                   },
                   {
-                    desc: 'Six flat boxes at your door. Fast solo unboxing and snap assembly in minutes.',
+                    desc: t('step5Desc'),
                     icon: 'home_pin',
-                    stage: 'Day 16–18',
-                    title: 'Final Doorstep',
+                    stage: t('step5Stage'),
+                    title: t('step5Title'),
                   },
                 ]
             ).map((step) => (
@@ -177,7 +178,7 @@ export function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
                 key={step.title}
               >
                 <div className="w-12 h-12 rounded-full bg-primary-fixed/30 border border-primary text-primary flex items-center justify-center mb-4">
-                  <span className="material-symbols-outlined text-[22px]">{step.icon}</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[22px]">{step.icon}</span>
                 </div>
                 <h3 className="font-label-md text-sm font-semibold text-on-surface mb-1">{step.title}</h3>
                 <span className="font-label-md text-xs text-primary mb-2">{step.stage}</span>
@@ -191,8 +192,8 @@ export function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
               className="inline-flex items-center gap-2 bg-on-background text-on-primary font-label-md text-sm uppercase tracking-wider px-8 py-4 rounded-full hover:bg-primary transition-colors"
               href="/1-bedroom-kit-builder"
             >
-              <span>Build Your Apartment Kit</span>
-              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              <span>{t('ctaBuildKit')}</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">arrow_forward</span>
             </Link>
           </div>
         </div>

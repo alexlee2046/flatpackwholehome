@@ -8,8 +8,8 @@
     "subtitle": "CNC mortise & tenon solid oak dining table. 1 flat box, 15 minutes, 0 screws.",
     "priceInUSD": 389,
     "ikeaBenchmarkPrice": 499,
-    "targetBOMUSD": 78,
-    "targetBOMRMB": 560,
+    "targetBOMUSD": 0,
+    "targetBOMRMB": 0,
     "shippingWeightKg": 21.5,
     "packedVolumeCbm": 0.07,
     "ddpRatePerKgRMB": 18,
@@ -17,8 +17,14 @@
     "assemblyMinutes": 15,
     "joineryType": "Japanese Cross-Lap Mortise & Tenon (Zero Hardware)",
     "madeToOrder": true,
-    "materials": ["white-oak", "black-walnut"],
-    "spaces": ["dining", "living-room"],
+    "materials": [
+      "white-oak",
+      "black-walnut"
+    ],
+    "spaces": [
+      "dining",
+      "living-room"
+    ],
     "deliveryNote": "Vacuum-packed and flat-packed to order. DDP duties, taxes, and doorstep delivery included.",
     "boxBreakdown": [
       {
@@ -30,23 +36,26 @@
       }
     ],
     "specifications": [
-      { "label": "Dimensions", "value": "140 cm (W) × 80 cm (D) × 75 cm (H)" },
-      { "label": "Material", "value": "FSC-Certified 22mm Solid White Oak Multi-layer Core" },
-      { "label": "Finish", "value": "Ultra-matte Waterborne Zero-VOC Protective Seal" },
-      { "label": "Weight Capacity", "value": "150 kg (Static Load)" },
-      { "label": "Hardware Needed", "value": "0 Screws / 0 Hex Wrenches (Tool-Free Snap Lock)" }
-    ],
-    "unitEconomicsPreview": {
-      "retailPriceUSD": 389.00,
-      "ikeaBenchmarkUSD": 499.00,
-      "savingsVsIkeaPercent": "22.0%",
-      "factoryBOMUSD": 78.00,
-      "factoryBOMRMB": 560.00,
-      "ddpFreightUSD": 53.75,
-      "factoryGrossMarginUSD": 311.00,
-      "factoryGrossMarginPercent": "79.9%",
-      "contributionMarginUSD": 257.25,
-      "contributionMarginPercent": "66.1%"
-    }
+      {
+        "label": "Dimensions",
+        "value": "140 cm (W) × 80 cm (D) × 75 cm (H)"
+      },
+      {
+        "label": "Material",
+        "value": "FSC-Certified 22mm Solid White Oak Multi-layer Core"
+      },
+      {
+        "label": "Finish",
+        "value": "Ultra-matte Waterborne Zero-VOC Protective Seal"
+      },
+      {
+        "label": "Weight Capacity",
+        "value": "150 kg (Static Load)"
+      },
+      {
+        "label": "Hardware Needed",
+        "value": "0 Screws / 0 Hex Wrenches (Tool-Free Snap Lock)"
+      }
+    ]
   }
 }

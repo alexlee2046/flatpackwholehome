@@ -1,8 +1,6 @@
-'use client'
-
 import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 import React from 'react'
 
 type ModulivHomepageProps = {
@@ -30,12 +28,11 @@ type ModulivHomepageProps = {
   }>
 }
 
-export function ModulivHomepage({
+export async function ModulivHomepage({
   heroEyebrow,
   heroHeadline,
   heroBody,
   heroImage,
-  announcement,
   bundleTitle,
   bundleSubtitle,
   bundlePrice,
@@ -43,14 +40,14 @@ export function ModulivHomepage({
   comparisonMatrix,
   testimonials,
 }: ModulivHomepageProps) {
-  const tHome = useTranslations('Pages.Home')
-  const tCommon = useTranslations('Common')
-  const tAnnounce = useTranslations('Announcement')
+  const [tHome, tCommon] = await Promise.all([
+    getTranslations('Pages.Home'),
+    getTranslations('Common'),
+  ])
 
   const resolvedEyebrow = heroEyebrow || tHome('heroEyebrow')
   const resolvedHeadline = heroHeadline || tHome('heroHeadline')
   const resolvedBody = heroBody || tHome('heroBody')
-  const resolvedAnnouncement = announcement || tAnnounce('bar')
 
   const rawHeroUrl =
     (typeof heroImage === 'object' && heroImage?.url) ||
@@ -70,21 +67,7 @@ export function ModulivHomepage({
         {tCommon('skipToContent')}
       </a>
 
-      {/* Announcement Bar */}
-      <div
-        id="announcement-bar"
-        className="w-full bg-[#A85F3B] text-on-primary py-2 px-margin-mobile md:px-margin-desktop md:pr-14 text-center font-label-md text-[11px] md:text-label-md tracking-wide relative"
-      >
-        {resolvedAnnouncement}
-        <button
-          id="announcement-dismiss"
-          type="button"
-          aria-label={tAnnounce('dismiss')}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-on-primary opacity-80 hover:opacity-100 transition-opacity p-1 leading-none cursor-pointer"
-        >
-          ✕
-        </button>
-      </div>
+      {/* Announcement bar lives once, in SiteHeader — not duplicated here. */}
 
       <main id="main" tabIndex={-1}>
         {/* Hero Section */}
@@ -98,6 +81,9 @@ export function ModulivHomepage({
             </h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant">
               {resolvedBody}
+            </p>
+            <p className="font-label-md text-label-md text-on-surface">
+              {tHome('heroValueProp', { price: bundlePrice ?? 1499 })}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link

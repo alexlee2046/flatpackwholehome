@@ -87,56 +87,56 @@ export function ModulivFooter({
 
       <div className="flex flex-col gap-3">
         <span className="font-label-md text-xs uppercase tracking-widest text-outline font-semibold">
-          Furniture System
+          {tFooter('furnitureSystemHeading')}
         </span>
         <nav aria-label="Furniture System Navigation" className="flex flex-wrap gap-x-8 gap-y-4 items-center font-label-md text-label-md">
           <Link
             className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
             href="/products/modusofa"
           >
-            The ModuSofa
+            {tNav('modusofa')}
           </Link>
           <Link
             className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
             href="/products/snapbed"
           >
-            The SnapBed
+            {tNav('snapbed')}
           </Link>
           <Link
             className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
             href="/products/1-bedroom-kit"
           >
-            The 1-Bedroom Kit
+            {tNav('oneBedroomKitProduct')}
           </Link>
           <Link
             className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
             href="/1-bedroom-kit-builder"
           >
-            Move-In Kit Builder
+            {tNav('kitBuilder')}
           </Link>
           <Link
             className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
             href="/free-swatch-box-material-discovery"
           >
-            Free Swatch Box
+            {tNav('swatchBox')}
           </Link>
           <Link
             className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
             href="/how-it-works-craft-logistics"
           >
-            Tool-Free Assembly
+            {tNav('howItWorks')}
           </Link>
           <Link
             className="text-primary font-semibold hover:underline transition-all duration-200"
             href="/us-vs-ikea"
           >
-            Vs IKEA (-20%)
+            {tNav('usVsIkea')} (-20%)
           </Link>
           <Link
             className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
             href="/faq"
           >
-            FAQ
+            {tNav('faq')}
           </Link>
           {navItems &&
             navItems

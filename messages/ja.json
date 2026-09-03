@@ -16,7 +16,9 @@
     "cart": "Cart",
     "search": "Search",
     "searchPlaceholder": "Search furniture, spaces, materials...",
-    "currency": "USD"
+    "currency": "USD",
+    "snapbed": "SnapBed",
+    "oneBedroomKitProduct": "The 1-Bedroom Kit"
   },
   "Announcement": {
     "bar": "Free Swatch Box with $50 Voucher — Worldwide DDP Delivery & Duties Included",
@@ -52,7 +54,44 @@
     "increaseQuantity": "数量を増やす",
     "remove": "削除",
     "voucher": "クーポン",
-    "removeVoucher": "クーポンを削除"
+    "removeVoucher": "クーポンを削除",
+    "shippingDdpNote": "(DDP、関税込み)",
+    "freeShippingBadge": "送料無料ポリシー · DDP海上輸送費 {amount} 相当を免除",
+    "freeShippingDetail": "{boxes}箱セット一式（{weight}kg）は、国際DDP方式で通関手続き済みのままお届けします。輸入関税や配送時の追加料金は一切かかりません。",
+    "ikeaCompareLabel": "現地IKEA店舗での自己搬送と比較した場合の推定節約額：",
+    "ikeaCompareCta": "{amount}以上お得（内訳を見る）",
+    "shippingAddressTitle": "お届け先住所",
+    "emailLabel": "メールアドレス",
+    "emailPlaceholder": "you@example.com",
+    "firstNameLabel": "名",
+    "lastNameLabel": "姓",
+    "companyLabel": "会社名（任意）",
+    "addressLine1Label": "住所",
+    "addressLine2Label": "建物名・部屋番号（任意）",
+    "cityLabel": "市区町村",
+    "stateLabel": "都道府県 / 州",
+    "stateHint": "アメリカ・カナダ・オーストラリアの場合は入力必須です。",
+    "postalCodeLabel": "郵便番号",
+    "countryLabel": "国",
+    "countryPlaceholder": "国を選択してください",
+    "phoneLabel": "電話番号（任意）",
+    "fieldRequired": "この項目は必須です。",
+    "emailInvalid": "有効なメールアドレスを入力してください。",
+    "continueToPayment": "お支払いへ進む",
+    "resolvingCart": "ご注文の準備中…",
+    "backToCart": "カートに戻る",
+    "backToAddress": "戻る",
+    "paymentTitle": "お支払い",
+    "amountDueLabel": "本日のお支払い金額",
+    "calculatingTotal": "合計金額を計算中…",
+    "payNow": "今すぐ支払う",
+    "paying": "決済処理中…",
+    "paymentMethodsNote": "主要なクレジットカード・デビットカードに加え、ご利用可能な地域ではApple PayとGoogle Payもお使いいただけます — Stripeによる安全な決済処理です。",
+    "checkoutUnavailable": "現在、ご注文手続きを一時的にご利用いただけません。しばらくしてから再度お試しください。",
+    "checkoutErrorGeneric": "お会計処理中に問題が発生しました。もう一度お試しください。",
+    "itemUnavailable": "カート内の一部商品は現在ご注文いただけません。",
+    "itemRemoved": "商品を削除しました。",
+    "undo": "元に戻す"
   },
   "Common": {
     "addToCart": "カートに追加",
@@ -66,7 +105,8 @@
     "boxes": "{count} 箱",
     "freeDelivery": "DDP送料無料・関税込",
     "home": "ホーム",
-    "skipToContent": "メインコンテンツへスキップ"
+    "skipToContent": "メインコンテンツへスキップ",
+    "cartError": "カートの準備がまだ整っていません。しばらくしてから再度お試しください。"
   },
   "Footer": {
     "tagline": "Your entire home. Delivered in 6 flat boxes.",
@@ -75,7 +115,8 @@
     "termsOfService": "Terms of Service",
     "trial": "100-Night Trial",
     "warranty": "10-Year Warranty",
-    "copyright": "© 2026 The Flat Set Inc. All rights reserved."
+    "copyright": "© 2026 The Flat Set Inc. All rights reserved.",
+    "furnitureSystemHeading": "家具システム"
   },
   "PDP": {
     "home": "ホーム",
@@ -154,6 +195,8 @@
     "reservedTitle": "Your swatch box is reserved.",
     "reservedDesc": "48時間以内に工房より発送されます。蓋の裏側に50ドルの割引クーポンが記載されており、セット割引と併用して60日間ご利用いただけます。",
     "voucherCode": "クーポンコード: SWATCH50",
-    "goToCart": "カートを見る"
+    "goToCart": "カートを見る",
+    "rateLimitError": "リクエスト数が上限に達しました。しばらくしてから再度お試しください。",
+    "genericError": "エラーが発生しました。もう一度お試しください。"
   }
 }
