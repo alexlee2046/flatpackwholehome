@@ -36,6 +36,7 @@ import { Homepage } from '@/globals/Homepage'
 import { HowItWorks } from '@/globals/HowItWorks'
 import { SiteSettings } from '@/globals/SiteSettings'
 import { seedInitialContent } from '@/utilities/seedContent'
+import { seedI18nContent } from '@/utilities/seedI18nContent'
 import { plugins } from './plugins'
 
 const filename = fileURLToPath(import.meta.url)
@@ -192,6 +193,9 @@ export default buildConfig({
 
       // Automatically seed initial CMS content (FAQs, HowItWorks, Homepage blocks, Navigation)
       await seedInitialContent(payload)
+
+      // Automatically seed professional multilingual translations (zh-CN, zh-TW, de, ja, ar, ru)
+      await seedI18nContent(payload)
     } catch (err: any) {
       payload.logger.warn(`[onInit] Initialization error: ${err.message}`)
     }
