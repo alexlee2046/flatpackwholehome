@@ -20,7 +20,7 @@ export function ModulivFooter({
   const tNav = useTranslations('Navigation')
   const tFooter = useTranslations('Footer')
 
-  const resolvedSlogan = brandSlogan || '6 Boxes · 60 Minutes · 0 Screws · DDP Duties Included'
+  const resolvedSlogan = brandSlogan || '6 Boxes · 60 Minutes · 0 Screws · 20% Below IKEA · DDP Duties Included'
   const resolvedCopyright = copyrightText || tFooter('copyright')
 
   const openPolicy = (modalId: string) => {
@@ -127,6 +127,12 @@ export function ModulivFooter({
               href="/faq"
             >
               {tNav('faq')}
+            </Link>
+            <Link
+              className="text-primary font-semibold hover:underline transition-all duration-200"
+              href="/us-vs-ikea"
+            >
+              {tNav('usVsIkea')} (-20%)
             </Link>
           </>
         )}

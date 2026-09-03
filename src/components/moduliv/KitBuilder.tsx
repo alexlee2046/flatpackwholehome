@@ -573,9 +573,14 @@ export function KitBuilder({
                   <span className="font-body-md text-sm text-on-surface-variant line-through mb-1 hidden sm:inline">
                     {tKit('retailPrice')}
                   </span>
-                  <span className="font-label-md text-xs text-primary bg-primary-fixed/30 px-2 py-0.5 rounded-full mb-1.5 ml-2">
-                    {tKit('saveBadge')}
-                  </span>
+                  <Link
+                    href="/us-vs-ikea"
+                    className="font-label-md text-xs text-primary bg-primary/10 hover:bg-primary/20 px-2.5 py-0.5 rounded-full mb-1.5 ml-2 transition-colors inline-flex items-center gap-1"
+                    title="Compare item-by-item with local US IKEA"
+                  >
+                    <span>{tKit('saveBadge')} vs IKEA (-20.8%)</span>
+                    <span className="material-symbols-outlined text-[13px]">info</span>
+                  </Link>
                 </>
               )}
             </div>

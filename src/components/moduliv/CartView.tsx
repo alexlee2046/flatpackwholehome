@@ -251,8 +251,28 @@ export function CartView() {
                 <dd className="font-medium text-on-surface">${subtotal.toFixed(2)}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-on-surface-variant">{t('shipping')}</dt>
-                <dd className="text-primary font-medium">{t('included')} ($0)</dd>
+                <dt className="text-on-surface-variant flex items-center gap-1">
+                  <span>{t('shipping')}</span>
+                  <span className="text-[11px] text-neutral-400 font-normal">(DDP 包税到门)</span>
+                </dt>
+                <dd className="text-primary font-medium">{t('included')} ($0.00)</dd>
+              </div>
+
+              {/* DDP Logistics & IKEA Savings Callout */}
+              <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg text-xs space-y-1.5">
+                <div className="flex items-center gap-1.5 font-semibold text-primary">
+                  <span className="material-symbols-outlined text-[15px]">verified</span>
+                  <span>免运费政策 · 价值 $255.00 DDP 海派全免</span>
+                </div>
+                <p className="text-neutral-600 leading-relaxed text-[11px]">
+                  全套 6 箱 (102kg) 享受跨境 DDP 双清包税到门，无任何进口关税与尾程加价。
+                </p>
+                <div className="pt-1 border-t border-primary/10 flex justify-between items-center text-[11px]">
+                  <span className="text-neutral-500">对标当地宜家自提预估立省：</span>
+                  <Link href="/us-vs-ikea" className="font-bold text-emerald-700 hover:underline">
+                    省 $690+ (查看明细)
+                  </Link>
+                </div>
               </div>
 
               {voucherApplied && (

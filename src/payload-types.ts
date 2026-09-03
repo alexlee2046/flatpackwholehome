@@ -377,6 +377,26 @@ export interface Product {
   careSummary?: string | null;
   deliveryNote?: string | null;
   /**
+   * Retail price of equivalent local IKEA US product in USD (e.g. 799 for KIVIK, 1894 for 1-Bed Kit).
+   */
+  ikeaBenchmarkPrice?: number | null;
+  /**
+   * Target factory procurement / BOM cost in USD.
+   */
+  targetBOMUSD?: number | null;
+  /**
+   * Target factory procurement / BOM cost in RMB (CNY).
+   */
+  targetBOMRMB?: number | null;
+  /**
+   * Total gross shipping weight across all packaging boxes in kilograms (kg).
+   */
+  shippingWeightKg?: number | null;
+  /**
+   * DDP ocean freight rate per kg in RMB (default safe threshold: 18 RMB/kg).
+   */
+  ddpRatePerKgRMB?: number | null;
+  /**
    * Total number of flat packaging boxes for this item or bundle.
    */
   boxCount?: number | null;
@@ -2265,6 +2285,11 @@ export interface ProductsSelect<T extends boolean = true> {
   construction?: T;
   careSummary?: T;
   deliveryNote?: T;
+  ikeaBenchmarkPrice?: T;
+  targetBOMUSD?: T;
+  targetBOMRMB?: T;
+  shippingWeightKg?: T;
+  ddpRatePerKgRMB?: T;
   boxCount?: T;
   assemblyMinutes?: T;
   joineryType?: T;

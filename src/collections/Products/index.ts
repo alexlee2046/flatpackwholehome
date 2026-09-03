@@ -59,6 +59,10 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     material: true,
     madeToOrder: true,
     packedVolumeCbm: true,
+    ikeaBenchmarkPrice: true,
+    targetBOMUSD: true,
+    targetBOMRMB: true,
+    shippingWeightKg: true,
   },
   hooks: {
     ...defaultCollection?.hooks,
@@ -265,6 +269,42 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
               localized: true,
               defaultValue:
                 'Made to order. DDP freight, duties, and taxes are calculated for supported destinations before payment.',
+            },
+            {
+              name: 'ikeaBenchmarkPrice',
+              type: 'number',
+              admin: {
+                description: 'Retail price of equivalent local IKEA US product in USD (e.g. 799 for KIVIK, 1894 for 1-Bed Kit).',
+              },
+            },
+            {
+              name: 'targetBOMUSD',
+              type: 'number',
+              admin: {
+                description: 'Target factory procurement / BOM cost in USD.',
+              },
+            },
+            {
+              name: 'targetBOMRMB',
+              type: 'number',
+              admin: {
+                description: 'Target factory procurement / BOM cost in RMB (CNY).',
+              },
+            },
+            {
+              name: 'shippingWeightKg',
+              type: 'number',
+              admin: {
+                description: 'Total gross shipping weight across all packaging boxes in kilograms (kg).',
+              },
+            },
+            {
+              name: 'ddpRatePerKgRMB',
+              type: 'number',
+              defaultValue: 18,
+              admin: {
+                description: 'DDP ocean freight rate per kg in RMB (default safe threshold: 18 RMB/kg).',
+              },
             },
             {
               name: 'boxCount',
