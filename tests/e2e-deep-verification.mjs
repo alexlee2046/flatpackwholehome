@@ -1,12 +1,11 @@
 import { chromium } from 'playwright';
 
 async function runDeepE2E() {
-  const BASE_URL = process.env.BASE_URL || 'https://flatpack.dev.canbee.cn';
+  const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
   console.log(`=== Launching Deep E2E Verification against ${BASE_URL} ===\n`);
 
   const browser = await chromium.launch({
     headless: true,
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 

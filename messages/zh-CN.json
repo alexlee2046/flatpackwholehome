@@ -43,7 +43,6 @@
     "checkout": "前往结算",
     "checkoutSecure": "100天无忧试用 • DDP完税到门 • 配送送货进屋",
     "orderSummary": "订单概要",
-    "itemCount": "{count} 个装配箱",
     "exploreModusofa": "浏览 ModuSofa 模块沙发",
     "orderConfirmed": "订单已确认 — DDP 门到门交付已排期",
     "orderConfirmedDesc": "您的家具将在 48 小时内进入精工工坊生产，真空压缩扁平封装入标准快递箱。0颗螺丝设计，包邮包税送货进屋，尊享 100 天全屋试用。",
@@ -198,5 +197,15 @@
     "goToCart": "前往购物车",
     "rateLimitError": "您的请求次数已达上限，请稍后再试。",
     "genericError": "出了点问题，请重试。"
+  },
+  "Errors": {
+    "notFoundEyebrow": "404 — 页面未找到",
+    "notFoundTitle": "这一件没能装进这个房间。",
+    "notFoundBody": "你请求的页面可能已经移动或不存在。回到我们的平板家具系列看看。",
+    "buildKitCta": "配置一居室套装",
+    "errorEyebrow": "出错了",
+    "errorTitle": "有些部件没能拼到一起。",
+    "errorBody": "加载这个页面时发生了意外错误。请重试，或回到我们的平板家具系列。",
+    "tryAgain": "重试"
   }
 }

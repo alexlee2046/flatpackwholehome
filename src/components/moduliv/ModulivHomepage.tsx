@@ -185,7 +185,7 @@ export async function ModulivHomepage({
             </p>
           </div>
           <div className="overflow-x-auto rounded-xl border border-outline-variant/50 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(26,28,29,0.04)]">
-            <table className="w-full min-w-[720px] text-left border-collapse">
+            <table className="w-full min-w-[720px] text-start border-collapse">
               <thead>
                 <tr className="border-b border-outline-variant/50">
                   <th className="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant py-5 px-6 w-[22%]"></th>

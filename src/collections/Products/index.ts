@@ -308,18 +308,6 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
               },
             },
             {
-              name: 'ddpRatePerKgRMB',
-              type: 'number',
-              defaultValue: 18,
-              access: {
-                read: adminOnlyFieldAccess,
-                update: adminOnlyFieldAccess,
-              },
-              admin: {
-                description: 'DDP ocean freight rate per kg in RMB (default safe threshold: 18 RMB/kg).',
-              },
-            },
-            {
               name: 'boxCount',
               type: 'number',
               defaultValue: 1,

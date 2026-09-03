@@ -29,7 +29,12 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
       value={locale}
     >
       {locales.map((candidate) => (
-        <option key={candidate} value={candidate} className="bg-surface text-on-surface">
+        <option
+          key={candidate}
+          value={candidate}
+          className="bg-surface text-on-surface"
+          dir={localeDetails[candidate].dir}
+        >
           {localeDetails[candidate].label}
         </option>
       ))}

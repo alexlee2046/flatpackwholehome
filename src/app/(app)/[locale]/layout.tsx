@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 
+import '../globals.css'
+
 import { OrganizationJsonLd, WebSiteJsonLd } from '@/components/seo/JsonLd'
 import { getOpenGraphLocales } from '@/i18n/metadata'
 import { localeDetails, locales, routing, type AppLocale } from '@/i18n/routing'
@@ -84,110 +86,12 @@ export default async function RootLayout({ children, params }: LayoutProps) {
         {/* latin subset (unicode-range U+0000-00FF) of each family — what English body copy actually renders with */}
         <link rel="preload" href="/vendor/fonts/fbe25729b3d.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/vendor/fonts/f9deeae7719.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-        <link rel="preload" href="/vendor/tailwind.js" as="script" />
         <link href="/vendor/fonts/fonts-a39f5c6f.css" rel="stylesheet" />
         <link href="/vendor/fonts/fonts-7cdb80a7.css" rel="stylesheet" />
         <link
           rel="icon"
           type="image/svg+xml"
           href="/assets/brand/favicon.svg"
-        />
-        <script src="/vendor/tailwind.js" />
-        <script
-          id="tailwind-config"
-          dangerouslySetInnerHTML={{
-            __html: `
-          tailwind.config = {
-            darkMode: "class",
-            theme: {
-              extend: {
-                colors: {
-                  "surface-container-highest": "#e2e2e3",
-                  "surface-dim": "#dadadb",
-                  "on-background": "#1a1c1d",
-                  "on-tertiary-fixed": "#00201f",
-                  "surface-bright": "#f9f9fa",
-                  "on-secondary-fixed": "#161d14",
-                  "primary-container": "#a85f3b",
-                  "primary-fixed": "#ffdbcc",
-                  "on-primary": "#ffffff",
-                  "on-secondary-container": "#5d6559",
-                  "secondary": "#596155",
-                  "outline-variant": "#d9c2b8",
-                  "inverse-on-surface": "#f1f1f1",
-                  "error-container": "#ffdad6",
-                  "on-tertiary-fixed-variant": "#00504d",
-                  "on-error-container": "#93000a",
-                  "on-primary-fixed-variant": "#733515",
-                  "surface": "#f9f9fa",
-                  "inverse-surface": "#2f3132",
-                  "secondary-fixed-dim": "#c1c9ba",
-                  "surface-container-lowest": "#ffffff",
-                  "tertiary": "#006562",
-                  "surface-container": "#eeeeef",
-                  "outline": "#86736b",
-                  "surface-container-low": "#f3f3f4",
-                  "on-tertiary-container": "#e2fffc",
-                  "on-tertiary": "#ffffff",
-                  "on-primary-fixed": "#351000",
-                  "on-error": "#ffffff",
-                  "background": "#F9F8F6",
-                  "tertiary-fixed-dim": "#78d6d1",
-                  "primary": "#8a4725",
-                  "tertiary-container": "#07807c",
-                  "on-secondary": "#ffffff",
-                  "inverse-primary": "#ffb694",
-                  "error": "#ba1a1a",
-                  "primary-fixed-dim": "#ffb694",
-                  "surface-tint": "#904c2a",
-                  "surface-container-high": "#e8e8e9",
-                  "secondary-fixed": "#dde5d6",
-                  "on-surface": "#1a1c1d",
-                  "surface-variant": "#e2e2e3",
-                  "tertiary-fixed": "#94f3ed",
-                  "on-surface-variant": "#54433c",
-                  "on-secondary-fixed-variant": "#41493e",
-                  "secondary-container": "#dae2d3",
-                  "on-primary-container": "#fff7f4"
-                },
-                borderRadius: {
-                  DEFAULT: "0.125rem",
-                  lg: "0.25rem",
-                  xl: "0.5rem",
-                  full: "9999px"
-                },
-                spacing: {
-                  "margin-mobile": "20px",
-                  "gutter": "24px",
-                  "section-gap": "120px",
-                  "margin-desktop": "64px",
-                  "base": "8px"
-                },
-                fontFamily: {
-                  "headline-md": ["Playfair Display", "Georgia", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "serif"],
-                  "headline-lg-mobile": ["Playfair Display", "Georgia", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "serif"],
-                  "headline-sm": ["Playfair Display", "Georgia", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "serif"],
-                  "body-md": ["Plus Jakarta Sans", "system-ui", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "sans-serif"],
-                  "display-lg": ["Playfair Display", "Georgia", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "serif"],
-                  "headline-lg": ["Playfair Display", "Georgia", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "serif"],
-                  "body-lg": ["Plus Jakarta Sans", "system-ui", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "sans-serif"],
-                  "label-md": ["Plus Jakarta Sans", "system-ui", "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", "sans-serif"]
-                },
-                fontSize: {
-                  "headline-md": ["32px", { lineHeight: "1.3", fontWeight: "500" }],
-                  "headline-lg-mobile": ["36px", { lineHeight: "1.2", fontWeight: "500" }],
-                  "headline-sm": ["24px", { lineHeight: "1.4", fontWeight: "500" }],
-                  "body-md": ["16px", { lineHeight: "1.6", fontWeight: "400" }],
-                  "display-lg": ["64px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "600" }],
-                  "headline-lg": ["48px", { lineHeight: "1.2", fontWeight: "500" }],
-                  "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
-                  "label-md": ["14px", { lineHeight: "1.2", letterSpacing: "0.05em", fontWeight: "600" }]
-                }
-              }
-            }
-          };
-          `,
-          }}
         />
         <Script src="/moduliv-core.js" strategy="afterInteractive" />
         <style dangerouslySetInnerHTML={{ __html: `

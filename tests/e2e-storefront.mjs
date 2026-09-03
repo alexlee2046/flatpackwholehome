@@ -4,7 +4,6 @@ async function testPlaywright() {
   console.log('--- Launching Playwright browser test for Next.js Storefront ---');
   const browser = await chromium.launch({
     headless: true,
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 

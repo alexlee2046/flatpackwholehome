@@ -161,12 +161,14 @@ export function GeoSuggestionBanner({ currentLocale }: GeoBannerProps) {
             <button
               onClick={handleSwitch}
               className="bg-primary hover:bg-primary-container text-on-primary px-3.5 py-1 rounded-full text-xs font-medium transition-colors shadow-sm cursor-pointer"
+              dir={targetDir}
             >
               {prompt.switchText}
             </button>
             <button
               onClick={handleDismiss}
-              className="text-surface-variant hover:text-on-primary underline text-xs cursor-pointer ml-1"
+              className="text-surface-variant hover:text-on-primary underline text-xs cursor-pointer ms-1"
+              dir={targetDir}
             >
               {prompt.stayText}
             </button>

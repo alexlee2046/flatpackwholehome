@@ -1,8 +1,9 @@
 'use client'
 
 import { Link } from '@/i18n/navigation'
+import { localeDetails, type AppLocale } from '@/i18n/routing'
 import Image from 'next/image'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
 export function SwatchView({
@@ -12,6 +13,8 @@ export function SwatchView({
 } = {}) {
   const t = useTranslations('Swatch')
   const tCommon = useTranslations('Common')
+  const locale = useLocale() as AppLocale
+  const isRtl = localeDetails[locale].dir === 'rtl'
   const [formData, setFormData] = useState({
     address: '',
     city: '',
@@ -77,7 +80,9 @@ export function SwatchView({
         <Link className="hover:text-primary transition-colors" href="/">
           {tCommon('home')}
         </Link>
-        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span className={`material-symbols-outlined text-[16px]${isRtl ? ' scale-x-[-1]' : ''}`}>
+          chevron_right
+        </span>
         <span className="text-on-surface font-medium">{t('breadcrumb')}</span>
       </nav>
 

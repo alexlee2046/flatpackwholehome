@@ -43,7 +43,6 @@
     "checkout": "Proceed to Checkout",
     "checkoutSecure": "Guaranteed 100-night trial • DDP landed total • Room-of-choice delivery",
     "orderSummary": "Order Summary",
-    "itemCount": "{count, plural, =1 {1 box} other {# boxes}}",
     "exploreModusofa": "ModuSofa entdecken",
     "orderConfirmed": "Bestellung bestätigt — DDP-Lieferung geplant.",
     "orderConfirmedDesc": "Ihre Möbel werden innerhalb von 48 Stunden in unserer Präzisionswerkstatt gefertigt, frisch komprimiert und in flachen Standard-Paketen verpackt. DDP-Lieferung bis an die Haustür, 0 Schrauben und 100 Nächte Probeschlafen.",
@@ -198,5 +197,15 @@
     "goToCart": "Zum Warenkorb",
     "rateLimitError": "Sie haben das Anfragelimit erreicht. Bitte versuchen Sie es in Kürze erneut.",
     "genericError": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+  },
+  "Errors": {
+    "notFoundEyebrow": "404 — SEITE NICHT GEFUNDEN",
+    "notFoundTitle": "Dieses Teil passt nicht in den Raum.",
+    "notFoundBody": "Die angeforderte Seite wurde möglicherweise verschoben oder existiert nicht. Kehren Sie zu unseren Flat-Pack-Kollektionen zurück.",
+    "buildKitCta": "1-Zimmer-Set konfigurieren",
+    "errorEyebrow": "FEHLER",
+    "errorTitle": "Etwas passte nicht zusammen.",
+    "errorBody": "Beim Laden dieser Seite ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es erneut oder kehren Sie zu unseren Kollektionen zurück.",
+    "tryAgain": "Erneut versuchen"
   }
 }

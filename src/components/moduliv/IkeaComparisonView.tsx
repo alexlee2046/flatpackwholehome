@@ -1,7 +1,8 @@
 'use client'
 
 import { Link } from '@/i18n/navigation'
-import { useTranslations } from 'next-intl'
+import { localeDetails, type AppLocale } from '@/i18n/routing'
+import { useLocale, useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
 const CITY_DATA = [
@@ -22,6 +23,8 @@ const TRANSPORT_DATA = [
 export function IkeaComparisonView() {
   const t = useTranslations('Pages.UsVsIkea')
   const tCommon = useTranslations('Common')
+  const locale = useLocale() as AppLocale
+  const isRtl = localeDetails[locale].dir === 'rtl'
   const [selectedCityIndex, setSelectedCityIndex] = useState(0)
   const [selectedTransportId, setSelectedTransportId] = useState<(typeof TRANSPORT_DATA)[number]['id']>('uhaul')
 
@@ -46,7 +49,9 @@ export function IkeaComparisonView() {
           <Link className="hover:text-primary transition-colors" href="/">
             {tCommon('home')}
           </Link>
-          <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+          <span className={`material-symbols-outlined text-[16px] ${isRtl ? 'scale-x-[-1]' : ''}`}>
+            chevron_right
+          </span>
           <span className="text-on-surface font-medium">{t('breadcrumbCurrent')}</span>
         </nav>
 
@@ -127,15 +132,21 @@ export function IkeaComparisonView() {
               <div className="space-y-3 text-sm text-on-surface-variant mb-6">
                 <div className="flex justify-between">
                   <span>{t('ikeaLineSubtotal')}</span>
-                  <span className="font-semibold text-on-surface">${ikeaSubtotal.toFixed(2)}</span>
+                  <span dir="ltr" className="font-semibold text-on-surface">
+                    ${ikeaSubtotal.toFixed(2)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant">
                   <span>{t('ikeaLineTax', { rate: taxRatePercent })}</span>
-                  <span className="font-semibold">+${ikeaTax.toFixed(2)}</span>
+                  <span dir="ltr" className="font-semibold">
+                    +${ikeaTax.toFixed(2)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant">
                   <span>{t('ikeaLineTransport')}</span>
-                  <span className="font-semibold">+${currentTransport.cost.toFixed(2)}</span>
+                  <span dir="ltr" className="font-semibold">
+                    +${currentTransport.cost.toFixed(2)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant/70 text-xs">
                   <span>{t('ikeaLineAssembly')}</span>
@@ -144,13 +155,15 @@ export function IkeaComparisonView() {
               </div>
               <div className="border-t border-outline-variant pt-4 flex justify-between items-baseline">
                 <span className="text-sm font-bold text-on-surface">{t('ikeaLandedLabel')}</span>
-                <span className="text-2xl font-extrabold text-on-surface">${ikeaLandedTotal.toFixed(2)}</span>
+                <span dir="ltr" className="text-2xl font-extrabold text-on-surface">
+                  ${ikeaLandedTotal.toFixed(2)}
+                </span>
               </div>
             </div>
 
             {/* The Flat Set Side */}
             <div className="rounded-xl p-6 bg-primary/5 border-2 border-primary relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-primary text-white text-[11px] font-bold px-3 py-1 rounded-bl-lg tracking-wider uppercase">
+              <div className="absolute top-0 end-0 bg-primary text-white text-[11px] font-bold px-3 py-1 rounded-es-lg tracking-wider uppercase">
                 {t('directAtelierBadge')}
               </div>
               <div className="flex items-center justify-between mb-4">
@@ -161,7 +174,9 @@ export function IkeaComparisonView() {
               <div className="space-y-3 text-sm text-on-surface-variant mb-6">
                 <div className="flex justify-between">
                   <span>{t('flatSetLineSubtotal')}</span>
-                  <span className="font-semibold text-on-surface">${flatSetSubtotal.toFixed(2)}</span>
+                  <span dir="ltr" className="font-semibold text-on-surface">
+                    ${flatSetSubtotal.toFixed(2)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-tertiary">
                   <span>{t('flatSetLineDuty')}</span>
@@ -178,8 +193,10 @@ export function IkeaComparisonView() {
               </div>
               <div className="border-t border-primary/20 pt-4 flex justify-between items-baseline">
                 <span className="text-sm font-bold text-primary">{t('flatSetPayLabel')}</span>
-                <div className="text-right">
-                  <span className="text-3xl font-extrabold text-primary">${flatSetSubtotal.toFixed(2)}</span>
+                <div className="text-end">
+                  <span dir="ltr" className="text-3xl font-extrabold text-primary">
+                    ${flatSetSubtotal.toFixed(2)}
+                  </span>
                   <div className="text-xs font-bold text-tertiary mt-1">
                     {t('flatSetSavingsLine', { amount: totalLandedSavings.toFixed(2), percent: landedSavingsPercent })}
                   </div>
@@ -206,82 +223,107 @@ export function IkeaComparisonView() {
           </div>
 
           <div className="overflow-x-auto -mx-6 sm:-mx-10 mb-8">
-            <table className="w-full text-left border-collapse min-w-[520px]">
+            <table className="w-full text-start border-collapse min-w-[520px]">
               <thead>
                 <tr className="bg-surface-container-low border-y border-outline-variant text-xs font-bold uppercase tracking-wider text-on-surface-variant">
                   <th scope="col" className="py-3.5 px-6">
                     {t('tableColBox')}
                   </th>
-                  <th scope="col" className="py-3.5 px-4 text-right">
+                  <th scope="col" className="py-3.5 px-4 text-end">
                     {t('tableColRetail')}
                   </th>
-                  <th scope="col" className="py-3.5 px-6 text-right">
+                  <th scope="col" className="py-3.5 px-6 text-end">
                     {t('tableColBundle')}
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/70 text-sm text-on-surface font-medium">
                 <tr className="hover:bg-surface-container-low/80 transition">
-                  <th scope="row" className="py-4 px-6 font-semibold text-on-surface text-left">
+                  <th scope="row" className="py-4 px-6 font-semibold text-on-surface text-start">
                     {t('boxSofaName')}
                     <br />
                     <span className="text-xs font-normal text-on-surface-variant">{t('boxSofaDesc')}</span>
                   </th>
-                  <td className="py-4 px-4 text-right text-on-surface-variant">$699.00</td>
-                  <td className="py-4 px-6 text-right font-bold text-primary">$599.00</td>
+                  <td dir="ltr" className="py-4 px-4 text-end text-on-surface-variant">
+                    $699.00
+                  </td>
+                  <td dir="ltr" className="py-4 px-6 text-end font-bold text-primary">
+                    $599.00
+                  </td>
                 </tr>
 
                 <tr className="hover:bg-surface-container-low/80 transition">
-                  <th scope="row" className="py-4 px-6 font-semibold text-on-surface text-left">
+                  <th scope="row" className="py-4 px-6 font-semibold text-on-surface text-start">
                     {t('boxCoffeeName')}
                     <br />
                     <span className="text-xs font-normal text-on-surface-variant">{t('boxCoffeeDesc')}</span>
                   </th>
-                  <td className="py-4 px-4 text-right text-on-surface-variant">$149.00</td>
-                  <td className="py-4 px-6 text-right font-bold text-primary">$129.00</td>
+                  <td dir="ltr" className="py-4 px-4 text-end text-on-surface-variant">
+                    $149.00
+                  </td>
+                  <td dir="ltr" className="py-4 px-6 text-end font-bold text-primary">
+                    $129.00
+                  </td>
                 </tr>
 
                 <tr className="hover:bg-surface-container-low/80 transition">
-                  <th scope="row" className="py-4 px-6 font-semibold text-on-surface text-left">
+                  <th scope="row" className="py-4 px-6 font-semibold text-on-surface text-start">
                     {t('boxMediaName')}
                     <br />
                     <span className="text-xs font-normal text-on-surface-variant">{t('boxMediaDesc')}</span>
                   </th>
-                  <td className="py-4 px-4 text-right text-on-surface-variant">$249.00</td>
-                  <td className="py-4 px-6 text-right font-bold text-primary">$219.00</td>
+                  <td dir="ltr" className="py-4 px-4 text-end text-on-surface-variant">
+                    $249.00
+                  </td>
+                  <td dir="ltr" className="py-4 px-6 text-end font-bold text-primary">
+                    $219.00
+                  </td>
                 </tr>
 
                 <tr className="hover:bg-surface-container-low/80 transition">
-                  <th scope="row" className="py-4 px-6 font-semibold text-on-surface text-left">
+                  <th scope="row" className="py-4 px-6 font-semibold text-on-surface text-start">
                     {t('boxBedName')}
                     <br />
                     <span className="text-xs font-normal text-on-surface-variant">{t('boxBedDesc')}</span>
                   </th>
-                  <td className="py-4 px-4 text-right text-on-surface-variant">$349.00</td>
-                  <td className="py-4 px-6 text-right font-bold text-primary">$379.00</td>
+                  <td dir="ltr" className="py-4 px-4 text-end text-on-surface-variant">
+                    $349.00
+                  </td>
+                  <td dir="ltr" className="py-4 px-6 text-end font-bold text-primary">
+                    $379.00
+                  </td>
                 </tr>
 
                 <tr className="hover:bg-surface-container-low/80 transition">
-                  <th scope="row" className="py-4 px-6 font-semibold text-on-surface text-left">
+                  <th scope="row" className="py-4 px-6 font-semibold text-on-surface text-start">
                     {t('boxNightstandName')}
                     <br />
                     <span className="text-xs font-normal text-on-surface-variant">{t('boxNightstandDesc')}</span>
                   </th>
-                  <td className="py-4 px-4 text-right text-on-surface-variant">$199.00</td>
-                  <td className="py-4 px-6 text-right font-bold text-primary">$173.00</td>
+                  <td dir="ltr" className="py-4 px-4 text-end text-on-surface-variant">
+                    $199.00
+                  </td>
+                  <td dir="ltr" className="py-4 px-6 text-end font-bold text-primary">
+                    $173.00
+                  </td>
                 </tr>
 
                 {/* Total Row */}
                 <tr className="bg-primary/5 font-bold text-on-surface">
-                  <th scope="row" className="py-5 px-6 text-primary text-left">
+                  <th scope="row" className="py-5 px-6 text-primary text-start">
                     {t('totalRowLabel')}
                     <br />
                     <span className="text-xs font-normal text-primary/80">{t('totalRowDesc')}</span>
                   </th>
-                  <td className="py-5 px-4 text-right font-semibold text-on-surface-variant line-through">
+                  <td
+                    dir="ltr"
+                    className="py-5 px-4 text-end font-semibold text-on-surface-variant line-through"
+                  >
                     $1,645.00
                   </td>
-                  <td className="py-5 px-6 text-right font-extrabold text-xl text-primary">$1,499.00</td>
+                  <td dir="ltr" className="py-5 px-6 text-end font-extrabold text-xl text-primary">
+                    $1,499.00
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -331,7 +373,9 @@ export function IkeaComparisonView() {
                   className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 rounded-full bg-primary text-white font-label-md text-sm uppercase tracking-wider hover:bg-primary/90 transition-colors"
                 >
                   <span>{t('ctaButton')}</span>
-                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                  <span className={`material-symbols-outlined text-[18px] ${isRtl ? 'scale-x-[-1]' : ''}`}>
+                    arrow_forward
+                  </span>
                 </Link>
               </div>
             </div>

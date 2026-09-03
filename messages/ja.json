@@ -43,7 +43,6 @@
     "checkout": "Proceed to Checkout",
     "checkoutSecure": "Guaranteed 100-night trial • DDP landed total • Room-of-choice delivery",
     "orderSummary": "Order Summary",
-    "itemCount": "{count, plural, =1 {1 box} other {# boxes}}",
     "exploreModusofa": "ModuSofaを見る",
     "orderConfirmed": "ご注文が完了しました — DDP配送手配中",
     "orderConfirmedDesc": "ご注文の商品は48時間以内に精密工房で製造に入り、新鮮な状態で真空圧縮されフラットボックスに梱包されます。ネジ0本、関税・送料全額込みでご自宅までお届けし、100日間のトライアルが付帯します。",
@@ -198,5 +197,15 @@
     "goToCart": "カートを見る",
     "rateLimitError": "リクエスト数が上限に達しました。しばらくしてから再度お試しください。",
     "genericError": "エラーが発生しました。もう一度お試しください。"
+  },
+  "Errors": {
+    "notFoundEyebrow": "404 — ページが見つかりません",
+    "notFoundTitle": "このパーツは部屋に合いませんでした。",
+    "notFoundBody": "お探しのページは移動したか、存在しない可能性があります。フラットパックのコレクションへお戻りください。",
+    "buildKitCta": "1ベッドルームキットを構成する",
+    "errorEyebrow": "エラー",
+    "errorTitle": "うまく組み立てられませんでした。",
+    "errorBody": "ページの読み込み中に予期しないエラーが発生しました。もう一度お試しいただくか、コレクションへお戻りください。",
+    "tryAgain": "再試行"
   }
 }

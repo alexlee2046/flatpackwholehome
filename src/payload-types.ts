@@ -393,10 +393,6 @@ export interface Product {
    */
   shippingWeightKg?: number | null;
   /**
-   * DDP ocean freight rate per kg in RMB (default safe threshold: 18 RMB/kg).
-   */
-  ddpRatePerKgRMB?: number | null;
-  /**
    * Total number of flat packaging boxes for this item or bundle.
    */
   boxCount?: number | null;
@@ -2295,7 +2291,6 @@ export interface ProductsSelect<T extends boolean = true> {
   targetBOMUSD?: T;
   targetBOMRMB?: T;
   shippingWeightKg?: T;
-  ddpRatePerKgRMB?: T;
   boxCount?: T;
   assemblyMinutes?: T;
   joineryType?: T;

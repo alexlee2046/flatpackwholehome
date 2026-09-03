@@ -21,6 +21,13 @@ type DDPZone = {
 /**
  * The Flat Set global DDP (Delivered Duty Paid) logistics and duty calculation model.
  * Server-authoritative calculation for flat boxes delivered straight to customer door.
+ *
+ * SINGLE SOURCE OF TRUTH. These rates are hardcoded on purpose: cross-border duty and
+ * freight rates change rarely, and a wrong quote costs real money, so a code change +
+ * review + deploy is the correct amount of friction. There is no CMS-backed alternative —
+ * `ShippingZones` (src/collections/ShippingZones.ts) and `Products.ddpRatePerKgRMB` do NOT
+ * feed checkout pricing and never have (zero references, no seed data). To change a rate,
+ * edit the values below.
  */
 export const DDP_ZONES = {
   australia: {

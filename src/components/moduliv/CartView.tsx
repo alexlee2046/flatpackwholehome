@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form'
 
 import { ODSAI_DESTINATIONS } from '@/lib/commerce/ddp'
 import { CheckoutValidationError, normalizeCheckoutAddress } from '@/lib/commerce/checkoutValidation'
+import { localeDetails } from '@/i18n/routing'
 
 const THUMBS: Record<string, string> = {
   'bundle-1bed': '/assets/1-bedroom-kit-builder/b4e5f4d8a0.png',
@@ -92,6 +93,7 @@ export function CartView() {
   const t = useTranslations('Transaction')
   const tCommon = useTranslations('Common')
   const locale = useLocale()
+  const isRtl = localeDetails[locale as keyof typeof localeDetails]?.dir === 'rtl'
 
   // Client-first localStorage read avoids an empty-cart flash on first paint.
   const [items, setItems] = useState<any[]>(() => readCartFromStorage())
@@ -439,7 +441,7 @@ export function CartView() {
         <Link className="hover:text-primary transition-colors" href="/">
           {tCommon('home')}
         </Link>
-        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span className="material-symbols-outlined text-[16px]">{isRtl ? 'chevron_left' : 'chevron_right'}</span>
         <span className="text-on-surface font-medium">{t('cartTitle')}</span>
       </nav>
 
@@ -463,7 +465,7 @@ export function CartView() {
             {t('orderConfirmedDesc')}
           </p>
           <p className="font-label-md text-label-md uppercase tracking-wider text-primary mt-6 mb-8">
-            {t('orderRef')} <span id="order-ref">{orderRef}</span>
+            {t('orderRef')} <span dir="ltr" id="order-ref">{orderRef}</span>
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link className={ctaClass} href="/">
@@ -534,7 +536,7 @@ export function CartView() {
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between gap-4 items-baseline">
                       <h3 className="font-headline-sm text-[19px] text-on-surface">{it.name}</h3>
-                      <span className="font-medium text-on-surface whitespace-nowrap">
+                      <span className="font-medium text-on-surface whitespace-nowrap" dir="ltr">
                         ${((it.price || 0) * (it.qty || 1)).toFixed(2)}
                       </span>
                     </div>
@@ -583,14 +585,16 @@ export function CartView() {
             <dl className="space-y-4 font-body-md text-sm">
               <div className="flex justify-between gap-4">
                 <dt className="text-on-surface-variant">{t('subtotal')}</dt>
-                <dd className="font-medium text-on-surface">${subtotal.toFixed(2)}</dd>
+                <dd className="font-medium text-on-surface" dir="ltr">${subtotal.toFixed(2)}</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-on-surface-variant flex items-center gap-1">
                   <span>{t('shipping')}</span>
                   <span className="text-[11px] text-neutral-600 font-normal">{t('shippingDdpNote')}</span>
                 </dt>
-                <dd className="text-primary font-medium">{t('included')} ($0.00)</dd>
+                <dd className="text-primary font-medium">
+                  {t('included')} <span dir="ltr">($0.00)</span>
+                </dd>
               </div>
 
               {/* DDP Logistics & IKEA Savings Callout */}
@@ -616,7 +620,7 @@ export function CartView() {
                     {t('voucher')} <span className="font-label-md text-[12px] uppercase tracking-wider text-primary">SWATCH50</span>
                   </dt>
                   <dd className="flex items-center gap-3">
-                    <span className="text-primary font-medium">−$50.00</span>
+                    <span className="text-primary font-medium" dir="ltr">−$50.00</span>
                     <button
                       aria-label={t('removeVoucher')}
                       className="p-2 text-on-surface-variant hover:text-error transition-colors cursor-pointer"
@@ -671,7 +675,7 @@ export function CartView() {
 
               <div className="flex justify-between gap-4 pt-4 border-t border-outline-variant/40 text-lg">
                 <dt className="font-medium text-on-surface">{t('total')}</dt>
-                <dd className="font-headline-sm text-headline-sm text-on-surface" id="sum-total">
+                <dd className="font-headline-sm text-headline-sm text-on-surface" dir="ltr" id="sum-total">
                   ${total.toFixed(2)}
                 </dd>
               </div>
@@ -693,7 +697,9 @@ export function CartView() {
                   type="button"
                 >
                   {t('checkout')}
-                  <span className="material-symbols-outlined text-[18px] ml-2">arrow_forward</span>
+                  <span className="material-symbols-outlined text-[18px] ms-2">
+                    {isRtl ? 'arrow_back' : 'arrow_forward'}
+                  </span>
                 </button>
                 {checkoutDisabled && stripeStatus !== 'unknown' && (
                   <p className="mt-2 text-xs text-error" role="alert">
@@ -829,6 +835,7 @@ export function CartView() {
                     </label>
                     <input
                       className="w-full px-3 py-2 text-sm border border-outline-variant/60 bg-surface text-on-surface rounded focus:outline-none focus:border-primary"
+                      dir="ltr"
                       id="checkout-postalCode"
                       type="text"
                       {...register('postalCode', { required: t('fieldRequired') })}
@@ -861,6 +868,7 @@ export function CartView() {
                   </label>
                   <input
                     className="w-full px-3 py-2 text-sm border border-outline-variant/60 bg-surface text-on-surface rounded focus:outline-none focus:border-primary"
+                    dir="ltr"
                     id="checkout-phone"
                     type="tel"
                     {...register('phone')}
@@ -894,7 +902,7 @@ export function CartView() {
                 <h3 className="font-headline-sm text-base text-on-surface">{t('paymentTitle')}</h3>
                 <div className="flex justify-between text-sm">
                   <span className="text-on-surface-variant">{t('amountDueLabel')}</span>
-                  <span className="font-medium text-on-surface">
+                  <span className="font-medium text-on-surface" dir={amountDueCents === null ? undefined : 'ltr'}>
                     {amountDueCents === null ? t('calculatingTotal') : `$${(amountDueCents / 100).toFixed(2)}`}
                   </span>
                 </div>

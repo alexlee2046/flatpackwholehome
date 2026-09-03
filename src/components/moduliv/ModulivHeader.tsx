@@ -2,7 +2,8 @@
 
 import { Link } from '@/i18n/navigation'
 import { LanguageSwitcher } from './LanguageSwitcher'
-import { useTranslations } from 'next-intl'
+import { localeDetails, type AppLocale } from '@/i18n/routing'
+import { useLocale, useTranslations } from 'next-intl'
 import React, { useState, useEffect, useRef } from 'react'
 
 type HeaderProps = {
@@ -19,6 +20,8 @@ export function ModulivHeader({
   announcementUrl,
 }: HeaderProps = {}) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const locale = useLocale() as AppLocale
+  const isRtl = localeDetails[locale]?.dir === 'rtl'
   const tNav = useTranslations('Navigation')
   const tFooter = useTranslations('Footer')
   const menuTriggerRef = useRef<HTMLButtonElement>(null)
@@ -126,7 +129,7 @@ export function ModulivHeader({
               aria-expanded={isDrawerOpen}
               aria-controls="mobile-nav-drawer"
               onClick={() => setIsDrawerOpen(true)}
-              className="md:hidden flex items-center justify-center w-10 h-10 -ml-2 rounded-full text-on-surface hover:bg-surface-container-highest transition-colors"
+              className="md:hidden flex items-center justify-center w-10 h-10 -ms-2 rounded-full text-on-surface hover:bg-surface-container-highest transition-colors"
             >
               <span className="material-symbols-outlined text-[24px]" aria-hidden="true">menu</span>
             </button>
@@ -145,7 +148,7 @@ export function ModulivHeader({
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex gap-8 items-center ml-auto">
+          <nav className="hidden md:flex gap-8 items-center ms-auto">
             {navItems && navItems.length > 0 ? (
               navItems.map((item) => (
                 <Link
@@ -205,7 +208,7 @@ export function ModulivHeader({
           </nav>
 
           {/* Icons & Controls */}
-          <div className="flex items-center gap-4 text-primary dark:text-primary-fixed-dim md:ml-8">
+          <div className="flex items-center gap-4 text-primary dark:text-primary-fixed-dim md:ms-8">
             <div className="hidden md:flex items-center gap-3">
               <LanguageSwitcher className="bg-transparent text-xs font-label-md uppercase tracking-wider text-on-surface border border-outline-variant/60 rounded px-2 py-1 outline-none focus:border-primary cursor-pointer" />
               <span className="font-label-md text-label-md cursor-pointer hover:opacity-80 transition-opacity duration-300">
@@ -255,8 +258,8 @@ export function ModulivHeader({
           role="dialog"
           aria-modal="true"
           aria-label="Mobile Navigation Menu"
-          className={`fixed top-0 left-0 bottom-0 w-[320px] max-w-[85vw] bg-[#f9f8f6] dark:bg-[#1a1c1d] shadow-2xl z-50 flex flex-col justify-between overflow-y-auto p-6 transform transition-transform duration-300 ease-out ${
-            isDrawerOpen ? 'translate-x-0' : '-translate-x-full'
+          className={`fixed top-0 start-0 bottom-0 w-[320px] max-w-[85vw] bg-[#f9f8f6] dark:bg-[#1a1c1d] shadow-2xl z-50 flex flex-col justify-between overflow-y-auto p-6 transform transition-transform duration-300 ease-out ${
+            isDrawerOpen ? 'translate-x-0' : isRtl ? 'translate-x-full' : '-translate-x-full'
           }`}
         >
           <div>
@@ -291,7 +294,7 @@ export function ModulivHeader({
               <button
                 type="button"
                 onClick={openSearch}
-                className="w-full flex items-center gap-3 px-4 py-2.5 rounded-full bg-surface-container-lowest dark:bg-surface-container border border-outline-variant/40 text-on-surface-variant text-sm font-label-md hover:border-primary transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-2.5 rounded-full bg-surface-container-lowest dark:bg-surface-container border border-outline-variant/40 text-on-surface-variant text-sm font-label-md hover:border-primary transition-colors text-start"
               >
                 <span className="material-symbols-outlined text-[20px] text-primary" aria-hidden="true">search</span>
                 <span>{tNav('searchPlaceholder')}</span>
@@ -309,7 +312,7 @@ export function ModulivHeader({
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>{tNav('kitBuilder')}</span>
-                <span className="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">arrow_forward</span>
+                <span className={`material-symbols-outlined text-[18px] text-outline ${isRtl ? 'scale-x-[-1]' : ''}`} aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/products/modusofa"
@@ -317,7 +320,7 @@ export function ModulivHeader({
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>{tNav('modusofa')}</span>
-                <span className="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">arrow_forward</span>
+                <span className={`material-symbols-outlined text-[18px] text-outline ${isRtl ? 'scale-x-[-1]' : ''}`} aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/products/snapbed"
@@ -325,7 +328,7 @@ export function ModulivHeader({
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>The SnapBed</span>
-                <span className="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">arrow_forward</span>
+                <span className={`material-symbols-outlined text-[18px] text-outline ${isRtl ? 'scale-x-[-1]' : ''}`} aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/products/1-bedroom-kit"
@@ -333,7 +336,7 @@ export function ModulivHeader({
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>The 1-Bedroom Kit</span>
-                <span className="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">arrow_forward</span>
+                <span className={`material-symbols-outlined text-[18px] text-outline ${isRtl ? 'scale-x-[-1]' : ''}`} aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/how-it-works-craft-logistics"
@@ -341,7 +344,7 @@ export function ModulivHeader({
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>{tNav('howItWorks')}</span>
-                <span className="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">arrow_forward</span>
+                <span className={`material-symbols-outlined text-[18px] text-outline ${isRtl ? 'scale-x-[-1]' : ''}`} aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/free-swatch-box-material-discovery"
@@ -349,7 +352,7 @@ export function ModulivHeader({
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>{tNav('swatchBox')}</span>
-                <span className="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">arrow_forward</span>
+                <span className={`material-symbols-outlined text-[18px] text-outline ${isRtl ? 'scale-x-[-1]' : ''}`} aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/faq"
@@ -357,7 +360,7 @@ export function ModulivHeader({
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-on-surface dark:text-surface-bright font-serif text-base hover:bg-surface-container-highest transition-colors"
               >
                 <span>{tNav('faq')}</span>
-                <span className="material-symbols-outlined text-[18px] text-outline" aria-hidden="true">arrow_forward</span>
+                <span className={`material-symbols-outlined text-[18px] text-outline ${isRtl ? 'scale-x-[-1]' : ''}`} aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/us-vs-ikea"
@@ -368,7 +371,7 @@ export function ModulivHeader({
                   <span>{tNav('usVsIkea')}</span>
                   <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">-20%</span>
                 </div>
-                <span className="material-symbols-outlined text-[18px] text-primary" aria-hidden="true">arrow_forward</span>
+                <span className={`material-symbols-outlined text-[18px] text-primary ${isRtl ? 'scale-x-[-1]' : ''}`} aria-hidden="true">arrow_forward</span>
               </Link>
               <Link
                 href="/cart"

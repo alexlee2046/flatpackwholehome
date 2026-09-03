@@ -43,7 +43,6 @@
     "checkout": "Proceed to Checkout",
     "checkoutSecure": "Guaranteed 100-night trial • DDP landed total • Room-of-choice delivery",
     "orderSummary": "Order Summary",
-    "itemCount": "{count, plural, =1 {1 box} other {# boxes}}",
     "exploreModusofa": "Explore ModuSofa",
     "orderConfirmed": "Order confirmed — DDP delivery scheduled.",
     "orderConfirmedDesc": "Your pieces will enter our precision workshop within 48 hours, freshly compressed and packaged into standard courier flat boxes. Delivered DDP to your door with 0 screws and 100 nights in-home trial.",
@@ -198,5 +197,15 @@
     "goToCart": "Go to Cart",
     "rateLimitError": "You've reached the request limit. Please try again in a little while.",
     "genericError": "Something went wrong. Please try again."
+  },
+  "Errors": {
+    "notFoundEyebrow": "404 — PAGE NOT FOUND",
+    "notFoundTitle": "This piece didn't fit the room.",
+    "notFoundBody": "The page you requested may have moved or doesn't exist. Return to our curated flat-pack collections.",
+    "buildKitCta": "Build 1-Bedroom Kit",
+    "errorEyebrow": "ERROR",
+    "errorTitle": "Something didn't fit together.",
+    "errorBody": "An unexpected error occurred while loading this page. Please try again, or return to our curated flat-pack collections.",
+    "tryAgain": "Try Again"
   }
 }

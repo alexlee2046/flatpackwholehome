@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 
 async function runAdminE2E() {
-  const BASE_URL = process.env.BASE_URL || 'https://flatpack.dev.canbee.cn';
+  const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
   const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@theflatset.com';
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'flatset_admin_2026';
 
@@ -9,7 +9,6 @@ async function runAdminE2E() {
 
   const browser = await chromium.launch({
     headless: true,
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 

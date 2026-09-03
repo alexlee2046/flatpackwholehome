@@ -1,5 +1,6 @@
 import { Link } from '@/i18n/navigation'
-import { getTranslations } from 'next-intl/server'
+import { localeDetails, type AppLocale } from '@/i18n/routing'
+import { getLocale, getTranslations } from 'next-intl/server'
 import React from 'react'
 
 type HowItWorksProps = {
@@ -19,7 +20,8 @@ type HowItWorksProps = {
 }
 
 export async function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
-  const t = await getTranslations('Pages.HowItWorks')
+  const [t, locale] = await Promise.all([getTranslations('Pages.HowItWorks'), getLocale()])
+  const isRtl = localeDetails[locale as AppLocale].dir === 'rtl'
 
   const eyebrow = hero?.eyebrow || t('heroEyebrow')
   const title = hero?.title || t('title')
@@ -193,7 +195,12 @@ export async function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
               href="/1-bedroom-kit-builder"
             >
               <span>{t('ctaBuildKit')}</span>
-              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              <span
+                aria-hidden="true"
+                className={`material-symbols-outlined text-[18px]${isRtl ? ' scale-x-[-1]' : ''}`}
+              >
+                arrow_forward
+              </span>
             </Link>
           </div>
         </div>

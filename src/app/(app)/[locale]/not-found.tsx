@@ -8,18 +8,19 @@ import React from 'react'
 export default async function NotFound() {
   const locale = (await getLocale()) || routing.defaultLocale
   const t = await getTranslations('Transaction')
+  const tError = await getTranslations('Errors')
   return (
     <>
       <SiteHeader locale={locale} />
       <main className="max-w-[1440px] mx-auto w-full px-margin-mobile md:px-margin-desktop py-24 text-center">
         <span className="font-label-md text-sm uppercase tracking-widest text-primary mb-3 block">
-          404 — PAGE NOT FOUND
+          {tError('notFoundEyebrow')}
         </span>
         <h1 className="font-display-lg text-[48px] md:text-[64px] text-on-surface mb-6">
-          This piece didn&apos;t fit the room.
+          {tError('notFoundTitle')}
         </h1>
         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-md mx-auto mb-8">
-          The page you requested may have moved or doesn&apos;t exist. Return to our curated flat-pack collections.
+          {tError('notFoundBody')}
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <Link
@@ -32,7 +33,7 @@ export default async function NotFound() {
             className="border border-on-background text-on-background py-4 px-8 font-label-md text-label-md uppercase tracking-wider rounded-full hover:bg-surface-container-low transition-colors"
             href="/1-bedroom-kit-builder"
           >
-            Build 1-Bedroom Kit
+            {tError('buildKitCta')}
           </Link>
         </div>
       </main>

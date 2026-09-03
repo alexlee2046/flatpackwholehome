@@ -3,7 +3,7 @@
     "defaultTitle": "The Flat Set | Your Entire Home. Delivered in 6 Flat Boxes.",
     "description": "The Flat Set تأثيث منزلك بالكامل من 6 صناديق مسطحة — تجميع بدون أدوات في 60 دقيقة، صندوق عينات مجاني مع قسيمة بقيمة 50 دولارًا، رسوم DDP مدفوعة، تجربة لمدة 100 ليلة.",
     "homeTitle": "The Flat Set — Whole-Home Flat-Pack Furniture",
-    "openGraphDescription": "Your entire home delivered in 6 flat boxes with tool-free assembly and DDP delivery worldwide."
+    "openGraphDescription": "منزلك بالكامل يصل في 6 صناديق مسطحة، تجميع بدون أدوات، وتوصيل DDP شامل الرسوم حول العالم."
   },
   "Navigation": {
     "brand": "The Flat Set",
@@ -26,16 +26,16 @@
   },
   "Transaction": {
     "cartTitle": "Your Cart",
-    "cartDescription": "Review your selected flat-pack furniture pieces before checkout.",
+    "cartDescription": "راجع قطع الأثاث المسطح التي اخترتها قبل إتمام الطلب.",
     "cartEyebrow": "YOUR SELECTION",
-    "emptyCart": "Your cart is empty",
-    "emptyCartPrompt": "Explore our 1-Bedroom flat-pack kit to furnish your entire space.",
+    "emptyCart": "سلة التسوق فارغة",
+    "emptyCartPrompt": "استكشف طقم غرفة النوم الواحدة المسطح لتأثيث مساحتك بالكامل.",
     "continueShopping": "Explore 1-Bedroom Kit",
     "promoLabel": "Have a Promo Code?",
     "promoPlaceholder": "e.g. SWATCH50",
     "promoApply": "Apply",
     "promoSuccess": "Code {code} applied successfully (−${amount})",
-    "promoInvalid": "Invalid or expired promo code.",
+    "promoInvalid": "رمز القسيمة غير صالح أو منتهي الصلاحية.",
     "subtotal": "Subtotal",
     "shipping": "DDP Shipping & Duties",
     "included": "Included",
@@ -43,7 +43,6 @@
     "checkout": "Proceed to Checkout",
     "checkoutSecure": "Guaranteed 100-night trial • DDP landed total • Room-of-choice delivery",
     "orderSummary": "Order Summary",
-    "itemCount": "{count, plural, =1 {1 box} other {# boxes}}",
     "exploreModusofa": "استكشف أريكة ModuSofa",
     "orderConfirmed": "تم تأكيد الطلب — جدولة التوصيل DDP قيد التنفيذ.",
     "orderConfirmedDesc": "ستدخل قطع أثاثك ورشة التصنيع الدقيقة خلال 48 ساعة، مضغوطة ومعبأة في صناديق مسطحة قياسية. توصيل DDP شامل الرسوم حتى باب منزلك مع صفر براغي وتجربة 100 ليلة.",
@@ -109,8 +108,8 @@
     "cartError": "السلة غير جاهزة بعد — يرجى المحاولة مرة أخرى بعد قليل."
   },
   "Footer": {
-    "tagline": "Your entire home. Delivered in 6 flat boxes.",
-    "description": "Architect-designed Japandi whole-home furniture kits engineered for tool-free assembly and zero-guesswork cross-border logistics.",
+    "tagline": "منزلك بالكامل. يصل في 6 صناديق مسطحة.",
+    "description": "أطقم أثاث Japandi لتأثيث المنزل بالكامل، مصممة بإشراف معماري ومهندَسة للتجميع بدون أدوات ولوجستيات عابرة للحدود بلا أي تخمين.",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
     "trial": "100-Night Trial",
@@ -192,11 +191,21 @@
     "processing": "جارٍ معالجة الطلب...",
     "deliveryNote": "يصل إلى باب منزلك مع 4 أقمشة مميزة وبطاقة قسيمة بقيمة 50 دولار.",
     "requiredError": "يرجى إكمال جميع الحقول المطلوبة.",
-    "reservedTitle": "Your swatch box is reserved.",
+    "reservedTitle": "تم حجز صندوق العينات الخاص بك.",
     "reservedDesc": "يغادر الصندوق ورشتنا خلال 48 ساعة. ستجد داخل الغطاء بطاقة قسيمة 50 دولار صالحة لمدة 60 يوماً على جميع طلبات الأثاث.",
     "voucherCode": "رمز القسيمة: SWATCH50",
     "goToCart": "الذهاب إلى السلة",
     "rateLimitError": "لقد وصلت إلى الحد الأقصى للطلبات. يرجى المحاولة مرة أخرى بعد قليل.",
     "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+  },
+  "Errors": {
+    "notFoundEyebrow": "404 — الصفحة غير موجودة",
+    "notFoundTitle": "هذه القطعة لم تناسب الغرفة.",
+    "notFoundBody": "ربما تم نقل الصفحة المطلوبة أو أنها غير موجودة. عد إلى مجموعاتنا من الأثاث المسطّح.",
+    "buildKitCta": "صمّم طقم غرفة النوم",
+    "errorEyebrow": "خطأ",
+    "errorTitle": "لم تتركّب الأمور كما ينبغي.",
+    "errorBody": "حدث خطأ غير متوقع أثناء تحميل هذه الصفحة. يرجى المحاولة مرة أخرى أو العودة إلى مجموعاتنا.",
+    "tryAgain": "حاول مرة أخرى"
   }
 }

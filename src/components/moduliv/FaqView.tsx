@@ -1,7 +1,8 @@
 'use client'
 import { FAQ_ITEMS, type FaqItem } from '@/data/faq'
 import { Link } from '@/i18n/navigation'
-import { useTranslations } from 'next-intl'
+import { localeDetails, type AppLocale } from '@/i18n/routing'
+import { useLocale, useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
 export { FAQ_ITEMS }
@@ -10,6 +11,8 @@ export function FaqView({ items = FAQ_ITEMS }: { items?: FaqItem[] }) {
   const t = useTranslations('Pages.FAQ')
   const tCommon = useTranslations('Common')
   const tNav = useTranslations('Navigation')
+  const locale = useLocale() as AppLocale
+  const isRtl = localeDetails[locale].dir === 'rtl'
   const [search, setSearch] = useState('')
   const activeItems = items && items.length > 0 ? items : FAQ_ITEMS
 
@@ -28,7 +31,9 @@ export function FaqView({ items = FAQ_ITEMS }: { items?: FaqItem[] }) {
         <Link className="hover:text-primary transition-colors" href="/">
           {tCommon('home')}
         </Link>
-        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span className={`material-symbols-outlined text-[16px]${isRtl ? ' scale-x-[-1]' : ''}`}>
+          chevron_right
+        </span>
         <span className="text-on-surface font-medium">{tNav('faq')}</span>
       </nav>
 
@@ -42,12 +47,12 @@ export function FaqView({ items = FAQ_ITEMS }: { items?: FaqItem[] }) {
 
       <div className="max-w-md mb-8">
         <div className="relative">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60 text-[20px]">
+          <span className="material-symbols-outlined absolute start-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60 text-[20px]">
             search
           </span>
           <input
             aria-label={t('searchPlaceholder')}
-            className="w-full pl-10 pr-4 py-2.5 border border-outline-variant/60 bg-surface-container-low text-on-surface text-sm rounded focus:outline-none focus:border-primary"
+            className="w-full ps-10 pe-4 py-2.5 border border-outline-variant/60 bg-surface-container-low text-on-surface text-sm rounded focus:outline-none focus:border-primary"
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('searchPlaceholder')}
             type="search"
@@ -69,7 +74,7 @@ export function FaqView({ items = FAQ_ITEMS }: { items?: FaqItem[] }) {
                 arrow_downward
               </span>
             </summary>
-            <p className="font-body-md text-body-md text-on-surface-variant pb-6 pr-8">{item.a}</p>
+            <p className="font-body-md text-body-md text-on-surface-variant pb-6 pe-8">{item.a}</p>
           </details>
         ))}
 

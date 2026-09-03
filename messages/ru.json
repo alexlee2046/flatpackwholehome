@@ -43,7 +43,6 @@
     "checkout": "Proceed to Checkout",
     "checkoutSecure": "Guaranteed 100-night trial • DDP landed total • Room-of-choice delivery",
     "orderSummary": "Order Summary",
-    "itemCount": "{count, plural, =1 {1 box} other {# boxes}}",
     "exploreModusofa": "Смотреть диван ModuSofa",
     "orderConfirmed": "Заказ подтвержден — доставка DDP запланирована.",
     "orderConfirmedDesc": "Ваш заказ поступит в производство в течение 48 часов, компоненты будут вакуумированы и упакованы в плоские коробки курьерского формата. Доставка DDP до двери, 0 винтов и 100 ночей тест-драйва.",
@@ -198,5 +197,15 @@
     "goToCart": "Перейти в корзину",
     "rateLimitError": "Вы достигли лимита запросов. Попробуйте немного позже.",
     "genericError": "Что-то пошло не так. Попробуйте ещё раз."
+  },
+  "Errors": {
+    "notFoundEyebrow": "404 — СТРАНИЦА НЕ НАЙДЕНА",
+    "notFoundTitle": "Эта деталь не подошла к комнате.",
+    "notFoundBody": "Запрошенная страница могла быть перемещена или не существует. Вернитесь к нашим коллекциям мебели в плоской упаковке.",
+    "buildKitCta": "Собрать комплект для спальни",
+    "errorEyebrow": "ОШИБКА",
+    "errorTitle": "Что-то не сошлось.",
+    "errorBody": "При загрузке страницы произошла непредвиденная ошибка. Попробуйте ещё раз или вернитесь к нашим коллекциям.",
+    "tryAgain": "Попробовать снова"
   }
 }

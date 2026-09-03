@@ -1,8 +1,9 @@
 'use client'
 
 import { Link, useRouter } from '@/i18n/navigation'
+import { localeDetails } from '@/i18n/routing'
 import Image from 'next/image'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
 type ProductDetailProps = {
@@ -52,6 +53,8 @@ const FABRICS = [
 
 export function ProductDetail({ product, materials }: ProductDetailProps) {
   const router = useRouter()
+  const locale = useLocale()
+  const isRtl = localeDetails[locale as keyof typeof localeDetails]?.dir === 'rtl'
   const t = useTranslations('PDP')
   const tCommon = useTranslations('Common')
   const isSofa = !product?.slug || product.slug === 'modusofa'
@@ -169,11 +172,11 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
         <Link className="hover:text-primary transition-colors" href="/">
           {tCommon('home')}
         </Link>
-        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">{isRtl ? 'chevron_left' : 'chevron_right'}</span>
         <Link className="hover:text-primary transition-colors" href="/1-bedroom-kit-builder">
           {categoryName}
         </Link>
-        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">{isRtl ? 'chevron_left' : 'chevron_right'}</span>
         <span className="text-on-surface font-medium">{title}</span>
       </nav>
 
@@ -197,7 +200,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
               return (
                 <button
                   aria-label={t('viewAngle', { number: idx + 1 })}
-                  className={`relative aspect-square bg-surface-container rounded-lg overflow-hidden border-2 transition-all cursor-pointer text-left ${
+                  className={`relative aspect-square bg-surface-container rounded-lg overflow-hidden border-2 transition-all cursor-pointer text-start ${
                     isSelected
                       ? 'border-primary ring-2 ring-primary/40'
                       : 'border-transparent hover:border-outline-variant'
@@ -220,7 +223,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
         </div>
 
         {/* Right Column: Details & Customizer */}
-        <div className="lg:col-span-5 flex flex-col lg:pl-6">
+        <div className="lg:col-span-5 flex flex-col lg:ps-6">
           <span className="font-label-md text-label-md uppercase tracking-wider text-primary mb-2 block">
             {eyebrowText}
           </span>
@@ -249,7 +252,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
           </div>
 
           <div className="flex items-baseline gap-3 mb-8">
-            <span className="font-headline-lg text-[36px] text-on-surface">${price}.00</span>
+            <span className="font-headline-lg text-[36px] text-on-surface" dir="ltr">${price}.00</span>
             <span className="font-body-md text-sm text-on-surface-variant">{t('deliveryIncluded')}</span>
           </div>
 
@@ -365,7 +368,9 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
               type="button"
             >
               <span>{isAdded ? t('addedToCart') : t('addToCartWithPrice', { price: (price * qty).toFixed(2) })}</span>
-              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
+                {isRtl ? 'arrow_back' : 'arrow_forward'}
+              </span>
             </button>
 
             {cartError && (
@@ -432,7 +437,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
                     <div className="flex justify-between items-center font-medium text-on-surface">
                       <span>{box.title}</span>
                       {box.dimensions && (
-                        <span className="text-xs text-on-surface-variant font-mono">
+                        <span className="text-xs text-on-surface-variant font-mono" dir="ltr">
                           {box.dimensions} {box.weight ? `· ${box.weight}` : ''}
                         </span>
                       )}
@@ -461,7 +466,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
                     className="flex justify-between py-1.5 border-b border-outline-variant/20"
                   >
                     <span className="text-on-surface-variant">{spec.label}</span>
-                    <span className="font-medium text-on-surface text-right">{spec.value}</span>
+                    <span className="font-medium text-on-surface text-end">{spec.value}</span>
                   </div>
                 ))}
               </div>

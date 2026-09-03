@@ -1,6 +1,7 @@
 'use client'
 
 import { Link, usePathname, useRouter } from '@/i18n/navigation'
+import { localeDetails } from '@/i18n/routing'
 import Image from 'next/image'
 import { useLocale, useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
@@ -114,6 +115,7 @@ function KitBuilderInner({
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const locale = useLocale()
+  const isRtl = localeDetails[locale as keyof typeof localeDetails]?.dir === 'rtl'
   const tKit = useTranslations('Pages.KitBuilder')
   const tCommon = useTranslations('Common')
 
@@ -278,7 +280,7 @@ function KitBuilderInner({
           <Link className="hover:text-primary transition-colors" href="/">
             {tCommon('home')}
           </Link>
-          <span aria-hidden="true" className="material-symbols-outlined text-[16px]">chevron_right</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[16px]">{isRtl ? 'chevron_left' : 'chevron_right'}</span>
           <span className="text-on-surface font-medium">{tKit('title')}</span>
         </nav>
 
@@ -544,7 +546,7 @@ function KitBuilderInner({
                         </span>
                         <span className="font-body-md text-on-surface">{tKit('mattressPrice')}</span>
                       </div>
-                      <p className="font-body-md text-sm text-on-surface-variant pr-8">
+                      <p className="font-body-md text-sm text-on-surface-variant pe-8">
                         {tKit('mattressDesc')}
                       </p>
                     </div>
@@ -599,7 +601,7 @@ function KitBuilderInner({
         <div className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-4 flex flex-col md:flex-row justify-between items-center gap-4">
           <div aria-live="polite" className="flex flex-col items-center md:items-start w-full md:w-auto">
             <div className="flex items-end gap-3">
-              <span className="font-headline-md text-3xl text-on-surface" id="kit-total">
+              <span className="font-headline-md text-3xl text-on-surface" dir="ltr" id="kit-total">
                 ${total.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
               {space === 'full' && (
@@ -609,10 +611,12 @@ function KitBuilderInner({
                   </span>
                   <Link
                     href="/us-vs-ikea"
-                    className="font-label-md text-xs text-primary bg-primary/10 hover:bg-primary/20 px-2.5 py-0.5 rounded-full mb-1.5 ml-2 transition-colors inline-flex items-center gap-1"
+                    className="font-label-md text-xs text-primary bg-primary/10 hover:bg-primary/20 px-2.5 py-0.5 rounded-full mb-1.5 ms-2 transition-colors inline-flex items-center gap-1"
                     title="Compare item-by-item with local US IKEA"
                   >
-                    <span>{tKit('saveBadge')} vs IKEA (-20.8%)</span>
+                    <span>
+                      {tKit('saveBadge')} <span dir="ltr">vs IKEA (-20.8%)</span>
+                    </span>
                     <span aria-hidden="true" className="material-symbols-outlined text-[13px]">info</span>
                   </Link>
                 </>
@@ -649,7 +653,9 @@ function KitBuilderInner({
                   ? tKit('addedOpeningCart')
                   : tKit('addToCartButton', { space: currentSpace.cta, count: currentSpace.boxes.length })}
               </span>
-              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
+                {isRtl ? 'arrow_back' : 'arrow_forward'}
+              </span>
             </button>
           </div>
         </div>
