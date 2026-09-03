@@ -131,39 +131,47 @@ export function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-            {[
-              {
-                desc: 'Your order is cut the morning it’s placed. CNC-milled oak to 0.1 mm tolerances, hand-sanded edges.',
-                icon: 'handyman',
-                stage: 'Day 1–3',
-                title: 'Workshop Crafting',
-              },
-              {
-                desc: 'Foam is poured, cured and vacuum-sealed the same day — fresh-pressed, never warehouse-stale.',
-                icon: 'compress',
-                stage: 'Day 4',
-                title: 'Vacuum-Seal',
-              },
-              {
-                desc: 'Carbon-offset freight, sized to standard pallets and apartment elevators.',
-                icon: 'directions_boat',
-                stage: 'Day 5–14',
-                title: 'Ocean Express',
-              },
-              {
-                desc: 'Our broker clears your boxes and pays every duty and tax. Nothing is owed at the door — ever.',
-                icon: 'task_alt',
-                stage: 'Day 15',
-                title: 'Customs Cleared',
-              },
-              {
-                desc: 'Six flat boxes at your door. Fast solo unboxing and snap assembly in minutes.',
-                icon: 'home_pin',
-                stage: 'Day 16–18',
-                title: 'Final Doorstep',
-              },
-            ].map((step) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {((steps && steps.length > 0)
+              ? steps.map((s) => ({
+                  desc: s.description,
+                  icon: s.icon || 'precision_manufacturing',
+                  stage: s.metric || s.badge || s.stepNumber,
+                  title: s.title,
+                }))
+              : [
+                  {
+                    desc: 'Your order is cut the morning it’s placed. CNC-milled oak to 0.1 mm tolerances, hand-sanded edges.',
+                    icon: 'handyman',
+                    stage: 'Day 1–3',
+                    title: 'Workshop Crafting',
+                  },
+                  {
+                    desc: 'Foam is poured, cured and vacuum-sealed the same day — fresh-pressed, never warehouse-stale.',
+                    icon: 'compress',
+                    stage: 'Day 4',
+                    title: 'Vacuum-Seal',
+                  },
+                  {
+                    desc: 'Carbon-offset freight, sized to standard pallets and apartment elevators.',
+                    icon: 'directions_boat',
+                    stage: 'Day 5–14',
+                    title: 'Ocean Express',
+                  },
+                  {
+                    desc: 'Our broker clears your boxes and pays every duty and tax. Nothing is owed at the door — ever.',
+                    icon: 'task_alt',
+                    stage: 'Day 15',
+                    title: 'Customs Cleared',
+                  },
+                  {
+                    desc: 'Six flat boxes at your door. Fast solo unboxing and snap assembly in minutes.',
+                    icon: 'home_pin',
+                    stage: 'Day 16–18',
+                    title: 'Final Doorstep',
+                  },
+                ]
+            ).map((step) => (
               <div
                 className="flex flex-col items-center text-center p-6 bg-surface rounded-xl border border-outline-variant/30 shadow-sm"
                 key={step.title}
