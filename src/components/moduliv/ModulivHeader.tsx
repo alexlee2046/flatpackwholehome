@@ -132,6 +132,13 @@ export function ModulivHeader() {
             >
               {tNav('faq')}
             </Link>
+            <Link
+              className="inline-flex items-center gap-1.5 text-primary font-semibold hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
+              href="/us-vs-ikea"
+            >
+              <span>{tNav('usVsIkea')}</span>
+              <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">-20%</span>
+            </Link>
           </nav>
 
           {/* Icons & Controls */}
@@ -271,6 +278,17 @@ export function ModulivHeader() {
               >
                 <span>{tNav('faq')}</span>
                 <span className="material-symbols-outlined text-[18px] text-outline">arrow_forward</span>
+              </Link>
+              <Link
+                href="/us-vs-ikea"
+                onClick={() => setIsDrawerOpen(false)}
+                className="flex items-center justify-between px-3 py-3 rounded-lg text-primary font-serif text-base font-semibold hover:bg-primary/5 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <span>{tNav('usVsIkea')}</span>
+                  <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">-20%</span>
+                </div>
+                <span className="material-symbols-outlined text-[18px] text-primary">arrow_forward</span>
               </Link>
               <Link
                 href="/cart"

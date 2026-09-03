@@ -51,7 +51,7 @@ export function ModulivFooter() {
           {tFooter('copyright')}
         </p>
         <p className="font-label-md text-[12px] tracking-widest uppercase text-outline mt-2">
-          6 Boxes · 60 Minutes · 0 Screws · DDP Duties Included
+          6 Boxes · 60 Minutes · 0 Screws · 20% Below IKEA · DDP Duties Included
         </p>
       </div>
 
@@ -85,6 +85,12 @@ export function ModulivFooter() {
           href="/faq"
         >
           {tNav('faq')}
+        </Link>
+        <Link
+          className="text-primary font-semibold hover:underline transition-all duration-200"
+          href="/us-vs-ikea"
+        >
+          {tNav('usVsIkea')} (-20%)
         </Link>
         <button
           type="button"

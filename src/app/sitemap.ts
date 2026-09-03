@@ -18,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
     { pathname: '/', changeFrequency: 'weekly' as const, priority: 1.0 },
     { pathname: '/1-bedroom-kit-builder', changeFrequency: 'weekly' as const, priority: 1.0 },
+    { pathname: '/us-vs-ikea', changeFrequency: 'weekly' as const, priority: 0.95 },
     { pathname: '/free-swatch-box-material-discovery', changeFrequency: 'weekly' as const, priority: 0.9 },
     { pathname: '/how-it-works-craft-logistics', changeFrequency: 'monthly' as const, priority: 0.8 },
     { pathname: '/faq', changeFrequency: 'monthly' as const, priority: 0.8 },
