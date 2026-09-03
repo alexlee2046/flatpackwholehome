@@ -71,8 +71,8 @@ export default async function RootLayout({ children, params }: LayoutProps) {
       suppressHydrationWarning
     >
       <head>
-        <OrganizationJsonLd />
-        <WebSiteJsonLd />
+        <OrganizationJsonLd locale={locale} />
+        <WebSiteJsonLd locale={locale} />
         <link rel="preload" href="/vendor/fonts/f305d441dc1.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/vendor/fonts/f49e0be9626.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/vendor/tailwind.js" as="script" />

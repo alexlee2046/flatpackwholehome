@@ -1,3 +1,4 @@
+import { HowToJsonLd } from '@/components/seo/JsonLd'
 import { HowItWorksView } from '@/components/moduliv/HowItWorksView'
 import { SiteFooter } from '@/components/moduliv/SiteFooter'
 import { SiteHeader } from '@/components/moduliv/SiteHeader'
@@ -36,6 +37,12 @@ export default async function HowItWorksPage({ params }: Props) {
 
   return (
     <>
+      <HowToJsonLd
+        description={hero?.subtitle || 'From workshop to living room in 6 flat boxes. 100% tool-free assembly.'}
+        locale={locale}
+        name={hero?.title || 'How Precision Engineering Meets Ocean Express'}
+        steps={(steps as any) || []}
+      />
       <SiteHeader locale={locale} />
       <HowItWorksView hero={hero as any} steps={steps as any} />
       <SiteFooter locale={locale} />

@@ -17,7 +17,7 @@ export function JsonLdScript({ data }: { data: Record<string, any> }) {
 /**
  * Organization & Brand Structured Data
  */
-export function OrganizationJsonLd() {
+export function OrganizationJsonLd({ locale = 'en' }: { locale?: string }) {
   const baseUrl = SITE_URL.replace(/\/$/, '')
 
   const data = {
@@ -29,6 +29,7 @@ export function OrganizationJsonLd() {
     url: baseUrl,
     logo: `${baseUrl}/assets/brand/lockup.svg`,
     image: `${baseUrl}/assets/homepage/hero-split.png`,
+    inLanguage: locale,
     description:
       'The Flat Set furnishes your whole home from 6 flat boxes — 100% tool-free 60-minute assembly, fresh-pressed made-to-order craft, free swatch box, DDP duties included, and 100-night trial.',
     slogan: 'Your entire home. Delivered in 6 flat boxes.',
@@ -57,7 +58,7 @@ export function OrganizationJsonLd() {
 /**
  * WebSite & SearchAction Structured Data
  */
-export function WebSiteJsonLd() {
+export function WebSiteJsonLd({ locale = 'en' }: { locale?: string }) {
   const baseUrl = SITE_URL.replace(/\/$/, '')
 
   const data = {
@@ -66,6 +67,7 @@ export function WebSiteJsonLd() {
     '@id': `${baseUrl}/#website`,
     url: baseUrl,
     name: 'The Flat Set',
+    inLanguage: locale,
     description: 'Whole-Home Flat-Pack Living System delivered in 6 flat boxes with tool-free assembly.',
     publisher: {
       '@id': `${baseUrl}/#organization`,
@@ -78,22 +80,34 @@ export function WebSiteJsonLd() {
       },
       'query-input': 'required name=search_term_string',
     },
+    workTranslation: [
+      { '@type': 'WebSite', inLanguage: 'en', url: `${baseUrl}/` },
+      { '@type': 'WebSite', inLanguage: 'zh-CN', url: `${baseUrl}/zh-CN` },
+      { '@type': 'WebSite', inLanguage: 'zh-TW', url: `${baseUrl}/zh-TW` },
+      { '@type': 'WebSite', inLanguage: 'de', url: `${baseUrl}/de` },
+      { '@type': 'WebSite', inLanguage: 'ja', url: `${baseUrl}/ja` },
+      { '@type': 'WebSite', inLanguage: 'ar', url: `${baseUrl}/ar` },
+      { '@type': 'WebSite', inLanguage: 'ru', url: `${baseUrl}/ru` },
+    ],
   }
 
   return <JsonLdScript data={data} />
 }
 
 /**
- * FAQPage Structured Data
+ * FAQPage Structured Data (Generative AI Q&A & Search Rich Snippets)
  */
 export function FaqJsonLd({
   items,
+  locale = 'en',
 }: {
   items: Array<{ q: string; a: string }>
+  locale?: string
 }) {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
+    inLanguage: locale,
     mainEntity: Array.isArray(items)
       ? items.map((item) => ({
           '@type': 'Question',
@@ -102,6 +116,62 @@ export function FaqJsonLd({
             '@type': 'Answer',
             text: item.a,
           },
+        }))
+      : [],
+  }
+
+  return <JsonLdScript data={data} />
+}
+
+/**
+ * HowTo Structured Data (Generative AI Guide Extraction & Google Rich Snippets)
+ */
+export function HowToJsonLd({
+  name,
+  description,
+  steps,
+  totalTime = 'PT60M',
+  locale = 'en',
+}: {
+  name: string
+  description: string
+  steps: Array<{ title: string; description: string; stepNumber?: string }>
+  totalTime?: string
+  locale?: string
+}) {
+  const baseUrl = SITE_URL.replace(/\/$/, '')
+
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name,
+    description,
+    inLanguage: locale,
+    totalTime,
+    estimatedCost: {
+      '@type': 'MonetaryAmount',
+      currency: 'USD',
+      value: 0,
+    },
+    supply: [
+      {
+        '@type': 'HowToSupply',
+        name: 'The Flat Set Compact Flat Boxes',
+      },
+    ],
+    tool: [
+      {
+        '@type': 'HowToTool',
+        name: 'None (100% Tool-Free Mechanical Snap-Lock Joint Assembly)',
+      },
+    ],
+    step: Array.isArray(steps)
+      ? steps.map((s, idx) => ({
+          '@type': 'HowToStep',
+          position: idx + 1,
+          name: s.title,
+          text: s.description,
+          url: `${baseUrl}/how-it-works-craft-logistics#step-${idx + 1}`,
         }))
       : [],
   }
@@ -121,6 +191,7 @@ export function ProductJsonLd({
   url,
   currency = 'USD',
   inStock = true,
+  locale = 'en',
 }: {
   name: string
   description: string
@@ -130,6 +201,7 @@ export function ProductJsonLd({
   url: string
   currency?: string
   inStock?: boolean
+  locale?: string
 }) {
   const baseUrl = SITE_URL.replace(/\/$/, '')
   const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url.startsWith('/') ? url : `/${url}`}`
@@ -140,6 +212,7 @@ export function ProductJsonLd({
     '@type': 'Product',
     name,
     description,
+    inLanguage: locale,
     image: [imageUrl],
     sku,
     mpn: sku,

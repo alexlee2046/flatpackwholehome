@@ -36,7 +36,7 @@ export default async function FaqPage({ params }: Props) {
 
   return (
     <>
-      <FaqJsonLd items={faqs} />
+      <FaqJsonLd items={faqs} locale={locale} />
       <BreadcrumbJsonLd
         items={[
           { name: 'Home', url: '/' },

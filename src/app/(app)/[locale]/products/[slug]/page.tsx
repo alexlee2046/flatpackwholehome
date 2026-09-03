@@ -86,6 +86,7 @@ export default async function ProductPage({ params }: Props) {
         price={productData.price}
         sku={`TFS-${slug.toUpperCase()}`}
         url={`/products/${slug}`}
+        locale={locale}
       />
       <BreadcrumbJsonLd
         items={[

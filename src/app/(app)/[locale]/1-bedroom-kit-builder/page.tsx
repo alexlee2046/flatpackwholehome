@@ -50,6 +50,7 @@ export default async function KitBuilderPage({ params }: Props) {
         price={bundleProduct?.priceInUSD || 1499}
         sku="TFS-BUNDLE-1BED"
         url="/1-bedroom-kit-builder"
+        locale={locale}
       />
       <BreadcrumbJsonLd
         items={[
