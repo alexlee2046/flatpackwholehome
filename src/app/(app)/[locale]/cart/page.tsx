@@ -1,5 +1,6 @@
 import { BreadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { CartView } from '@/components/moduliv/CartView'
+import { readStripeServerConfig } from '@/lib/commerce/stripeConfig'
 import { SiteFooter } from '@/components/moduliv/SiteFooter'
 import { SiteHeader } from '@/components/moduliv/SiteHeader'
 import { defaultLocale, locales, type AppLocale } from '@/i18n/routing'
@@ -30,6 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CartPage({ params }: Props) {
+  const stripeConfig = readStripeServerConfig()
   const { locale: rawLocale } = await params
   const locale = (hasLocale(locales, rawLocale) ? rawLocale : defaultLocale) as AppLocale
   setRequestLocale(locale)
@@ -48,7 +50,7 @@ export default async function CartPage({ params }: Props) {
         ]}
       />
       <SiteHeader locale={locale} />
-      <CartView />
+      <CartView publishableKey={stripeConfig.status === 'configured' ? stripeConfig.publishableKey : ''} />
       <SiteFooter locale={locale} />
     </>
   )

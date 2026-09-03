@@ -2,6 +2,7 @@
 
 import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
+import { useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
 import { useLocale, useTranslations } from 'next-intl'
 import React, { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -80,16 +81,7 @@ function readVoucherFromStorage(): boolean {
   }
 }
 
-async function extractErrorMessage(res: Response, fallback: string): Promise<string> {
-  try {
-    const data = await res.json()
-    return data?.errors?.[0]?.message || data?.message || fallback
-  } catch {
-    return fallback
-  }
-}
-
-export function CartView() {
+export function CartView({ publishableKey }: { publishableKey: string }) {
   const t = useTranslations('Transaction')
   const tCommon = useTranslations('Common')
   const locale = useLocale()
@@ -108,15 +100,15 @@ export function CartView() {
   const [undoState, setUndoState] = useState<{ index: number; item: any } | null>(null)
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const [stripeStatus, setStripeStatus] = useState<StripeStatus>('unknown')
-  const [publishableKey, setPublishableKey] = useState<string | null>(null)
+  const { addItem, clearCart } = useCart()
+  const { confirmOrder, initiatePayment, paymentMethods } = usePayments()
+  const stripeReady = paymentMethods.some((m) => m.name === 'stripe') && Boolean(publishableKey)
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>('cart')
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [isSubmittingAddress, setIsSubmittingAddress] = useState(false)
   const [isPaying, setIsPaying] = useState(false)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [checkoutEmail, setCheckoutEmail] = useState('')
-  const [cartMeta, setCartMeta] = useState<{ id: number | string; secret?: string } | null>(null)
   const [amountDueCents, setAmountDueCents] = useState<number | null>(null)
   const stripeRef = useRef<{ elements: any; stripe: any } | null>(null)
 
@@ -162,25 +154,6 @@ export function CartView() {
       setCheckoutStep('cart')
     }
   }, [items.length, checkoutStep])
-
-  useEffect(() => {
-    let cancelled = false
-    fetch('/api/checkout/status')
-      .then((res) => res.json())
-      .then((config) => {
-        if (cancelled) return
-        setStripeStatus(config?.status === 'configured' ? 'configured' : (config?.status ?? 'disabled'))
-        if (config?.status === 'configured' && typeof config.publishableKey === 'string') {
-          setPublishableKey(config.publishableKey)
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setStripeStatus('disabled')
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   // Mount the Stripe Payment Element once we have a clientSecret for this payment step.
   useEffect(() => {
@@ -303,7 +276,7 @@ export function CartView() {
   const onSubmitAddress = async (values: AddressFormValues) => {
     setCheckoutError(null)
 
-    if (stripeStatus !== 'configured') {
+    if (!stripeReady) {
       setCheckoutError(t('checkoutUnavailable'))
       return
     }
@@ -338,39 +311,26 @@ export function CartView() {
     try {
       const resolvedItems = await resolveCartItems()
 
-      const cartRes = await fetch('/api/carts', {
-        body: JSON.stringify({ currency: 'USD', items: resolvedItems }),
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-      })
-      if (!cartRes.ok) {
-        throw new Error(await extractErrorMessage(cartRes, t('checkoutErrorGeneric')))
+      // The provider owns the Payload cart; mirror the local browsing cart into it
+      // so initiatePayment prices exactly what the shopper just reviewed.
+      await clearCart()
+      for (const item of resolvedItems) {
+        await addItem({ product: item.product }, item.quantity)
       }
-      const cartData = await cartRes.json()
-      const cart = cartData?.doc
-      if (!cart?.id) throw new Error(t('checkoutErrorGeneric'))
 
-      const initiateRes = await fetch('/api/payments/stripe/initiate', {
-        body: JSON.stringify({
+      const initiated = (await initiatePayment('stripe', {
+        additionalData: {
           billingAddress: address,
-          cartID: cart.id,
           customerEmail: values.email,
           locale,
-          secret: cart.secret,
           shippingAddress: address,
-        }),
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-      })
-      if (!initiateRes.ok) {
-        throw new Error(await extractErrorMessage(initiateRes, t('checkoutErrorGeneric')))
-      }
-      const initiateData = await initiateRes.json()
-      if (!initiateData?.clientSecret) throw new Error(t('checkoutErrorGeneric'))
+        },
+      })) as { clientSecret?: string } | undefined
 
-      setCartMeta({ id: cart.id, secret: cart.secret })
+      if (!initiated?.clientSecret) throw new Error(t('checkoutErrorGeneric'))
+
       setCheckoutEmail(values.email)
-      setClientSecret(initiateData.clientSecret)
+      setClientSecret(initiated.clientSecret)
       setAmountDueCents(null)
       setCheckoutStep('payment')
     } catch (err) {
@@ -399,22 +359,13 @@ export function CartView() {
         throw new Error(t('checkoutErrorGeneric'))
       }
 
-      const confirmRes = await fetch('/api/payments/stripe/confirm-order', {
-        body: JSON.stringify({
-          cartID: cartMeta?.id,
-          customerEmail: checkoutEmail,
-          paymentIntentID: paymentIntent.id,
-        }),
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-      })
-      if (!confirmRes.ok) {
-        throw new Error(await extractErrorMessage(confirmRes, t('checkoutErrorGeneric')))
-      }
-      const confirmData = await confirmRes.json()
-      if (!confirmData?.orderID) throw new Error(t('checkoutErrorGeneric'))
+      const confirmed = (await confirmOrder('stripe', {
+        additionalData: { customerEmail: checkoutEmail, paymentIntentID: paymentIntent.id },
+      })) as { orderID?: number | string } | undefined
 
-      setOrderRef(String(confirmData.orderID))
+      if (!confirmed?.orderID) throw new Error(t('checkoutErrorGeneric'))
+
+      setOrderRef(String(confirmed.orderID))
       setIsOrdered(true)
       if (typeof window !== 'undefined' && (window as any).modulivCart) {
         ;(window as any).modulivCart.setItems([])
@@ -426,7 +377,7 @@ export function CartView() {
     }
   }
 
-  const checkoutDisabled = stripeStatus !== 'configured'
+  const checkoutDisabled = !stripeReady
   const ctaClass =
     'bg-on-background text-on-primary py-4 px-8 font-label-md text-label-md uppercase hover:bg-primary transition-colors duration-300 inline-flex items-center justify-center rounded-full'
 
@@ -701,7 +652,7 @@ export function CartView() {
                     {isRtl ? 'arrow_back' : 'arrow_forward'}
                   </span>
                 </button>
-                {checkoutDisabled && stripeStatus !== 'unknown' && (
+                {checkoutDisabled && (
                   <p className="mt-2 text-xs text-error" role="alert">
                     {t('checkoutUnavailable')}
                   </p>
