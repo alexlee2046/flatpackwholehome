@@ -51,6 +51,7 @@ async function run() {
   console.log('\n--- 2. Static Assets Referenced in Components ---')
   const staticAssets = [
     // Swatches in ProductDetail & KitBuilder
+    '/assets/1-bedroom-kit-builder/wood-walnut.png',
     '/assets/1-bedroom-kit-builder/42c66f93ee.png',
     '/assets/1-bedroom-kit-builder/ec621fdd7b.png',
     '/assets/1-bedroom-kit-builder/359e11ad79.png',

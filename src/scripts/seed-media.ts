@@ -24,13 +24,14 @@ export const ALT_MAP: Record<string, string> = {
   // ModuSofa PDP Assets
   'e38c85e68d.png': 'ModuSofa three-seater modular sofa in terracotta fabric with matching ottoman',
   'b354f66f79.png': 'Close up detail of stainless steel snap bracket connecting solid oak beams',
-  'd3a3e93b3d.png': 'Close detail of the ModuSofa upholstery weave and the seam between two modular seat units',
+  'd3a3e93b3d.png': 'Macro detail of the ModuSofa seam, showing the woven upholstery and piped edge',
 
   // Kit Builder / Whole Home Assets
-  'da48e93272.png': 'Japandi whole-home living room featuring ModuSofa and oak coffee table',
-  'b4e5f4d8a0.png': 'SnapBed minimal platform bed in solid oak bedroom setting',
-  '188581c175.png': 'American Black Walnut solid hardwood finish sample',
+  'da48e93272.png': 'Bedroom furnished with the SnapBed oak platform bed and a matching nightstand',
+  'b4e5f4d8a0.png': 'Open-plan studio apartment furnished end to end in terracotta and oak',
+  '188581c175.png': 'Living room with the ModuSofa, ottoman and a low oak coffee table',
   'ebd8892f4c.png': 'FSC European White Oak solid hardwood finish sample',
+  'wood-walnut.png': 'American Black Walnut solid hardwood finish sample',
   'ec621fdd7b.png': 'Cream Bouclé tactile upholstery fabric swatch',
   '42c66f93ee.png': 'Caramel Corduroy textured upholstery fabric swatch',
   '359e11ad79.png': 'Olive Chenille plush upholstery fabric swatch',
@@ -175,11 +176,11 @@ export async function seedMedia(payload: Payload): Promise<Map<string, number>> 
     {
       slug: 'snapbed',
       gallery: [
-        'b4e5f4d8a0.png',
+        'da48e93272.png',
         'd4a4793ee2.png',
         'd66ddc7ba1.png',
       ],
-      metaImage: 'b4e5f4d8a0.png',
+      metaImage: 'da48e93272.png',
     },
     {
       slug: '1-bedroom-kit',
@@ -189,7 +190,7 @@ export async function seedMedia(payload: Payload): Promise<Map<string, number>> 
         'asset-boxes-to-room-split.png',
         '188581c175.png',
       ],
-      metaImage: 'da48e93272.png',
+      metaImage: 'b4e5f4d8a0.png',
     },
   ]
 
@@ -272,8 +273,8 @@ export async function seedMedia(payload: Payload): Promise<Map<string, number>> 
 
   // 2. Link Spaces
   const spacesToUpdate = [
-    { slug: 'living-room', heroImage: 'da48e93272.png' },
-    { slug: 'bedroom', heroImage: 'b4e5f4d8a0.png' },
+    { slug: 'living-room', heroImage: '188581c175.png' },
+    { slug: 'bedroom', heroImage: 'da48e93272.png' },
     { slug: 'whole-home', heroImage: 'asset-boxes-to-room-split.png' },
   ]
 
@@ -327,7 +328,7 @@ export async function seedMedia(payload: Payload): Promise<Map<string, number>> 
 
   const materialsToUpdate = [
     { slug: 'white-oak', heroImage: 'ebd8892f4c.png' },
-    { slug: 'black-walnut', heroImage: '188581c175.png' },
+    { slug: 'black-walnut', heroImage: 'wood-walnut.png' },
     { slug: 'oatmeal-boucle', heroImage: 'ec621fdd7b.png' },
   ]
 
