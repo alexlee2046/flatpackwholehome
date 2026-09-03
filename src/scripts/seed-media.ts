@@ -11,9 +11,9 @@ const rootDir = process.cwd()
 
 export const ALT_MAP: Record<string, string> = {
   // Screenshots & Key Visuals
-  'asset-snap-joint-exploded.png': 'Exploded view of MODULIV oak snap joints and hardware-free assembly',
-  'asset-boxes-to-room-split.png': 'Six MODULIV flat-pack boxes beside the same room fully furnished',
-  'asset-swatch-box-hero.png': 'MODULIV swatch box open on an oak coffee table in natural light',
+  'asset-snap-joint-exploded.png': 'Exploded view of The Flat Set oak snap joints and hardware-free assembly',
+  'asset-boxes-to-room-split.png': 'Six The Flat Set flat-pack boxes beside the same room fully furnished',
+  'asset-swatch-box-hero.png': 'The Flat Set swatch box open on an oak coffee table in natural light',
   'asset-swatch-box-closeup.png': 'Close-up editorial view of tactile fabric swatches and wood chips in kraft box',
   'homepage.png': 'The Flat Set whole home flat pack furniture storefront preview',
   'modusofa-product-detail-page.png': 'ModuSofa 3-seater modular sofa product detail page preview',

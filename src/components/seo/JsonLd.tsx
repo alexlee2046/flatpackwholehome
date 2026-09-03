@@ -30,7 +30,7 @@ export function OrganizationJsonLd({ locale = 'en' }: { locale?: string }) {
     '@type': 'Organization',
     '@id': `${baseUrl}/#organization`,
     name: 'The Flat Set',
-    alternateName: ['TheFlatSet', 'MODULIV', 'MODULIV Whole-Home'],
+    alternateName: ['TheFlatSet', 'The Flat Set Whole-Home'],
     url: baseUrl,
     logo: `${baseUrl}/assets/brand/lockup.svg`,
     image: `${baseUrl}/assets/homepage/hero-split.png`,
