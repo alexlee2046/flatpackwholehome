@@ -37,19 +37,23 @@ import { HowItWorks } from '@/globals/HowItWorks'
 import { SiteSettings } from '@/globals/SiteSettings'
 import { seedInitialContent } from '@/utilities/seedContent'
 import { seedI18nContent } from '@/utilities/seedI18nContent'
+import { migrations } from './migrations'
 import { plugins } from './plugins'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const publicServerURL = process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3000'
 const siteURL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+const isProduction = process.env.NODE_ENV === 'production'
 
 export default buildConfig({
   admin: {
-    autoLogin: {
-      email: 'admin@theflatset.com',
-      prefillOnly: true,
-    },
+    autoLogin: isProduction
+      ? false
+      : {
+          email: process.env.INITIAL_ADMIN_EMAIL || 'admin@theflatset.com',
+          prefillOnly: true,
+        },
     components: {
       graphics: {
         Icon: '@/components/admin/AdminIcon#AdminIcon',
@@ -94,6 +98,7 @@ export default buildConfig({
       idleTimeoutMillis: 30000,
       max: process.env.DB_POOL_MAX ? parseInt(process.env.DB_POOL_MAX, 10) : 15,
     },
+    prodMigrations: migrations,
   }),
   editor: lexicalEditor({
     features: () => {
@@ -149,7 +154,6 @@ export default buildConfig({
   onInit: async (payload) => {
     try {
       const adminEmail = process.env.INITIAL_ADMIN_EMAIL || 'admin@theflatset.com'
-      const adminPassword = process.env.INITIAL_ADMIN_PASSWORD || 'flatset_admin_2026'
 
       const existingAdmin = await payload.find({
         collection: 'users',
@@ -165,25 +169,32 @@ export default buildConfig({
       })
 
       if (existingAdmin.docs[0]) {
+        // Never touch the password field for an existing admin — a process restart
+        // must not revert credentials an operator has since changed.
         await payload.update({
           collection: 'users',
           id: existingAdmin.docs[0].id,
           data: {
             email: adminEmail,
             name: 'The Flat Set Admin',
-            password: adminPassword,
             roles: ['admin'],
           },
           overrideAccess: true,
         })
-        payload.logger.info(`[onInit] Admin credentials verified for: ${adminEmail}`)
+        payload.logger.info(`[onInit] Admin account verified for: ${adminEmail}`)
+      } else if (!process.env.INITIAL_ADMIN_PASSWORD) {
+        // No fallback password exists by design: without one there is no code path
+        // that can produce an admin with credentials anybody could read from the repo.
+        payload.logger.error(
+          `[onInit] INITIAL_ADMIN_PASSWORD is not set — admin user ${adminEmail} was NOT created. Set it and restart.`,
+        )
       } else {
         await payload.create({
           collection: 'users',
           data: {
             email: adminEmail,
             name: 'The Flat Set Admin',
-            password: adminPassword,
+            password: process.env.INITIAL_ADMIN_PASSWORD,
             roles: ['admin'],
           },
           overrideAccess: true,

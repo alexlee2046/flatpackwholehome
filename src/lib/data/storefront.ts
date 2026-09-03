@@ -56,7 +56,8 @@ export const getHomePageData = cache(async (locale: string) => {
           homepage: resolvedHome,
           kitProduct: kitProductRes?.docs?.[0] || null,
         }
-      } catch {
+      } catch (err) {
+        console.error('[storefront:getHomePageData]', err)
         return {
           announcement: null,
           homepage: dict ? dict.homepage : null,
@@ -88,7 +89,8 @@ export const getProductData = cache(async (slug: string, locale: string) => {
           },
         })
         return productResult?.docs?.[0] || null
-      } catch {
+      } catch (err) {
+        console.error('[storefront:getProductData]', err)
         return null
       }
     },
@@ -139,7 +141,8 @@ export const getKitBuilderData = cache(async (locale: string) => {
           materials: materialsRes?.docs || [],
           spaces: spacesRes?.docs || [],
         }
-      } catch {
+      } catch (err) {
+        console.error('[storefront:getKitBuilderData]', err)
         return {
           bedProduct: null,
           bundleProduct: null,
@@ -153,6 +156,21 @@ export const getKitBuilderData = cache(async (locale: string) => {
     { revalidate: 300, tags: ['kit-builder', 'products', 'spaces', 'materials'] },
   )()
 })
+
+// Normalized English question text is the only key shared across the CMS `faqs`
+// collection, the static FAQ_ITEMS defaults and the I18N_DICTIONARY translations —
+// none of the three carries an explicit id. Match on this instead of array
+// position so reordering/adding/removing a FAQ in the CMS can't misalign a doc
+// with an unrelated translation.
+const normalizeFaqKey = (text?: string | null) =>
+  (text || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/\s+/g, ' ')
+
+const FAQ_INDEX_BY_KEY = new Map(FAQ_ITEMS.map((item, idx) => [normalizeFaqKey(item.q), idx]))
 
 /**
  * Retrieve FAQ dataset from CMS with fallback to default questions.
@@ -173,19 +191,20 @@ export const getFaqData = cache(async (locale: string) => {
         })
 
         if (res?.docs?.length) {
-          const items: FaqItem[] = res.docs.map((doc: any, idx: number) => {
-            const isEnglishFallback =
-              locale !== 'en' && doc.question === FAQ_ITEMS[idx]?.q
-            const localized = dict?.faqs?.[idx]
+          const items: FaqItem[] = res.docs.map((doc: any) => {
+            const idx = FAQ_INDEX_BY_KEY.get(normalizeFaqKey(doc.question))
+            const isEnglishFallback = locale !== 'en' && idx !== undefined
+            const localized = idx !== undefined ? dict?.faqs?.[idx] : undefined
+            const defaults = idx !== undefined ? FAQ_ITEMS[idx] : undefined
             return {
-              q: isEnglishFallback && localized ? localized.q : doc.question || localized?.q || FAQ_ITEMS[idx]?.q,
-              a: isEnglishFallback && localized ? localized.a : doc.answer || localized?.a || FAQ_ITEMS[idx]?.a,
+              q: isEnglishFallback && localized ? localized.q : doc.question || localized?.q || defaults?.q,
+              a: isEnglishFallback && localized ? localized.a : doc.answer || localized?.a || defaults?.a,
             }
           })
           return { faqs: items }
         }
-      } catch {
-        // Fall back gracefully
+      } catch (err) {
+        console.error('[storefront:getFaqData]', err)
       }
       return { faqs: dict?.faqs || FAQ_ITEMS }
     },
@@ -223,8 +242,8 @@ export const getHowItWorksData = cache(async (locale: string) => {
             steps: hiw.steps,
           }
         }
-      } catch {
-        // Fall back gracefully
+      } catch (err) {
+        console.error('[storefront:getHowItWorksData]', err)
       }
       return {
         hero: dict?.howItWorks.hero || null,
@@ -299,7 +318,8 @@ export const getSiteLayoutData = cache(async (locale: string) => {
           footer: resolvedFooter,
           header: resolvedHeader,
         }
-      } catch {
+      } catch (err) {
+        console.error('[storefront:getSiteLayoutData]', err)
         return {
           announcement: null,
           footer: dict
@@ -335,7 +355,8 @@ export const getMaterialsData = cache(async (locale: string) => {
           overrideAccess: true,
         })
         return res?.docs || []
-      } catch {
+      } catch (err) {
+        console.error('[storefront:getMaterialsData]', err)
         return []
       }
     },

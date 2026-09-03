@@ -1,10 +1,9 @@
 import configPromise from '@payload-config'
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
+import { getCanonicalSiteURL } from '@/utilities/canonicalUrl'
 
 export const dynamic = 'force-dynamic'
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://theflatset.com'
 
 const LOCALIZED_CATALOG: Record<
   string,
@@ -122,9 +121,7 @@ const LOCALIZED_CATALOG: Record<
  * Supports query parameter ?locale= (e.g. /api/catalog?locale=de)
  */
 export async function GET(request: NextRequest) {
-  const host = request.headers.get('x-forwarded-host') || request.headers.get('host')
-  const proto = request.headers.get('x-forwarded-proto') || 'https'
-  const baseUrl = host ? `${proto}://${host}` : SITE_URL.replace(/\/$/, '')
+  const baseUrl = getCanonicalSiteURL()
 
   const { searchParams } = new URL(request.url)
   const locale = searchParams.get('locale') || 'en'
@@ -215,8 +212,8 @@ export async function GET(request: NextRequest) {
           return {
             id: String(doc.id),
             slug: doc.slug,
-            name: loc?.name || doc.title || doc.name,
-            category: loc?.category || doc.productCollection?.title || 'Modular Furniture',
+            name: doc.title || doc.name || loc?.name,
+            category: doc.productCollection?.title || loc?.category || 'Modular Furniture',
             priceUSD: doc.priceInUSD || 699,
             boxCount: doc.boxCount || 2,
             assemblyMinutes: doc.assemblyMinutes || 15,
@@ -226,7 +223,7 @@ export async function GET(request: NextRequest) {
             trialPeriodDays: 100,
             returnPolicy: 'Donation-Over-Return (Full refund on charity pickup receipt)',
             url: `${baseUrl}${locale === 'en' ? '' : `/${locale}`}/products/${doc.slug}`,
-            description: loc?.description || doc.subtitle || 'Whole-Home flat-pack living piece engineered for tool-free assembly.',
+            description: doc.subtitle || loc?.description || 'Whole-Home flat-pack living piece engineered for tool-free assembly.',
           }
         })
       }

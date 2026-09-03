@@ -16,7 +16,6 @@ ENV DATABASE_URL=postgresql://build:build@127.0.0.1:5432/build
 ENV NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ENV NEXT_PUBLIC_SERVER_URL=http://localhost:3000
 ENV PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000
-ENV PAYLOAD_RUN_MIGRATIONS=false
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm generate:importmap && pnpm build
@@ -41,6 +40,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 RUN mkdir -p /app/public/media && chown -R nextjs:nodejs /app/public/media
+VOLUME ["/app/public/media"]
 
 USER nextjs
 EXPOSE 3000

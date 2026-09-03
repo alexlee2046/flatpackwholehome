@@ -46,10 +46,9 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'flatpack.dev.canbee.cn',
       },
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-      },
+      ...(process.env.NODE_ENV !== 'production'
+        ? [{ protocol: 'http' as const, hostname: 'localhost' }]
+        : []),
       ...[NEXT_PUBLIC_SERVER_URL].map((item) => {
         try {
           const url = new URL(item)
@@ -136,14 +135,6 @@ const nextConfig: NextConfig = {
         destination: '/media/:path*',
       },
     ]
-  },
-  webpack: (webpackConfig) => {
-    webpackConfig.resolve.extensionAlias = {
-      '.cjs': ['.cts', '.cjs'],
-      '.js': ['.ts', '.tsx', '.js', '.jsx'],
-      '.mjs': ['.mts', '.mjs'],
-    }
-    return webpackConfig
   },
   turbopack: {
     root: path.resolve(dirname),

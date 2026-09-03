@@ -4,8 +4,47 @@ import { getPayload } from 'payload'
 
 export const dynamic = 'force-dynamic'
 
+const RATE_LIMIT = 5
+const WINDOW_MS = 60 * 60 * 1000 // 1 hour
+
+// ponytail: module-level Map keyed by IP, fine for a single-process standalone
+// container. Swap for a shared store (e.g. Redis) if this ever runs multi-replica.
+const hits = new Map<string, number[]>()
+
+function isRateLimited(ip: string): boolean {
+  const cutoff = Date.now() - WINDOW_MS
+
+  // sweep stale entries on every check so the map can't grow unbounded
+  for (const [key, timestamps] of hits) {
+    const recent = timestamps.filter((t) => t > cutoff)
+    if (recent.length === 0) hits.delete(key)
+    else hits.set(key, recent)
+  }
+
+  const timestamps = hits.get(ip) ?? []
+  if (timestamps.length >= RATE_LIMIT) return true
+
+  timestamps.push(Date.now())
+  hits.set(ip, timestamps)
+  return false
+}
+
+function getClientIP(req: Request): string {
+  const forwarded = req.headers.get('x-forwarded-for')
+  if (forwarded) return forwarded.split(',')[0]!.trim()
+  return req.headers.get('x-real-ip') || 'unknown'
+}
+
 export async function POST(req: Request) {
   try {
+    const ip = getClientIP(req)
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 },
+      )
+    }
+
     const body = await req.json()
     const { name, email, address, city, postal, room } = body || {}
 

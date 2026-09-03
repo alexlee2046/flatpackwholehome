@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  PAYLOAD_SECRET: moduliv-build-secret-dummy
+  DATABASE_URL: postgresql://build:build@127.0.0.1:5432/build
+  NEXT_PUBLIC_SITE_URL: http://localhost:3000
+  NEXT_PUBLIC_SERVER_URL: http://localhost:3000
+  PAYLOAD_PUBLIC_SERVER_URL: http://localhost:3000
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.14.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec tsc --noEmit
+      - run: pnpm build

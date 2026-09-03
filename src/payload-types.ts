@@ -1363,6 +1363,7 @@ export interface TradeEnquiry {
   id: number;
   name: string;
   email: string;
+  website?: string | null;
   company?: string | null;
   projectType: string;
   destination: string;
@@ -1385,6 +1386,7 @@ export interface NewsletterSignup {
   consent: boolean;
   source?: string | null;
   locale?: string | null;
+  website?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1398,6 +1400,7 @@ export interface ContactEnquiry {
   email: string;
   subject: string;
   message: string;
+  website?: string | null;
   status: 'new' | 'reviewing' | 'replied' | 'closed';
   updatedAt: string;
   createdAt: string;
@@ -1978,6 +1981,7 @@ export interface DdpQuotesSelect<T extends boolean = true> {
 export interface TradeEnquiriesSelect<T extends boolean = true> {
   name?: T;
   email?: T;
+  website?: T;
   company?: T;
   projectType?: T;
   destination?: T;
@@ -1999,6 +2003,7 @@ export interface NewsletterSignupsSelect<T extends boolean = true> {
   consent?: T;
   source?: T;
   locale?: T;
+  website?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2011,6 +2016,7 @@ export interface ContactEnquiriesSelect<T extends boolean = true> {
   email?: T;
   subject?: T;
   message?: T;
+  website?: T;
   status?: T;
   updatedAt?: T;
   createdAt?: T;

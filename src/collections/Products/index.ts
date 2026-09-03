@@ -59,9 +59,6 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     material: true,
     madeToOrder: true,
     packedVolumeCbm: true,
-    ikeaBenchmarkPrice: true,
-    targetBOMUSD: true,
-    targetBOMRMB: true,
     shippingWeightKg: true,
   },
   hooks: {
@@ -273,6 +270,10 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
             {
               name: 'ikeaBenchmarkPrice',
               type: 'number',
+              access: {
+                read: adminOnlyFieldAccess,
+                update: adminOnlyFieldAccess,
+              },
               admin: {
                 description: 'Retail price of equivalent local IKEA US product in USD (e.g. 799 for KIVIK, 1894 for 1-Bed Kit).',
               },
@@ -280,6 +281,10 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
             {
               name: 'targetBOMUSD',
               type: 'number',
+              access: {
+                read: adminOnlyFieldAccess,
+                update: adminOnlyFieldAccess,
+              },
               admin: {
                 description: 'Target factory procurement / BOM cost in USD.',
               },
@@ -287,6 +292,10 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
             {
               name: 'targetBOMRMB',
               type: 'number',
+              access: {
+                read: adminOnlyFieldAccess,
+                update: adminOnlyFieldAccess,
+              },
               admin: {
                 description: 'Target factory procurement / BOM cost in RMB (CNY).',
               },
@@ -302,6 +311,10 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
               name: 'ddpRatePerKgRMB',
               type: 'number',
               defaultValue: 18,
+              access: {
+                read: adminOnlyFieldAccess,
+                update: adminOnlyFieldAccess,
+              },
               admin: {
                 description: 'DDP ocean freight rate per kg in RMB (default safe threshold: 18 RMB/kg).',
               },
