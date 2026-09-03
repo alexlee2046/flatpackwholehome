@@ -122,7 +122,10 @@ const LOCALIZED_CATALOG: Record<
  * Supports query parameter ?locale= (e.g. /api/catalog?locale=de)
  */
 export async function GET(request: NextRequest) {
-  const baseUrl = SITE_URL.replace(/\/$/, '')
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host')
+  const proto = request.headers.get('x-forwarded-proto') || 'https'
+  const baseUrl = host ? `${proto}://${host}` : SITE_URL.replace(/\/$/, '')
+
   const { searchParams } = new URL(request.url)
   const locale = searchParams.get('locale') || 'en'
   const localizedItems = LOCALIZED_CATALOG[locale] || {}
@@ -196,22 +199,25 @@ export async function GET(request: NextRequest) {
       locale: (locale as any) || 'en',
     })
     if (res?.docs?.length) {
-      products = res.docs.map((doc: any) => ({
-        id: String(doc.id),
-        slug: doc.slug,
-        name: doc.title || doc.name,
-        category: doc.productCollection?.title || 'Modular Furniture',
-        priceUSD: doc.priceInUSD || 699,
-        boxCount: doc.boxCount || 2,
-        assemblyMinutes: doc.assemblyMinutes || 15,
-        joineryType: doc.joineryType || 'Tool-Free Mechanical Snap-Lock',
-        toolsRequired: 'None (0 Screws, 0 Allen Keys)',
-        shippingType: 'DDP Doorstep Express (Duties & Taxes Included)',
-        trialPeriodDays: 100,
-        returnPolicy: 'Donation-Over-Return (Full refund on charity pickup receipt)',
-        url: `${baseUrl}${locale === 'en' ? '' : `/${locale}`}/products/${doc.slug}`,
-        description: doc.subtitle || 'Whole-Home flat-pack living piece engineered for tool-free assembly.',
-      }))
+      const validDocs = res.docs.filter((doc: any) => Boolean(doc.slug))
+      if (validDocs.length > 0) {
+        products = validDocs.map((doc: any) => ({
+          id: String(doc.id),
+          slug: doc.slug,
+          name: doc.title || doc.name,
+          category: doc.productCollection?.title || 'Modular Furniture',
+          priceUSD: doc.priceInUSD || 699,
+          boxCount: doc.boxCount || 2,
+          assemblyMinutes: doc.assemblyMinutes || 15,
+          joineryType: doc.joineryType || 'Tool-Free Mechanical Snap-Lock',
+          toolsRequired: 'None (0 Screws, 0 Allen Keys)',
+          shippingType: 'DDP Doorstep Express (Duties & Taxes Included)',
+          trialPeriodDays: 100,
+          returnPolicy: 'Donation-Over-Return (Full refund on charity pickup receipt)',
+          url: `${baseUrl}${locale === 'en' ? '' : `/${locale}`}/products/${doc.slug}`,
+          description: doc.subtitle || 'Whole-Home flat-pack living piece engineered for tool-free assembly.',
+        }))
+      }
     }
   } catch {
     // Return localized static fallbacks if DB unreachable
