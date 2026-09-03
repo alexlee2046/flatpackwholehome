@@ -235,11 +235,22 @@ function KitBuilderInner({
     }
   })
 
-  let total = currentSpace.price
-  if (!isLiving) {
-    if (bed === 'king') total += 15000
-    if (hasMattress) total += 39900
-  }
+  // Add-ons are separate catalog products so the server can price them. Keeping
+  // them as a surcharge folded into one line item meant the cart showed a total
+  // the checkout had no way to charge.
+  const KING_UPGRADE_PRICE = 15000
+  const MATTRESS_PRICE = 39900
+  const addOns = isLiving
+    ? []
+    : [
+        ...(bed === 'king'
+          ? [{ id: 'king-bed-upgrade', name: tKit('kingUpgradeTitle'), price: KING_UPGRADE_PRICE }]
+          : []),
+        ...(hasMattress
+          ? [{ id: 'mattress', name: tKit('mattressTitle'), price: MATTRESS_PRICE }]
+          : []),
+      ]
+  const total = currentSpace.price + addOns.reduce((sum, a) => sum + a.price, 0)
 
   const handleAddToCart = () => {
     const cart = typeof window !== 'undefined' ? (window as any).modulivCart : null
@@ -253,12 +264,16 @@ function KitBuilderInner({
     if (!isLiving) variantParts.push(bed === 'king' ? `King Bed (${tKit('kingUpgrade')})` : tKit('queen'))
     if (!isLiving && hasMattress) variantParts.push(`${tKit('mattressTitle')} (${tKit('mattressPrice')})`)
 
+    for (const addOn of addOns) {
+      cart.add(1, { id: addOn.id, name: addOn.name, price: addOn.price, qty: 1, variant: '' })
+    }
+
     cart.add(1, {
       id: 'bundle-1bed',
       name: bundleProduct?.title
         ? `${bundleProduct.title} (${currentSpace.cta})`
         : `The Flat Set 1-Bedroom (${currentSpace.cta})`,
-      price: total,
+      price: currentSpace.price,
       qty: 1,
       variant: variantParts.join(' · '),
     })

@@ -8,6 +8,7 @@ import Stripe from 'stripe'
 import { defaultLocale, locales, type AppLocale } from '@/i18n/routing'
 import { readStripeServerConfig } from './stripeConfig'
 import { getShippingDestination, normalizeCheckoutAddress } from './checkoutValidation'
+import { normalizeVoucherCode, voucherDiscountInUSD } from '@/lib/commerce/vouchers'
 import { calculateDDPQuote, MAX_ITEM_QUANTITY, type ODSaiDestinationCode } from './ddp'
 
 const MAX_PAYMENT_AMOUNT_IN_USD = 99_999_999
@@ -215,10 +216,12 @@ export async function priceCart({
   cart,
   countryCode,
   req,
+  voucherCode,
 }: {
   cart: CheckoutCart
   countryCode: ODSaiDestinationCode
   req: PayloadRequest
+  voucherCode?: unknown
 }) {
   const items = canonicalizeItems(cart.items)
   const { packedCbm, subtotalInUSD } = await resolveSellableItems({
@@ -231,9 +234,16 @@ export async function priceCart({
     throw new Error('Your cart price changed. Refresh the cart before paying.')
   }
 
+  const quote = calculateDDPQuote({ countryCode, packedCbm, subtotalInUSD })
+  // The DDP quote itself is what gets recorded against the order, so it stays
+  // untouched; the voucher only reduces what the card is charged.
+  const discountInUSD = voucherDiscountInUSD(voucherCode, quote.landedTotalInUSD)
+
   return {
+    amountToChargeInUSD: quote.landedTotalInUSD - discountInUSD,
+    discountInUSD,
     items,
-    quote: calculateDDPQuote({ countryCode, packedCbm, subtotalInUSD }),
+    quote,
     subtotalInUSD,
   }
 }
@@ -496,6 +506,12 @@ export function stripeDDPAdapter(
       (req.data as Record<string, unknown> | undefined)?.locale,
     )
     const cartID = relationshipID(data.cart.id)
+    // The plugin's endpoint hands the adapter a fixed five-field `data`; anything
+    // else the client sent stays on req.data, which is where `locale` above comes
+    // from too.
+    const voucherCode = normalizeVoucherCode(
+      (req.data as Record<string, unknown> | undefined)?.voucherCode,
+    )
 
     if (!customerEmail || !customerEmail.includes('@')) {
       throw new Error('A valid customer email is required.')
@@ -539,7 +555,12 @@ export function stripeDDPAdapter(
     })) as CheckoutCart
     if (freshCart.purchasedAt) throw new Error('This cart has already been purchased.')
 
-    const { items, quote } = await priceCart({ cart: freshCart, countryCode, req })
+    const { amountToChargeInUSD, discountInUSD, items, quote } = await priceCart({
+      cart: freshCart,
+      countryCode,
+      req,
+      voucherCode,
+    })
 
     if (quote.landedTotalInUSD > MAX_PAYMENT_AMOUNT_IN_USD) {
       throw new Error('This order requires a trade checkout. Please contact ODSai.')
@@ -554,6 +575,7 @@ export function stripeDDPAdapter(
           cartID,
           checkoutLocale,
           customerEmail,
+          amountToChargeInUSD,
           items,
           landedTotalInUSD: quote.landedTotalInUSD,
           shippingAddress,
@@ -562,7 +584,7 @@ export function stripeDDPAdapter(
       .digest('hex')}`
     const paymentIntent = await stripe.paymentIntents.create(
       {
-        amount: quote.landedTotalInUSD,
+        amount: amountToChargeInUSD,
         automatic_payment_methods: { enabled: true },
         currency: 'usd',
         customer: customer.id,
@@ -613,6 +635,8 @@ export function stripeDDPAdapter(
             shippingAmountInUSD: quote.shippingAndImportInUSD,
             shippingZone: quote.zone,
             status: 'pending',
+            voucherCode: discountInUSD > 0 ? voucherCode : null,
+            voucherDiscountInUSD: discountInUSD,
             stripe: {
               customerID: customer.id,
               paymentIntentID: paymentIntent.id,
@@ -812,9 +836,14 @@ export function stripeDDPAdapter(
       }
 
       const shippingAmount = transaction.shippingAmountInUSD
+      // transaction.amount is what the card was charged, i.e. already net of the
+      // voucher. Add the recorded discount back before comparing against cart
+      // subtotals, which never carried it.
+      const recordedDiscount =
+        typeof transaction.voucherDiscountInUSD === 'number' ? transaction.voucherDiscountInUSD : 0
       const snapshotSubtotal =
         typeof transaction.amount === 'number' && typeof shippingAmount === 'number'
-          ? transaction.amount - shippingAmount
+          ? transaction.amount + recordedDiscount - shippingAmount
           : Number.NaN
       if (
         cart.purchasedAt ||
@@ -837,7 +866,7 @@ export function stripeDDPAdapter(
 
         if (
           currentPricing.subtotalInUSD !== snapshotSubtotal ||
-          currentQuote.landedTotalInUSD !== transaction.amount ||
+          currentQuote.landedTotalInUSD - recordedDiscount !== transaction.amount ||
           currentQuote.shippingAndImportInUSD !== transaction.shippingAmountInUSD ||
           currentQuote.freightInUSD !== transaction.freightInUSD ||
           currentQuote.importChargesInUSD !== transaction.importChargesInUSD ||

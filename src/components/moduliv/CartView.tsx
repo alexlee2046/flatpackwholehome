@@ -8,6 +8,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { ODSAI_DESTINATIONS } from '@/lib/commerce/ddp'
+import { isValidVoucherCode, normalizeVoucherCode } from '@/lib/commerce/vouchers'
 import { CheckoutValidationError, normalizeCheckoutAddress } from '@/lib/commerce/checkoutValidation'
 import { localeDetails } from '@/i18n/routing'
 
@@ -25,6 +26,7 @@ const THUMBS: Record<string, string> = {
 // price a $699 sofa at $6.99.
 const CART_ITEMS_KEY = 'moduliv-cart-items-v2'
 const VOUCHER_DISCOUNT_CENTS = 5000
+const VOUCHER_CODE_KEY = 'moduliv-voucher-code'
 
 const PRODUCT_SLUG_ALIASES: Record<string, string> = {
   'bundle-1bed': '1-bedroom-kit',
@@ -79,12 +81,12 @@ function readCartFromStorage(): any[] {
   }
 }
 
-function readVoucherFromStorage(): boolean {
-  if (typeof window === 'undefined') return false
+function readVoucherFromStorage(): string {
+  if (typeof window === 'undefined') return ''
   try {
-    return localStorage.getItem('moduliv-voucher-applied') === '1'
+    return normalizeVoucherCode(localStorage.getItem(VOUCHER_CODE_KEY))
   } catch {
-    return false
+    return ''
   }
 }
 
@@ -96,7 +98,8 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
 
   // Client-first localStorage read avoids an empty-cart flash on first paint.
   const [items, setItems] = useState<any[]>(() => readCartFromStorage())
-  const [voucherApplied, setVoucherApplied] = useState(() => readVoucherFromStorage())
+  const [appliedVoucherCode, setAppliedVoucherCode] = useState(() => readVoucherFromStorage())
+  const voucherApplied = isValidVoucherCode(appliedVoucherCode)
   const [promoCode, setPromoCode] = useState('')
   const [promoMessage, setPromoMessage] = useState<{ text: string; type: 'error' | 'success' } | null>(
     null,
@@ -144,7 +147,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
 
   const loadCart = () => {
     setItems(readCartFromStorage())
-    setVoucherApplied(readVoucherFromStorage())
+    setAppliedVoucherCode(readVoucherFromStorage())
   }
 
   useEffect(() => {
@@ -235,10 +238,10 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
 
   const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault()
-    const trimmed = promoCode.trim().toUpperCase()
-    if (trimmed === 'SWATCH50' || trimmed === 'MODULIV-SWATCH-50' || trimmed === 'FLATSET50') {
-      setVoucherApplied(true)
-      localStorage.setItem('moduliv-voucher-applied', '1')
+    const trimmed = normalizeVoucherCode(promoCode)
+    if (isValidVoucherCode(trimmed)) {
+      setAppliedVoucherCode(trimmed)
+      localStorage.setItem(VOUCHER_CODE_KEY, trimmed)
       setPromoMessage({
         // promoSuccess's message text carries a hardcoded "−$" prefix (messages/ is out of
         // scope here), so this is a plain locale-formatted decimal, not a currency string.
@@ -257,8 +260,8 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
   }
 
   const handleRemoveVoucher = () => {
-    setVoucherApplied(false)
-    localStorage.removeItem('moduliv-voucher-applied')
+    setAppliedVoucherCode('')
+    localStorage.removeItem(VOUCHER_CODE_KEY)
     setPromoMessage(null)
   }
 
@@ -360,6 +363,9 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
           customerEmail: values.email,
           locale,
           shippingAddress: address,
+          // Previewed above, but only honoured if the server recognises it — the
+          // charged amount comes back from the PaymentIntent, not from here.
+          voucherCode: voucherApplied ? appliedVoucherCode : undefined,
         },
       })) as { clientSecret?: string } | undefined
 

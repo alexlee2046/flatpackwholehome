@@ -159,6 +159,11 @@ export async function seedFlatpack(payload: Payload) {
       description: richTextLocale('en', en.products.modusofa.description),
       specifications: en.products.modusofa.specifications,
       boxBreakdown: en.products.modusofa.boxBreakdown,
+      priceInUSDEnabled: true,
+      // ~0.2 cbm per flat box; DDP freight is charged by volume.
+      packedVolumeCbm: 0.4,
+      shippingWeightKg: 34,
+      inventory: 100,
       _status: 'published',
     }, 'en'),
     upsertBySlug('products', 'snapbed', {
@@ -173,6 +178,11 @@ export async function seedFlatpack(payload: Payload) {
       description: richTextLocale('en', en.products.snapbed.description),
       specifications: en.products.snapbed.specifications,
       boxBreakdown: en.products.snapbed.boxBreakdown,
+      priceInUSDEnabled: true,
+      // ~0.2 cbm per flat box; DDP freight is charged by volume.
+      packedVolumeCbm: 0.4,
+      shippingWeightKg: 34,
+      inventory: 100,
       _status: 'published',
     }, 'en'),
     upsertBySlug('products', '1-bedroom-kit', {
@@ -187,6 +197,46 @@ export async function seedFlatpack(payload: Payload) {
       description: richTextLocale('en', en.products['1-bedroom-kit'].description),
       specifications: en.products['1-bedroom-kit'].specifications,
       boxBreakdown: en.products['1-bedroom-kit'].boxBreakdown,
+      priceInUSDEnabled: true,
+      // ~0.2 cbm per flat box; DDP freight is charged by volume.
+      packedVolumeCbm: 1.2,
+      shippingWeightKg: 102,
+      inventory: 100,
+      _status: 'published',
+    }, 'en'),
+  ])
+
+  // Add-ons the KitBuilder can put in a cart. They exist as products because the
+  // checkout prices every line from the catalog — a surcharge that only lives in
+  // the browser is displayed to the shopper but never charged.
+  await Promise.all([
+    upsertBySlug('products', 'king-bed-upgrade', {
+      title: 'King Bed Upgrade',
+      subtitle: 'Upgrades the SnapBed frame from Queen to King.',
+      priceInUSD: 15000,
+      boxCount: 1,
+      assemblyMinutes: 0,
+      material: matOak.id,
+      spaces: [spaceBedroom.id],
+      priceInUSDEnabled: true,
+      // Only the volume a King frame adds over a Queen.
+      packedVolumeCbm: 0.1,
+      shippingWeightKg: 9,
+      inventory: 100,
+      _status: 'published',
+    }, 'en'),
+    upsertBySlug('products', 'mattress', {
+      title: 'Foam Mattress',
+      subtitle: 'Roll-packed foam mattress, sized to the selected bed.',
+      priceInUSD: 39900,
+      boxCount: 1,
+      assemblyMinutes: 0,
+      material: matOak.id,
+      spaces: [spaceBedroom.id],
+      priceInUSDEnabled: true,
+      packedVolumeCbm: 0.35,
+      shippingWeightKg: 24,
+      inventory: 100,
       _status: 'published',
     }, 'en'),
   ])

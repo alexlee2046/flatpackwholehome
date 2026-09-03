@@ -28,6 +28,11 @@ const checkoutLocaleField = () => ({
   required: true,
 })
 
+const voucherFields = () => [
+  { name: 'voucherCode', type: 'text' as const },
+  { name: 'voucherDiscountInUSD', type: 'number' as const },
+]
+
 const ddpFields = () => [
   { name: 'shippingAmountInUSD', type: 'number' as const },
   { name: 'freightInUSD', type: 'number' as const },
@@ -259,6 +264,7 @@ export const plugins: Plugin[] = [
           checkoutLocaleField(),
           transactionShippingAddressField(),
           ...ddpFields(),
+          ...voucherFields(),
         ],
       }),
     },

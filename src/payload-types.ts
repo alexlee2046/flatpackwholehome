@@ -1210,6 +1210,8 @@ export interface Transaction {
   deliveryEstimateMinDays?: number | null;
   deliveryEstimateMaxDays?: number | null;
   ddpPricingVersion?: string | null;
+  voucherCode?: string | null;
+  voucherDiscountInUSD?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2453,6 +2455,8 @@ export interface TransactionsSelect<T extends boolean = true> {
   deliveryEstimateMinDays?: T;
   deliveryEstimateMaxDays?: T;
   ddpPricingVersion?: T;
+  voucherCode?: T;
+  voucherDiscountInUSD?: T;
   updatedAt?: T;
   createdAt?: T;
 }
