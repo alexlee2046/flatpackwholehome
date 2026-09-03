@@ -85,6 +85,7 @@ export interface Config {
     'trade-enquiries': TradeEnquiry;
     'newsletter-signups': NewsletterSignup;
     'contact-enquiries': ContactEnquiry;
+    faqs: Faq;
     forms: Form;
     'form-submissions': FormSubmission;
     addresses: Address;
@@ -127,6 +128,7 @@ export interface Config {
     'trade-enquiries': TradeEnquiriesSelect<false> | TradeEnquiriesSelect<true>;
     'newsletter-signups': NewsletterSignupsSelect<false> | NewsletterSignupsSelect<true>;
     'contact-enquiries': ContactEnquiriesSelect<false> | ContactEnquiriesSelect<true>;
+    faqs: FaqsSelect<false> | FaqsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     addresses: AddressesSelect<false> | AddressesSelect<true>;
@@ -157,6 +159,7 @@ export interface Config {
     'site-settings': SiteSetting;
     announcement: Announcement;
     homepage: Homepage;
+    'how-it-works': HowItWork;
     'ddp-settings': DdpSetting;
   };
   globalsSelect: {
@@ -165,6 +168,7 @@ export interface Config {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     announcement: AnnouncementSelect<false> | AnnouncementSelect<true>;
     homepage: HomepageSelect<false> | HomepageSelect<true>;
+    'how-it-works': HowItWorksSelect<false> | HowItWorksSelect<true>;
     'ddp-settings': DdpSettingsSelect<false> | DdpSettingsSelect<true>;
   };
   locale: 'en' | 'zh-CN' | 'zh-TW' | 'de' | 'ja' | 'ar' | 'ru';
@@ -1380,6 +1384,27 @@ export interface ContactEnquiry {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: number;
+  question: string;
+  answer: string;
+  category?: ('general' | 'assembly' | 'shipping' | 'materials' | 'returns') | null;
+  /**
+   * Lower number appears first
+   */
+  order?: number | null;
+  /**
+   * Show in featured lists or homepage search
+   */
+  isFeatured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
@@ -1470,6 +1495,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'contact-enquiries';
         value: number | ContactEnquiry;
+      } | null)
+    | ({
+        relationTo: 'faqs';
+        value: number | Faq;
       } | null)
     | ({
         relationTo: 'forms';
@@ -1968,6 +1997,20 @@ export interface ContactEnquiriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs_select".
+ */
+export interface FaqsSelect<T extends boolean = true> {
+  question?: T;
+  answer?: T;
+  category?: T;
+  order?: T;
+  isFeatured?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "forms_select".
  */
 export interface FormsSelect<T extends boolean = true> {
@@ -2433,18 +2476,15 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Header {
   id: number;
+  /**
+   * Toggle display of the top announcement banner across all pages
+   */
+  showAnnouncement?: boolean | null;
   navItems?:
     | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?: {
-            relationTo: 'pages';
-            value: number | Page;
-          } | null;
-          url?: string | null;
-          label: string;
-        };
+        label: string;
+        url: string;
+        badge?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -2458,18 +2498,19 @@ export interface Header {
  */
 export interface Footer {
   id: number;
+  brandSlogan?: string | null;
+  copyrightText?: string | null;
   navItems?:
     | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?: {
-            relationTo: 'pages';
-            value: number | Page;
-          } | null;
-          url?: string | null;
-          label: string;
-        };
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  socialLinks?:
+    | {
+        platform: string;
+        url: string;
         id?: string | null;
       }[]
     | null;
@@ -2519,9 +2560,76 @@ export interface Homepage {
     body?: string | null;
     image?: (number | null) | Media;
   };
+  trustPillars?:
+    | {
+        metric: string;
+        label: string;
+        icon?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  comparisonMatrix?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    subtitle?: string | null;
+    rows?:
+      | {
+          label: string;
+          flatSetValue: string;
+          traditionalValue: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  bundlePromo?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    subtitle?: string | null;
+    discountCallout?: string | null;
+    ctaLabel?: string | null;
+  };
+  testimonials?:
+    | {
+        quote: string;
+        author: string;
+        apartmentType?: string | null;
+        location?: string | null;
+        rating?: number | null;
+        id?: string | null;
+      }[]
+    | null;
   featuredProducts?: (number | Product)[] | null;
   featuredCollection?: (number | null) | ProductCollection;
   featuredPosts?: (number | JournalPost)[] | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "how-it-works".
+ */
+export interface HowItWork {
+  id: number;
+  hero?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    subtitle?: string | null;
+  };
+  steps?:
+    | {
+        stepNumber: string;
+        title: string;
+        description: string;
+        badge?: string | null;
+        /**
+         * Key quantifiable metric (e.g. "48 Hrs", "6 Boxes", "15 Min")
+         */
+        metric?: string | null;
+        icon?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -2544,18 +2652,13 @@ export interface DdpSetting {
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
+  showAnnouncement?: T;
   navItems?:
     | T
     | {
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-            };
+        label?: T;
+        url?: T;
+        badge?: T;
         id?: T;
       };
   _status?: T;
@@ -2568,18 +2671,20 @@ export interface HeaderSelect<T extends boolean = true> {
  * via the `definition` "footer_select".
  */
 export interface FooterSelect<T extends boolean = true> {
+  brandSlogan?: T;
+  copyrightText?: T;
   navItems?:
     | T
     | {
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-            };
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  socialLinks?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
         id?: T;
       };
   _status?: T;
@@ -2630,9 +2735,79 @@ export interface HomepageSelect<T extends boolean = true> {
         body?: T;
         image?: T;
       };
+  trustPillars?:
+    | T
+    | {
+        metric?: T;
+        label?: T;
+        icon?: T;
+        id?: T;
+      };
+  comparisonMatrix?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        subtitle?: T;
+        rows?:
+          | T
+          | {
+              label?: T;
+              flatSetValue?: T;
+              traditionalValue?: T;
+              id?: T;
+            };
+      };
+  bundlePromo?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        subtitle?: T;
+        discountCallout?: T;
+        ctaLabel?: T;
+      };
+  testimonials?:
+    | T
+    | {
+        quote?: T;
+        author?: T;
+        apartmentType?: T;
+        location?: T;
+        rating?: T;
+        id?: T;
+      };
   featuredProducts?: T;
   featuredCollection?: T;
   featuredPosts?: T;
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "how-it-works_select".
+ */
+export interface HowItWorksSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        subtitle?: T;
+      };
+  steps?:
+    | T
+    | {
+        stepNumber?: T;
+        title?: T;
+        description?: T;
+        badge?: T;
+        metric?: T;
+        icon?: T;
+        id?: T;
+      };
   _status?: T;
   updatedAt?: T;
   createdAt?: T;

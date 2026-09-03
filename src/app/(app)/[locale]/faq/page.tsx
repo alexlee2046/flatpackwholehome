@@ -1,10 +1,10 @@
 import { BreadcrumbJsonLd, FaqJsonLd } from '@/components/seo/JsonLd'
 import { FaqView } from '@/components/moduliv/FaqView'
-import { FAQ_ITEMS } from '@/data/faq'
-import { ModulivFooter } from '@/components/moduliv/ModulivFooter'
-import { ModulivHeader } from '@/components/moduliv/ModulivHeader'
+import { SiteFooter } from '@/components/moduliv/SiteFooter'
+import { SiteHeader } from '@/components/moduliv/SiteHeader'
 import { getPayloadLocale } from '@/i18n/getPayloadLocale'
 import { buildPageMetadata } from '@/i18n/pageMetadata'
+import { getFaqData } from '@/lib/data/storefront'
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import React from 'react'
@@ -22,18 +22,21 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function FaqPage() {
+  const locale = await getPayloadLocale()
+  const { faqs } = await getFaqData(locale)
+
   return (
     <>
-      <FaqJsonLd items={FAQ_ITEMS} />
+      <FaqJsonLd items={faqs} />
       <BreadcrumbJsonLd
         items={[
           { name: 'Home', url: '/' },
           { name: 'Frequently Asked Questions', url: '/faq' },
         ]}
       />
-      <ModulivHeader />
-      <FaqView />
-      <ModulivFooter />
+      <SiteHeader locale={locale} />
+      <FaqView items={faqs} />
+      <SiteFooter locale={locale} />
     </>
   )
 }

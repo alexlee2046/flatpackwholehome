@@ -1,10 +1,10 @@
 import { BreadcrumbJsonLd, ProductJsonLd } from '@/components/seo/JsonLd'
-import { ModulivFooter } from '@/components/moduliv/ModulivFooter'
-import { ModulivHeader } from '@/components/moduliv/ModulivHeader'
+import { SiteFooter } from '@/components/moduliv/SiteFooter'
+import { SiteHeader } from '@/components/moduliv/SiteHeader'
 import { ProductDetail } from '@/components/moduliv/ProductDetail'
 import { getPayloadLocale } from '@/i18n/getPayloadLocale'
 import { buildPageMetadata } from '@/i18n/pageMetadata'
-import { getProductData } from '@/lib/data/storefront'
+import { getMaterialsData, getProductData } from '@/lib/data/storefront'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import React from 'react'
@@ -42,7 +42,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params
   const locale = await getPayloadLocale()
-  const doc = await getProductData(slug, locale)
+  const [doc, materials] = await Promise.all([
+    getProductData(slug, locale),
+    getMaterialsData(locale),
+  ])
   if (!doc && slug !== 'modusofa') {
     notFound()
   }
@@ -91,9 +94,9 @@ export default async function ProductPage({ params }: Props) {
           { name: productData.title, url: `/products/${slug}` },
         ]}
       />
-      <ModulivHeader />
-      <ProductDetail product={productData} />
-      <ModulivFooter />
+      <SiteHeader locale={locale} />
+      <ProductDetail materials={materials as any} product={productData} />
+      <SiteFooter locale={locale} />
     </>
   )
 }

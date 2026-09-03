@@ -1,20 +1,42 @@
 import { Link } from '@/i18n/navigation'
 import React from 'react'
 
-export function HowItWorksView() {
+type HowItWorksProps = {
+  hero?: {
+    eyebrow?: string | null
+    title?: string | null
+    subtitle?: string | null
+  } | null
+  steps?: Array<{
+    stepNumber: string
+    title: string
+    description: string
+    badge?: string | null
+    metric?: string | null
+    icon?: string | null
+  }> | null
+}
+
+export function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
+  const eyebrow = hero?.eyebrow || 'CRAFTED ON-DEMAND · DELIVERED DIRECT'
+  const title = hero?.title || 'How Precision Engineering Meets Ocean Express.'
+  const subtitle =
+    hero?.subtitle ||
+    'From CNC-cut solid white oak in our zero-waste workshop to your living room in 14–18 days. No showrooms. No middlemen. Just honest craft and seamless DDP doorstep delivery.'
+
   return (
     <main id="main" tabIndex={-1}>
       {/* Page Header */}
       <section className="relative py-24 flex items-center justify-center overflow-hidden bg-surface-container-low border-b border-outline-variant/30">
         <div className="relative z-10 max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop text-center">
           <span className="inline-block font-label-md text-label-md tracking-widest text-primary uppercase mb-4">
-            CRAFTED ON-DEMAND · DELIVERED DIRECT
+            {eyebrow}
           </span>
           <h1 className="font-display-lg text-[40px] md:text-[64px] text-on-surface mb-6 max-w-4xl mx-auto leading-tight">
-            How Precision Engineering Meets Ocean Express.
+            {title}
           </h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
-            From CNC-cut solid white oak in our zero-waste workshop to your living room in 14–18 days. No showrooms. No middlemen. Just honest craft and seamless DDP doorstep delivery.
+            {subtitle}
           </p>
         </div>
       </section>

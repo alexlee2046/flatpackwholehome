@@ -22,6 +22,7 @@ import { Materials } from '@/collections/Materials'
 import { Media } from '@/collections/Media'
 import { NewsletterSignups } from '@/collections/NewsletterSignups'
 import { Pages } from '@/collections/Pages'
+import { FAQs } from '@/collections/FAQs'
 import { ProductCollections } from '@/collections/ProductCollections'
 import { ShippingZones } from '@/collections/ShippingZones'
 import { Spaces } from '@/collections/Spaces'
@@ -32,7 +33,9 @@ import { DDPSettings } from '@/globals/DDPSettings'
 import { Footer } from '@/globals/Footer'
 import { Header } from '@/globals/Header'
 import { Homepage } from '@/globals/Homepage'
+import { HowItWorks } from '@/globals/HowItWorks'
 import { SiteSettings } from '@/globals/SiteSettings'
+import { seedInitialContent } from '@/utilities/seedContent'
 import { plugins } from './plugins'
 
 const filename = fileURLToPath(import.meta.url)
@@ -79,6 +82,7 @@ export default buildConfig({
     TradeEnquiries,
     NewsletterSignups,
     ContactEnquiries,
+    FAQs,
   ],
   cors: [publicServerURL, siteURL],
   csrf: [publicServerURL, siteURL],
@@ -126,7 +130,7 @@ export default buildConfig({
     },
   }),
   endpoints: [],
-  globals: [Header, Footer, SiteSettings, Announcement, Homepage, DDPSettings],
+  globals: [Header, Footer, SiteSettings, Announcement, Homepage, HowItWorks, DDPSettings],
   localization: {
     defaultLocale: 'en',
     defaultLocalePublishOption: 'active',
@@ -185,6 +189,9 @@ export default buildConfig({
         })
         payload.logger.info(`[onInit] Admin user created: ${adminEmail}`)
       }
+
+      // Automatically seed initial CMS content (FAQs, HowItWorks, Homepage blocks, Navigation)
+      await seedInitialContent(payload)
     } catch (err: any) {
       payload.logger.warn(`[onInit] Initialization error: ${err.message}`)
     }

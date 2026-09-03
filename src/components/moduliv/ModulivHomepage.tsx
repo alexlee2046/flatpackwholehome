@@ -14,6 +14,20 @@ type ModulivHomepageProps = {
   bundleTitle?: string
   bundleSubtitle?: string
   bundlePrice?: number
+  trustPillars?: Array<{ metric: string; label: string; icon?: string }>
+  comparisonMatrix?: {
+    eyebrow?: string
+    title?: string
+    subtitle?: string
+    rows?: Array<{ label: string; flatSetValue: string; traditionalValue: string }>
+  }
+  testimonials?: Array<{
+    quote: string
+    author: string
+    apartmentType?: string
+    location?: string
+    rating?: number
+  }>
 }
 
 export function ModulivHomepage({
@@ -25,6 +39,9 @@ export function ModulivHomepage({
   bundleTitle,
   bundleSubtitle,
   bundlePrice,
+  trustPillars,
+  comparisonMatrix,
+  testimonials,
 }: ModulivHomepageProps) {
   const tHome = useTranslations('Pages.Home')
   const tCommon = useTranslations('Common')
@@ -148,30 +165,23 @@ export function ModulivHomepage({
             </div>
           </div>
           <div className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop pb-12 pt-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-            <figure className="flex flex-col gap-3">
-              <blockquote className="font-headline-sm text-[20px] leading-snug text-on-surface">
-                {tHome('quote1Text')}
-              </blockquote>
-              <figcaption className="font-label-md text-label-md uppercase tracking-wider text-surface-tint">
-                {tHome('quote1Author')}
-              </figcaption>
-            </figure>
-            <figure className="flex flex-col gap-3">
-              <blockquote className="font-headline-sm text-[20px] leading-snug text-on-surface">
-                {tHome('quote2Text')}
-              </blockquote>
-              <figcaption className="font-label-md text-label-md uppercase tracking-wider text-surface-tint">
-                {tHome('quote2Author')}
-              </figcaption>
-            </figure>
-            <figure className="flex flex-col gap-3">
-              <blockquote className="font-headline-sm text-[20px] leading-snug text-on-surface">
-                {tHome('quote3Text')}
-              </blockquote>
-              <figcaption className="font-label-md text-label-md uppercase tracking-wider text-surface-tint">
-                {tHome('quote3Author')}
-              </figcaption>
-            </figure>
+            {(testimonials && testimonials.length > 0
+              ? testimonials
+              : [
+                  { quote: tHome('quote1Text'), author: tHome('quote1Author'), location: '', apartmentType: '' },
+                  { quote: tHome('quote2Text'), author: tHome('quote2Author'), location: '', apartmentType: '' },
+                  { quote: tHome('quote3Text'), author: tHome('quote3Author'), location: '', apartmentType: '' },
+                ]
+            ).map((t, idx) => (
+              <figure key={idx} className="flex flex-col gap-3">
+                <blockquote className="font-headline-sm text-[20px] leading-snug text-on-surface">
+                  &ldquo;{t.quote}&rdquo;
+                </blockquote>
+                <figcaption className="font-label-md text-label-md uppercase tracking-wider text-surface-tint">
+                  {t.author} {t.location ? `· ${t.location}` : ''} {t.apartmentType ? `(${t.apartmentType})` : ''}
+                </figcaption>
+              </figure>
+            ))}
           </div>
         </section>
 
@@ -179,13 +189,13 @@ export function ModulivHomepage({
         <section id="comparison" className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
           <div className="max-w-2xl mb-12">
             <span className="font-label-md text-label-md uppercase tracking-wider text-surface-tint block mb-4">
-              {tHome('comparisonEyebrow')}
+              {comparisonMatrix?.eyebrow || tHome('comparisonEyebrow')}
             </span>
             <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">
-              {tHome('comparisonTitle')}
+              {comparisonMatrix?.title || tHome('comparisonTitle')}
             </h2>
             <p className="font-body-lg text-body-lg text-on-surface-variant">
-              {tHome('comparisonSubtitle')}
+              {comparisonMatrix?.subtitle || tHome('comparisonSubtitle')}
             </p>
           </div>
           <div className="overflow-x-auto rounded-xl border border-outline-variant/50 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(26,28,29,0.04)]">
@@ -202,42 +212,37 @@ export function ModulivHomepage({
                 </tr>
               </thead>
               <tbody className="font-body-md text-body-md">
-                <tr className="border-b border-outline-variant/30">
-                  <td className="py-5 px-6 font-label-md text-sm text-on-surface">{tHome('rowAssemblyLabel')}</td>
-                  <td className="py-5 px-6 bg-primary-fixed/10 text-on-surface">
-                    {tHome('rowAssemblyFlatSet')}
-                  </td>
-                  <td className="py-5 px-6 text-on-surface-variant">
-                    {tHome('rowAssemblyTraditional')}
-                  </td>
-                </tr>
-                <tr className="border-b border-outline-variant/30">
-                  <td className="py-5 px-6 font-label-md text-sm text-on-surface">{tHome('rowLeadTimeLabel')}</td>
-                  <td className="py-5 px-6 bg-primary-fixed/10 text-on-surface">
-                    {tHome('rowLeadTimeFlatSet')}
-                  </td>
-                  <td className="py-5 px-6 text-on-surface-variant">
-                    {tHome('rowLeadTimeTraditional')}
-                  </td>
-                </tr>
-                <tr className="border-b border-outline-variant/30">
-                  <td className="py-5 px-6 font-label-md text-sm text-on-surface">{tHome('rowFreshnessLabel')}</td>
-                  <td className="py-5 px-6 bg-primary-fixed/10 text-on-surface">
-                    {tHome('rowFreshnessFlatSet')}
-                  </td>
-                  <td className="py-5 px-6 text-on-surface-variant">
-                    {tHome('rowFreshnessTraditional')}
-                  </td>
-                </tr>
-                <tr className="border-b border-outline-variant/30">
-                  <td className="py-5 px-6 font-label-md text-sm text-on-surface">{tHome('rowPriceLabel')}</td>
-                  <td className="py-5 px-6 bg-primary-fixed/10 text-on-surface">
-                    {tHome('rowPriceFlatSet')}
-                  </td>
-                  <td className="py-5 px-6 text-on-surface-variant">
-                    {tHome('rowPriceTraditional')}
-                  </td>
-                </tr>
+                {(comparisonMatrix?.rows && comparisonMatrix.rows.length > 0
+                  ? comparisonMatrix.rows
+                  : [
+                      {
+                        label: tHome('rowAssemblyLabel'),
+                        flatSetValue: tHome('rowAssemblyFlatSet'),
+                        traditionalValue: tHome('rowAssemblyTraditional'),
+                      },
+                      {
+                        label: tHome('rowLeadTimeLabel'),
+                        flatSetValue: tHome('rowLeadTimeFlatSet'),
+                        traditionalValue: tHome('rowLeadTimeTraditional'),
+                      },
+                      {
+                        label: tHome('rowFreshnessLabel'),
+                        flatSetValue: tHome('rowFreshnessFlatSet'),
+                        traditionalValue: tHome('rowFreshnessTraditional'),
+                      },
+                      {
+                        label: tHome('rowPriceLabel'),
+                        flatSetValue: tHome('rowPriceFlatSet'),
+                        traditionalValue: tHome('rowPriceTraditional'),
+                      },
+                    ]
+                ).map((row, idx) => (
+                  <tr key={idx} className="border-b border-outline-variant/30">
+                    <td className="py-5 px-6 font-label-md text-sm text-on-surface">{row.label}</td>
+                    <td className="py-5 px-6 bg-primary-fixed/10 text-on-surface">{row.flatSetValue}</td>
+                    <td className="py-5 px-6 text-on-surface-variant">{row.traditionalValue}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

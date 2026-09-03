@@ -5,7 +5,11 @@ import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
-export function SwatchView() {
+export function SwatchView({
+  materials,
+}: {
+  materials?: Array<{ id: string | number; title: string; intro?: string }>
+} = {}) {
   const t = useTranslations('Swatch')
   const tCommon = useTranslations('Common')
   const [formData, setFormData] = useState({
@@ -127,6 +131,24 @@ export function SwatchView() {
                 {t('trustItem3')}
               </li>
             </ul>
+
+            {materials && materials.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-outline-variant/30">
+                <span className="font-label-md text-xs uppercase tracking-wider text-on-surface-variant block mb-2">
+                  Curated Materials in Box
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {materials.map((m) => (
+                    <span
+                      key={m.id}
+                      className="px-2.5 py-1 bg-surface-container text-on-surface rounded-full text-xs font-medium"
+                    >
+                      {m.title}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div>

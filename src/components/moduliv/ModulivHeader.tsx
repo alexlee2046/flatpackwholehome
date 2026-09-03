@@ -5,7 +5,19 @@ import { LanguageSwitcher } from './LanguageSwitcher'
 import { useTranslations } from 'next-intl'
 import React, { useState, useEffect } from 'react'
 
-export function ModulivHeader() {
+type HeaderProps = {
+  navItems?: Array<{ label: string; url: string; badge?: string | null }> | null
+  showAnnouncement?: boolean | null
+  announcementMessage?: string | null
+  announcementUrl?: string | null
+}
+
+export function ModulivHeader({
+  navItems,
+  showAnnouncement,
+  announcementMessage,
+  announcementUrl,
+}: HeaderProps = {}) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const tNav = useTranslations('Navigation')
   const tFooter = useTranslations('Footer')
@@ -71,6 +83,20 @@ export function ModulivHeader() {
 
   return (
     <>
+      {showAnnouncement && announcementMessage && (
+        <aside
+          aria-label="Site Announcement"
+          className="bg-primary text-on-primary py-2 px-margin-mobile md:px-margin-desktop text-center text-xs font-label-md tracking-wider flex items-center justify-center gap-2"
+        >
+          <span>{announcementMessage}</span>
+          {announcementUrl && (
+            <Link className="underline font-medium hover:opacity-85 transition-opacity" href={announcementUrl}>
+              Learn more →
+            </Link>
+          )}
+        </aside>
+      )}
+
       <header className="sticky top-0 z-50 w-full bg-surface/90 backdrop-blur-md border-b border-outline-variant/30">
         <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4 w-full px-margin-mobile md:px-margin-desktop py-3">
           {/* Mobile Menu Trigger & Logo */}
@@ -102,36 +128,55 @@ export function ModulivHeader() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex gap-8 items-center ml-auto">
-            <Link
-              className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
-              href="/1-bedroom-kit-builder"
-            >
-              {tNav('kitBuilder')}
-            </Link>
-            <Link
-              className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
-              href="/products/modusofa"
-            >
-              {tNav('modusofa')}
-            </Link>
-            <Link
-              className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
-              href="/how-it-works-craft-logistics"
-            >
-              {tNav('howItWorks')}
-            </Link>
-            <Link
-              className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
-              href="/free-swatch-box-material-discovery"
-            >
-              {tNav('swatchBox')}
-            </Link>
-            <Link
-              className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
-              href="/faq"
-            >
-              {tNav('faq')}
-            </Link>
+            {navItems && navItems.length > 0 ? (
+              navItems.map((item) => (
+                <Link
+                  key={item.url}
+                  className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md relative flex items-center gap-1.5"
+                  href={item.url}
+                >
+                  <span>{item.label}</span>
+                  {item.badge && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-semibold uppercase">
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              ))
+            ) : (
+              <>
+                <Link
+                  className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
+                  href="/1-bedroom-kit-builder"
+                >
+                  {tNav('kitBuilder')}
+                </Link>
+                <Link
+                  className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
+                  href="/products/modusofa"
+                >
+                  {tNav('modusofa')}
+                </Link>
+                <Link
+                  className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
+                  href="/how-it-works-craft-logistics"
+                >
+                  {tNav('howItWorks')}
+                </Link>
+                <Link
+                  className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
+                  href="/free-swatch-box-material-discovery"
+                >
+                  {tNav('swatchBox')}
+                </Link>
+                <Link
+                  className="text-on-surface-variant dark:text-surface-dim hover:text-on-surface dark:hover:text-surface-bright hover:opacity-80 transition-opacity duration-300 font-label-md text-label-md"
+                  href="/faq"
+                >
+                  {tNav('faq')}
+                </Link>
+              </>
+            )}
           </nav>
 
           {/* Icons & Controls */}

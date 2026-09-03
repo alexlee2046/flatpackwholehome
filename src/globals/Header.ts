@@ -1,7 +1,6 @@
-import type { GlobalConfig } from 'payload'
-
 import { adminOnly } from '@/access/adminOnly'
-import { link } from '@/fields/link'
+import { revalidateStorefrontTag } from '@/utilities/revalidate'
+import type { GlobalConfig } from 'payload'
 
 export const Header: GlobalConfig = {
   slug: 'header',
@@ -11,16 +10,44 @@ export const Header: GlobalConfig = {
   },
   fields: [
     {
+      name: 'showAnnouncement',
+      type: 'checkbox',
+      defaultValue: true,
+      admin: {
+        description: 'Toggle display of the top announcement banner across all pages',
+      },
+    },
+    {
       name: 'navItems',
       type: 'array',
       fields: [
-        link({
-          appearances: false,
-        }),
+        {
+          name: 'label',
+          type: 'text',
+          localized: true,
+          required: true,
+        },
+        {
+          name: 'url',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'badge',
+          type: 'text',
+          localized: true,
+        },
       ],
-      maxRows: 6,
+      maxRows: 8,
     },
   ],
+  hooks: {
+    afterChange: [
+      () => {
+        revalidateStorefrontTag('layout')
+      },
+    ],
+  },
   versions: {
     drafts: { autosave: true },
     max: 50,

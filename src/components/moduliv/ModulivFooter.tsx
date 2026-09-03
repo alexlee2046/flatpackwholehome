@@ -4,9 +4,24 @@ import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import React from 'react'
 
-export function ModulivFooter() {
+type FooterProps = {
+  brandSlogan?: string | null
+  copyrightText?: string | null
+  navItems?: Array<{ label: string; url: string }> | null
+  socialLinks?: Array<{ platform: string; url: string }> | null
+}
+
+export function ModulivFooter({
+  brandSlogan,
+  copyrightText,
+  navItems,
+  socialLinks,
+}: FooterProps = {}) {
   const tNav = useTranslations('Navigation')
   const tFooter = useTranslations('Footer')
+
+  const resolvedSlogan = brandSlogan || '6 Boxes · 60 Minutes · 0 Screws · DDP Duties Included'
+  const resolvedCopyright = copyrightText || tFooter('copyright')
 
   const openPolicy = (modalId: string) => {
     if (
@@ -48,44 +63,73 @@ export function ModulivFooter() {
           </span>
         </Link>
         <p className="font-body-md text-body-md text-on-surface-variant dark:text-surface-dim">
-          {tFooter('copyright')}
+          {resolvedCopyright}
         </p>
         <p className="font-label-md text-[12px] tracking-widest uppercase text-outline mt-2">
-          6 Boxes · 60 Minutes · 0 Screws · DDP Duties Included
+          {resolvedSlogan}
         </p>
+        {socialLinks && socialLinks.length > 0 && (
+          <div className="flex gap-4 mt-2">
+            {socialLinks.map((s) => (
+              <a
+                key={s.platform}
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-label-md text-xs text-on-surface-variant hover:text-primary transition-colors underline"
+              >
+                {s.platform}
+              </a>
+            ))}
+          </div>
+        )}
       </div>
 
       <nav className="flex flex-wrap gap-x-8 gap-y-4 items-center font-label-md text-label-md">
-        <Link
-          className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
-          href="/1-bedroom-kit-builder"
-        >
-          {tNav('kitBuilder')}
-        </Link>
-        <Link
-          className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
-          href="/products/modusofa"
-        >
-          {tNav('modusofa')}
-        </Link>
-        <Link
-          className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
-          href="/how-it-works-craft-logistics"
-        >
-          {tNav('howItWorks')}
-        </Link>
-        <Link
-          className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
-          href="/free-swatch-box-material-discovery"
-        >
-          {tNav('swatchBox')}
-        </Link>
-        <Link
-          className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
-          href="/faq"
-        >
-          {tNav('faq')}
-        </Link>
+        {navItems && navItems.length > 0 ? (
+          navItems.map((item) => (
+            <Link
+              key={item.url}
+              className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+              href={item.url}
+            >
+              {item.label}
+            </Link>
+          ))
+        ) : (
+          <>
+            <Link
+              className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+              href="/1-bedroom-kit-builder"
+            >
+              {tNav('kitBuilder')}
+            </Link>
+            <Link
+              className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+              href="/products/modusofa"
+            >
+              {tNav('modusofa')}
+            </Link>
+            <Link
+              className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+              href="/how-it-works-craft-logistics"
+            >
+              {tNav('howItWorks')}
+            </Link>
+            <Link
+              className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+              href="/free-swatch-box-material-discovery"
+            >
+              {tNav('swatchBox')}
+            </Link>
+            <Link
+              className="text-on-surface-variant dark:text-surface-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all duration-200"
+              href="/faq"
+            >
+              {tNav('faq')}
+            </Link>
+          </>
+        )}
         <button
           type="button"
           onClick={() => openPolicy('moduliv-privacy-modal')}

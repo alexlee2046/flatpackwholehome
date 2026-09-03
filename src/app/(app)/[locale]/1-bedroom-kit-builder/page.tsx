@@ -1,7 +1,7 @@
 import { BreadcrumbJsonLd, ProductJsonLd } from '@/components/seo/JsonLd'
 import { KitBuilder } from '@/components/moduliv/KitBuilder'
-import { ModulivFooter } from '@/components/moduliv/ModulivFooter'
-import { ModulivHeader } from '@/components/moduliv/ModulivHeader'
+import { SiteFooter } from '@/components/moduliv/SiteFooter'
+import { SiteHeader } from '@/components/moduliv/SiteHeader'
 import { getPayloadLocale } from '@/i18n/getPayloadLocale'
 import { buildPageMetadata } from '@/i18n/pageMetadata'
 import { getKitBuilderData } from '@/lib/data/storefront'
@@ -13,16 +13,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getPayloadLocale()
   const t = await getTranslations('Pages.KitBuilder')
   let title = t('title')
-  let description = t('subtitle')
-
-  const { bundleProduct } = await getKitBuilderData(locale)
-  if (bundleProduct) {
-    if (bundleProduct.title) title = bundleProduct.title
-    if (bundleProduct.subtitle) description = bundleProduct.subtitle
+  if (title === '1-Bedroom Move-In Kit Builder') {
+    title = '1-Bedroom Flat-Pack Furniture Kit Builder | ModuSofa & SnapBed'
   }
 
   return buildPageMetadata({
-    description,
+    description: t('subtitle'),
     locale,
     pathname: '/1-bedroom-kit-builder',
     title,
@@ -52,7 +48,7 @@ export default async function KitBuilderPage() {
           { name: 'Move-In 1-Bedroom Bundle', url: '/1-bedroom-kit-builder' },
         ]}
       />
-      <ModulivHeader />
+      <SiteHeader locale={locale} />
       <KitBuilder
         bedProduct={bedProduct as any}
         bundleProduct={bundleProduct as any}
@@ -60,7 +56,7 @@ export default async function KitBuilderPage() {
         materials={materials as any}
         spaces={spaces as any}
       />
-      <ModulivFooter />
+      <SiteFooter locale={locale} />
     </>
   )
 }

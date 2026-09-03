@@ -35,6 +35,12 @@ type ProductDetailProps = {
     subtitle?: string | null
     title?: string
   }
+  materials?: Array<{
+    id: string | number
+    title: string
+    hero?: any
+    slug?: string
+  }> | null
 }
 
 const FABRICS = [
@@ -44,12 +50,29 @@ const FABRICS = [
   { id: 'techGrey', img: '/assets/1-bedroom-kit-builder/13266a8714.png', name: 'Tech Grey', tag: 'Cool Touch' },
 ]
 
-export function ProductDetail({ product }: ProductDetailProps) {
+export function ProductDetail({ product, materials }: ProductDetailProps) {
   const router = useRouter()
   const t = useTranslations('PDP')
   const tCommon = useTranslations('Common')
   const isSofa = !product?.slug || product.slug === 'modusofa'
-  const [selectedFabric, setSelectedFabric] = useState(FABRICS[0].name)
+
+  const activeFabrics =
+    materials && materials.length > 0
+      ? materials.map((m, idx) => {
+          let img = FABRICS[idx % FABRICS.length]?.img || '/assets/1-bedroom-kit-builder/42c66f93ee.png'
+          if (m.hero && typeof m.hero === 'object' && m.hero.url) {
+            img = m.hero.url.replace(/^https?:\/\/[^/]+/, '').replace(/^\/api\/media\/file\//, '/media/')
+          }
+          return {
+            id: String(m.id || m.slug || idx),
+            img,
+            name: m.title,
+            tag: 'Curated',
+          }
+        })
+      : FABRICS
+
+  const [selectedFabric, setSelectedFabric] = useState(activeFabrics[0]?.name || 'Caramel Corduroy')
   const [selectedLeg, setSelectedLeg] = useState(isSofa ? 'Natural Oak' : 'Queen')
   const [qty, setQty] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
@@ -231,12 +254,13 @@ export function ProductDetail({ product }: ProductDetailProps) {
               <span className="font-body-md text-sm text-on-surface-variant">{selectedFabric}</span>
             </div>
             <div className="grid grid-cols-4 gap-3">
-              {FABRICS.map((fab) => {
+              {activeFabrics.map((fab) => {
                 const sel = selectedFabric === fab.name
                 const fabLabel = fab.name === 'Caramel Corduroy' ? t('fabrics.corduroy')
                   : fab.name === 'Cream Bouclé' ? t('fabrics.boucle')
                   : fab.name === 'Olive Chenille' ? t('fabrics.chenille')
-                  : t('fabrics.techGrey')
+                  : fab.name === 'Tech Grey' ? t('fabrics.techGrey')
+                  : fab.name
                 return (
                   <button
                     aria-label={t('selectFabric', { name: fab.name })}

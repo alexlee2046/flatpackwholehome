@@ -1,4 +1,5 @@
 import { adminOnly } from '@/access/adminOnly'
+import { revalidateStorefrontTag } from '@/utilities/revalidate'
 import type { GlobalConfig } from 'payload'
 
 export const DDPSettings: GlobalConfig = {
@@ -8,12 +9,13 @@ export const DDPSettings: GlobalConfig = {
     {
       name: 'definition',
       type: 'textarea',
+      localized: true,
       defaultValue:
-        'Delivered Duty Paid means ODSai checkout brings together the furniture, international freight, import duty, and applicable taxes for a supported destination.',
+        'Delivered Duty Paid (DDP) means The Flat Set checkout includes all international freight, customs clearance, import duties, and applicable local taxes. Zero surprise fees upon doorstep delivery.',
       required: true,
     },
     { name: 'quoteExpiryHours', type: 'number', defaultValue: 72 },
-    { name: 'supportEmail', type: 'email' },
+    { name: 'supportEmail', type: 'email', defaultValue: 'concierge@theflatset.com' },
     {
       name: 'fallbackMode',
       type: 'select',
@@ -24,4 +26,11 @@ export const DDPSettings: GlobalConfig = {
       ],
     },
   ],
+  hooks: {
+    afterChange: [
+      () => {
+        revalidateStorefrontTag('ddp-settings')
+      },
+    ],
+  },
 }

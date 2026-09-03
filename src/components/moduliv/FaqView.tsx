@@ -1,14 +1,15 @@
 'use client'
-import { FAQ_ITEMS } from '@/data/faq'
+import { FAQ_ITEMS, type FaqItem } from '@/data/faq'
 import { Link } from '@/i18n/navigation'
 import React, { useState } from 'react'
 
 export { FAQ_ITEMS }
 
-export function FaqView() {
+export function FaqView({ items = FAQ_ITEMS }: { items?: FaqItem[] }) {
   const [search, setSearch] = useState('')
+  const activeItems = items && items.length > 0 ? items : FAQ_ITEMS
 
-  const filtered = FAQ_ITEMS.filter((item) => {
+  const filtered = activeItems.filter((item) => {
     const q = search.toLowerCase()
     return item.q.toLowerCase().includes(q) || item.a.toLowerCase().includes(q)
   })

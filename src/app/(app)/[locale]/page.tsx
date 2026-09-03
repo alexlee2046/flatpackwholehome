@@ -1,5 +1,5 @@
-import { ModulivFooter } from '@/components/moduliv/ModulivFooter'
-import { ModulivHeader } from '@/components/moduliv/ModulivHeader'
+import { SiteFooter } from '@/components/moduliv/SiteFooter'
+import { SiteHeader } from '@/components/moduliv/SiteHeader'
 import { ModulivHomepage } from '@/components/moduliv/ModulivHomepage'
 import { getPayloadLocale } from '@/i18n/getPayloadLocale'
 import { buildPageMetadata } from '@/i18n/pageMetadata'
@@ -26,18 +26,21 @@ export default async function HomePage() {
 
   return (
     <>
-      <ModulivHeader />
+      <SiteHeader locale={locale} />
       <ModulivHomepage
         announcement={announcement?.message || undefined}
         bundlePrice={kitProduct?.priceInUSD || undefined}
         bundleSubtitle={kitProduct?.subtitle || undefined}
         bundleTitle={kitProduct?.title || undefined}
+        comparisonMatrix={(homepage as any)?.comparisonMatrix || undefined}
         heroBody={homepage?.hero?.body || undefined}
         heroEyebrow={homepage?.hero?.eyebrow || undefined}
         heroHeadline={homepage?.hero?.headline || undefined}
         heroImage={(homepage?.hero?.image as any) || undefined}
+        testimonials={(homepage as any)?.testimonials || undefined}
+        trustPillars={(homepage as any)?.trustPillars || undefined}
       />
-      <ModulivFooter />
+      <SiteFooter locale={locale} />
     </>
   )
 }

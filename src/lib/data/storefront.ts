@@ -1,3 +1,4 @@
+import { FAQ_ITEMS, type FaqItem } from '@/data/faq'
 import configPromise from '@payload-config'
 import { unstable_cache } from 'next/cache'
 import { getPayload } from 'payload'
@@ -109,7 +110,7 @@ export const getKitBuilderData = cache(async (locale: string) => {
           payload.find({
             collection: 'materials',
             depth: 1,
-            limit: 10,
+            limit: 20,
             locale: locale as any,
             overrideAccess: true,
           }),
@@ -134,5 +135,144 @@ export const getKitBuilderData = cache(async (locale: string) => {
     },
     ['storefront-kit-builder', locale],
     { revalidate: 300, tags: ['kit-builder', 'products', 'spaces', 'materials'] },
+  )()
+})
+
+/**
+ * Retrieve FAQ dataset from CMS with fallback to default questions.
+ */
+export const getFaqData = cache(async (locale: string) => {
+  return unstable_cache(
+    async () => {
+      try {
+        const payload = await getPayload({ config: configPromise })
+        const res = await payload.find({
+          collection: 'faqs',
+          depth: 0,
+          limit: 100,
+          locale: locale as any,
+          overrideAccess: true,
+          sort: 'order',
+        })
+
+        if (res?.docs?.length) {
+          const items: FaqItem[] = res.docs.map((doc: any) => ({
+            q: doc.question,
+            a: doc.answer,
+          }))
+          return { faqs: items }
+        }
+      } catch {
+        // Fall back gracefully
+      }
+      return { faqs: FAQ_ITEMS }
+    },
+    ['storefront-faqs', locale],
+    { revalidate: 300, tags: ['faqs', `faqs-${locale}`] },
+  )()
+})
+
+/**
+ * Retrieve HowItWorks 6-step dataset from CMS with fallback.
+ */
+export const getHowItWorksData = cache(async (locale: string) => {
+  return unstable_cache(
+    async () => {
+      try {
+        const payload = await getPayload({ config: configPromise })
+        const hiw = await payload.findGlobal({
+          slug: 'how-it-works',
+          depth: 1,
+          locale: locale as any,
+          overrideAccess: true,
+        })
+        if (hiw?.steps && hiw.steps.length > 0) {
+          return {
+            hero: hiw.hero || null,
+            steps: hiw.steps,
+          }
+        }
+      } catch {
+        // Fall back gracefully
+      }
+      return {
+        hero: null,
+        steps: [],
+      }
+    },
+    ['storefront-how-it-works', locale],
+    { revalidate: 300, tags: ['how-it-works', `how-it-works-${locale}`] },
+  )()
+})
+
+/**
+ * Retrieve global site layout configuration (Header, Footer, Announcement)
+ */
+export const getSiteLayoutData = cache(async (locale: string) => {
+  return unstable_cache(
+    async () => {
+      try {
+        const payload = await getPayload({ config: configPromise })
+        const [h, f, a] = await Promise.all([
+          payload.findGlobal({
+            slug: 'header',
+            depth: 1,
+            locale: locale as any,
+            overrideAccess: true,
+          }),
+          payload.findGlobal({
+            slug: 'footer',
+            depth: 1,
+            locale: locale as any,
+            overrideAccess: true,
+          }),
+          payload.findGlobal({
+            slug: 'announcement',
+            depth: 1,
+            locale: locale as any,
+            overrideAccess: true,
+          }),
+        ])
+
+        return {
+          announcement: a || null,
+          footer: f || null,
+          header: h || null,
+        }
+      } catch {
+        return {
+          announcement: null,
+          footer: null,
+          header: null,
+        }
+      }
+    },
+    ['storefront-site-layout', locale],
+    { revalidate: 300, tags: ['layout', 'header', 'footer', 'announcement'] },
+  )()
+})
+
+/**
+ * Retrieve materials (fabrics, woods) from CMS
+ */
+export const getMaterialsData = cache(async (locale: string) => {
+  return unstable_cache(
+    async () => {
+      try {
+        const payload = await getPayload({ config: configPromise })
+        const res = await payload.find({
+          collection: 'materials',
+          depth: 1,
+          limit: 30,
+          locale: locale as any,
+          overrideAccess: true,
+        })
+        return res?.docs || []
+      } catch {
+        return []
+      }
+    },
+    ['storefront-materials', locale],
+    { revalidate: 300, tags: ['materials', `materials-${locale}`] },
   )()
 })
