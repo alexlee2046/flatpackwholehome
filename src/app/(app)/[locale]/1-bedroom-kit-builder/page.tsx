@@ -1,3 +1,4 @@
+import { BreadcrumbJsonLd, ProductJsonLd } from '@/components/seo/JsonLd'
 import { KitBuilder } from '@/components/moduliv/KitBuilder'
 import { ModulivFooter } from '@/components/moduliv/ModulivFooter'
 import { ModulivHeader } from '@/components/moduliv/ModulivHeader'
@@ -35,6 +36,22 @@ export default async function KitBuilderPage() {
 
   return (
     <>
+      <ProductJsonLd
+        currency="USD"
+        description={bundleProduct?.subtitle || 'Move-In 1-Bedroom Bundle. 6 flat boxes, tool-free 60-minute assembly, DDP duties included.'}
+        image="/assets/1-bedroom-kit-builder/b4e5f4d8a0.png"
+        inStock={true}
+        name={bundleProduct?.title || 'Move-In 1-Bedroom Bundle'}
+        price={bundleProduct?.priceInUSD || 1499}
+        sku="TFS-BUNDLE-1BED"
+        url="/1-bedroom-kit-builder"
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Move-In 1-Bedroom Bundle', url: '/1-bedroom-kit-builder' },
+        ]}
+      />
       <ModulivHeader />
       <KitBuilder
         bedProduct={bedProduct as any}

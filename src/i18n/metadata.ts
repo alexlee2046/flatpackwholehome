@@ -2,7 +2,10 @@ import type { Metadata } from 'next'
 
 import { defaultLocale, localeDetails, locales, type AppLocale } from './routing'
 
-const siteURL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+const siteURL =
+  process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
+    ? process.env.NEXT_PUBLIC_SITE_URL
+    : 'https://theflatset.com'
 
 const normalizePathname = (pathname: string) => {
   if (!pathname || pathname === '/') return ''

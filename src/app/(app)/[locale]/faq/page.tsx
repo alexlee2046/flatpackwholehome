@@ -1,4 +1,6 @@
+import { BreadcrumbJsonLd, FaqJsonLd } from '@/components/seo/JsonLd'
 import { FaqView } from '@/components/moduliv/FaqView'
+import { FAQ_ITEMS } from '@/data/faq'
 import { ModulivFooter } from '@/components/moduliv/ModulivFooter'
 import { ModulivHeader } from '@/components/moduliv/ModulivHeader'
 import { getPayloadLocale } from '@/i18n/getPayloadLocale'
@@ -22,6 +24,13 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function FaqPage() {
   return (
     <>
+      <FaqJsonLd items={FAQ_ITEMS} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Frequently Asked Questions', url: '/faq' },
+        ]}
+      />
       <ModulivHeader />
       <FaqView />
       <ModulivFooter />

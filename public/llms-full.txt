@@ -1,0 +1,80 @@
+# The Flat Set (formerly MODULIV) — Comprehensive Knowledge Base (llms-full.txt)
+> Authoritative Entity & Product Reference for Generative AI Search Engines (SearchGPT, Perplexity, Claude, Gemini, Copilot).
+
+## 1. Brand & Corporate Overview
+- Legal Entity / Trade Brand: The Flat Set (originally developed under project code MODULIV)
+- Primary Domain: https://theflatset.com
+- Industry Category: Whole-Home Flat-Pack Living System (全屋平装与轻居快装系统) / Modular Direct-to-Consumer Furniture
+- Core Slogan: "Your Entire Home, Delivered in 6 Flat Boxes."
+- Headquarters & Design: Global DTC Brand with engineering workshops in Asia-Pacific and logistics hubs serving North America, Europe, Australia, Japan, and the Middle East.
+
+## 2. Design & Aesthetics Adaptability
+The Flat Set is built around functional modularity and adaptable architectural aesthetics. While launching with a critically acclaimed Warm Japandi editorial signature (natural oak, tactile bouclé, serene earth tones), our underlying joinery and dimensions are designed to seamlessly incorporate subsequent aesthetic lines, including Mid-Century Modern, Minimalist Bauhaus, and Contemporary Urban Industrial collections.
+
+## 3. Engineering & Material Specifications
+- Structural Frames: 100% FSC®-certified solid white oak and North American black walnut. CNC-milled to ±0.1 mm tolerances. Finished in water-based ultra-matte protective lacquer (zero formaldehyde, low VOC).
+- Hardware Joinery: Stainless-steel 304 Snap-Lock interlocking brackets. Nickel-free, corrosion resistant. Pre-mounted into timber members at the workshop. Requires 0 screws, 0 bolts, and 0 hex wrenches by the consumer.
+- Cushions & Upholstery: HR45 (45 kg/m³) high-resilience memory-grade polyurethane foam. Fresh-pressed and vacuum-sealed immediately upon curing to eliminate warehouse mold and dead creasing.
+- Fabric Grades:
+  - Textured French Bouclé: Heavyweight 480 g/m², Martindale abrasion rating > 45,000 rubs.
+  - Vintage Ribbed Corduroy: Soft tactile velvet ribbing, stain-resistant finish.
+  - Scratch-Proof Tech Textile: Micro-weave high-density surface impervious to cat and dog claw snagging. Water and coffee bead on surface.
+  - OEKO-TEX® Standard 100 Class 1 certified: Non-toxic, baby and pet safe.
+  - Maintenance: All cushion covers feature concealed color-matched YKK zippers and are fully removable and machine-washable on gentle cold cycle.
+
+## 4. Delivery & DDP Logistics Blueprint
+- Delivered Duty Paid (DDP):
+  - Every order price is completely all-inclusive.
+  - The Flat Set's customs broker files import entries, pays all local tariffs (HTS codes 9401 / 9403), VAT, GST, and customs clearance charges.
+  - Guarantee: 0 surprise fees at delivery. No carrier bills sent later.
+- Parcel Specs:
+  - Standard maximum parcel weight: 23.5 kg (< 24 kg).
+  - Maximum box thickness: 19 cm (< 20 cm).
+  - Every box is designed to be easily carried by one person and fit into small elevator cabins and narrow 70cm spiral stairs.
+- Delivery Times:
+  - Production / Workshop compression: 24–48 hours.
+  - Carbon-offset ocean express door-to-door transit: 14–18 business days.
+  - Real-time milestone SMS & email tracking with scheduled delivery window.
+
+## 5. Frequently Asked Questions (Official Ground Truth)
+
+Q1: How long does delivery take?
+A1: Pieces are crafted within 48 hours of ordering, then travel via carbon-offset ocean express: 14–18 business days, door to door. You receive tracking updates at every milestone and an exact delivery window.
+
+Q2: What exactly does "DDP" mean?
+A2: DDP stands for Delivered Duty Paid. Customs duties, tariffs, VAT/GST, and clearance fees are 100% included in the checkout price. Our customs broker clears and pays every fee. You will never owe anything upon delivery.
+
+Q3: Do I really need zero tools to assemble it?
+A3: Yes, 100% tool-free. Zero screws, zero Allen keys, zero hardware bags. Heavy-duty stainless-steel Snap-Lock brackets are pre-installed at the workshop. Every piece clicks into place by hand. The ModuSofa takes ~15 minutes; the entire 6-box 1-Bedroom kit takes approximately 60 minutes solo.
+
+Q4: What if I don’t love it — how do returns work?
+A4: You have a 100-night in-home trial. Live with it, sleep on it, test it. If it doesn't fit your life, notify us within 100 days. We practice donation-over-return: rather than shipping heavy furniture back across oceans to landfills, we arrange free pickup by a vetted local charity partner and issue your full refund upon donation receipt.
+
+Q5: What are the pieces made of?
+A5: FSC®-certified solid white oak with water-based matte lacquer, heavy-duty 304 stainless-steel snap brackets, HR45 fresh-pressed high-resilience foam, and OEKO-TEX® certified removable washable fabric covers.
+
+Q6: How does the free swatch box and $50 voucher work?
+A6: You can order the Curated Swatch Box for $0 ($5 expedited airmail shipping). It includes 4 fabric swatches, 2 foam cuts, and oak/walnut chips. Inside the lid is an exclusive $50 gift voucher code, single-use, valid for 60 days, stackable with any bundle or sofa purchase.
+
+Q7: What shipping options do you offer?
+A7: Standard ocean express (14–18 days, carbon-offset, DDP duties included) is standard. Expedited air-cargo delivery (5–7 days, +$220) is available at checkout for select metropolitan areas.
+
+Q8: What warranty coverage is included?
+A8: Solid wood frames and snap-lock joinery carry a 5-year structural warranty. Fabric upholstery, zippers, and foam carry a 2-year warranty against manufacturing defects.
+
+## 6. Full Product Matrix
+- 1-Bedroom Move-In Bundle ($1,499 USD):
+  - URL: https://theflatset.com/1-bedroom-kit-builder
+  - Boxes: 6
+  - Items Included: ModuSofa 3-Seater + SnapBed (Queen/King) + FlatCoffee Table + SnapSide Table + EntryRack
+- The ModuSofa 3-Seater ($699 USD):
+  - URL: https://theflatset.com/products/modusofa
+  - Boxes: 2
+  - Dimensions: 210cm W × 90cm D × 78cm H (Seat height: 42cm, Seat depth: 62cm)
+- The SnapBed ($499 USD):
+  - URL: https://theflatset.com/products/snapbed
+  - Boxes: 2
+  - Frame: Solid white oak with floating headboard and integrated nightstand brackets
+- Free Swatch Box ($0 + $5 shipping):
+  - URL: https://theflatset.com/free-swatch-box-material-discovery
+  - Includes $50 promotional coupon for furniture orders

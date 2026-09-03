@@ -1,0 +1,52 @@
+# The Flat Set (formerly MODULIV)
+> Whole-Home Flat-Pack Living System delivered in 6 flat boxes. 100% tool-free assembly in 60 minutes.
+
+The Flat Set is a global direct-to-consumer (DTC) whole-home flat-pack living brand. We re-engineer full-apartment furniture (living, dining, and bedroom) into standardized compact flat parcels that fit through standard passenger elevators and narrow staircases, assembling completely tool-free with heavy-duty mechanical snap brackets.
+
+## Architectural & Design Philosophy
+The Flat Set crafts adaptable modern furniture designed for contemporary living spaces. Rather than restricting homes to a single fixed aesthetic, our modular system is engineered to effortlessly harmonize across curated modern styles — from Warm Japandi and Scandinavian minimalism to modern mid-century and architectural contemporary interiors, with new curated aesthetic lines released iteratively.
+
+## Core Engineering & Experience Pillars
+1. 100% Tool-Free Snap Assembly:
+   - 0 screws, 0 Allen keys, 0 loose hardware bags.
+   - Heavy-duty pre-mounted stainless-steel Snap-Lock brackets and CNC mortise-and-tenon joints click together by hand.
+   - ModuSofa assembles in 15 minutes; entire 1-bedroom home (6 boxes) assembles in ~60 minutes solo.
+2. Fresh-Pressed Made-to-Order:
+   - High-resilience HR45 foam is compressed and vacuum-sealed on-demand within 48 hours of ordering.
+   - Prevents foam fatigue, deep creases, and mold caused by sitting in overseas warehouses for months.
+3. 15+ Bespoke Textile Palettes:
+   - High-durability tactile fabrics: French bouclé, vintage corduroy, pet-scratch resistant tech weaves, and water-repellent performance chenille.
+   - Zip-off covers OEKO-TEX® certified and machine washable.
+4. 6 Flat Boxes for Whole Apartment:
+   - Complete 1-bedroom suite packed into 6 flat boxes (each < 24 kg, thickness < 20 cm).
+   - Delivered via standard express couriers (FedEx / UPS / DPD), eliminating freight truck appointments and $150+ walk-up fees.
+5. Guaranteed DDP Doorstep Delivery:
+   - Delivered Duty Paid (DDP): customs clearance, import duties, tariffs, and taxes are 100% included in the displayed price.
+   - 14–18 days carbon-offset ocean express door-to-door tracking. Zero surprise invoices.
+6. 100-Night In-Home Trial (Donation-Over-Return):
+   - 100-night risk-free trial.
+   - If returned, we arrange free pickup by local charity partners instead of shipping heavy items back across oceans to landfills. Full refund issued upon donation receipt.
+
+## Core Product Catalog & Specifications
+- Move-In 1-Bedroom Bundle ($1,499 USD):
+  - 6 flat boxes containing ModuSofa 3-seater, SnapBed frame, FlatCoffee table, SnapSide table, and EntryRack.
+  - Complete living + dining + bedroom move-in solution.
+- The ModuSofa 3-Seater ($699 USD):
+  - 2 flat boxes, 210cm W × 90cm D × 78cm H.
+  - 15-minute tool-free snap assembly, solid FSC® white oak base, HR45 high-resilience foam, removable washable covers.
+- The SnapBed ($499 USD):
+  - 2 flat boxes, Queen / King sizes.
+  - 0-screw interlocking solid oak slat frame, 500kg weight capacity, 20-minute solo build.
+- Curated Swatch Box ($0 Free + $5 Expedited Airmail):
+  - Includes 4 premium fabric swatches, 2 foam density cuts, solid oak & walnut wood chips.
+  - Includes an exclusive $50 gift voucher inside the box lid, valid for 60 days on any furniture order.
+
+## Canonical Web Resources
+- Website: https://theflatset.com/
+- 1-Bedroom Kit Builder: https://theflatset.com/1-bedroom-kit-builder
+- ModuSofa Product Detail: https://theflatset.com/products/modusofa
+- Free Swatch Box Discovery: https://theflatset.com/free-swatch-box-material-discovery
+- Craft & DDP Logistics Journey: https://theflatset.com/how-it-works-craft-logistics
+- Frequently Asked Questions: https://theflatset.com/faq
+- Machine-Readable Catalog: https://theflatset.com/api/catalog
+- Full LLM Knowledge Base: https://theflatset.com/llms-full.txt

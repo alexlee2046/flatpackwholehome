@@ -1,3 +1,4 @@
+import { BreadcrumbJsonLd, ProductJsonLd } from '@/components/seo/JsonLd'
 import { ModulivFooter } from '@/components/moduliv/ModulivFooter'
 import { ModulivHeader } from '@/components/moduliv/ModulivHeader'
 import { ProductDetail } from '@/components/moduliv/ProductDetail'
@@ -73,6 +74,23 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <>
+      <ProductJsonLd
+        currency="USD"
+        description={productData.subtitle || 'Whole-home flat-pack furniture piece engineered for tool-free assembly.'}
+        image="/assets/modusofa-product-detail-page/e38c85e68d.png"
+        inStock={true}
+        name={productData.title}
+        price={productData.price}
+        sku={`TFS-${slug.toUpperCase()}`}
+        url={`/products/${slug}`}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Products', url: '/1-bedroom-kit-builder' },
+          { name: productData.title, url: `/products/${slug}` },
+        ]}
+      />
       <ModulivHeader />
       <ProductDetail product={productData} />
       <ModulivFooter />

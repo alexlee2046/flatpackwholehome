@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 
+import { OrganizationJsonLd, WebSiteJsonLd } from '@/components/seo/JsonLd'
 import { getOpenGraphLocales } from '@/i18n/metadata'
 import { localeDetails, locales, routing, type AppLocale } from '@/i18n/routing'
 import { notFound } from 'next/navigation'
@@ -70,6 +71,8 @@ export default async function RootLayout({ children, params }: LayoutProps) {
       suppressHydrationWarning
     >
       <head>
+        <OrganizationJsonLd />
+        <WebSiteJsonLd />
         <link rel="preload" href="/vendor/fonts/f305d441dc1.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/vendor/fonts/f49e0be9626.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/vendor/tailwind.js" as="script" />

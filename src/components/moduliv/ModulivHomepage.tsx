@@ -71,7 +71,7 @@ export function ModulivHomepage({
 
       <main id="main" tabIndex={-1}>
         {/* Hero Section */}
-        <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-24 flex flex-col-reverse md:flex-row gap-gutter md:gap-16 items-center">
+        <section id="overview" className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-24 flex flex-col-reverse md:flex-row gap-gutter md:gap-16 items-center">
           <div className="flex-1 space-y-6 max-w-xl reveal">
             <p className="font-label-md text-label-md uppercase tracking-wider text-surface-tint">
               {resolvedEyebrow}
@@ -176,7 +176,7 @@ export function ModulivHomepage({
         </section>
 
         {/* Flat vs Traditional Comparison */}
-        <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
+        <section id="comparison" className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
           <div className="max-w-2xl mb-12">
             <span className="font-label-md text-label-md uppercase tracking-wider text-surface-tint block mb-4">
               {tHome('comparisonEyebrow')}
@@ -193,10 +193,10 @@ export function ModulivHomepage({
               <thead>
                 <tr className="border-b border-outline-variant/50">
                   <th className="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant py-5 px-6 w-[22%]"></th>
-                  <th className="font-label-md text-label-md uppercase tracking-wider text-primary py-5 px-6 bg-primary-fixed/20">
+                  <th className="font-headline-sm text-lg text-primary py-5 px-6 bg-primary-fixed/20 rounded-t-lg border-b-2 border-primary w-[39%]">
                     {tHome('comparisonColFlatSet')}
                   </th>
-                  <th className="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant py-5 px-6">
+                  <th className="font-headline-sm text-lg text-on-surface-variant py-5 px-6 w-[39%]">
                     {tHome('comparisonColTraditional')}
                   </th>
                 </tr>
@@ -244,7 +244,7 @@ export function ModulivHomepage({
         </section>
 
         {/* 1-Bedroom Bundle Promotion CTA */}
-        <section className="bg-surface-container-low py-section-gap">
+        <section id="bundles" className="bg-surface-container-low py-section-gap">
           <div className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop flex flex-col lg:flex-row items-center justify-between gap-12">
             <div className="max-w-xl">
               <span className="font-label-md text-label-md uppercase tracking-wider text-surface-tint block mb-2">
