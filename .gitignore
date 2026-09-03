@@ -28,3 +28,6 @@ pnpm-debug.log*
 # OS files
 .DS_Store
 Thumbs.db
+
+# Payload media uploads are runtime data, written by the CMS and the seed script.
+/public/media/
