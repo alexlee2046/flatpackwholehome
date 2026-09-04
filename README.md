@@ -36,13 +36,14 @@
 ## 4. 目录与文档导航 (Documentation Navigation)
 
 * 📄 [README.md](README.md) — 本项目总览索引
+* 🏗️ [软件架构](docs/architecture/README.md) — 当前运行边界、模块所有权与关键数据流
 * 📋 **战略规划与品牌审查**：
   * [PLAN-001 对外品牌名与主域名规划](.plans/PLAN-001-brand-and-domain.md) — 域名排查、商标防撞、The Flat Set 战略确立
   * [PLAN-002 全站 UI/UX 深度治理计划](.plans/PLAN-002-full-site-review-and-dead-link-elimination.md) — 全站链路闭环、消除死链与死内容
   * [PLAN-003 Payload CMS 后端接入与多语言支持](.plans/PLAN-003-payload-cms-backend-and-i18n-integration.md) — ODSai 架构复用、PostgreSQL 数据库驱动与 7 种语言国际化
   * [PLAN-004 Coolify CLI 与 Supabase 生产部署](.plans/PLAN-004-coolify-and-supactl-deployment.md) — Docker 容器化、健康探针、双语数据播种与生产发布
   * [PLAN-005 The Flat Set 视觉识别 (VI) 与品牌手册](.plans/PLAN-005-the-flat-set-vi.md) — 六板印、Wordmark、色卡与包装印刷标准
-* 📚 **系统架构文档库**：
+* 📚 **品牌、商业与设计文档**：
   * [docs/01 全屋平装战略定位与全景商业模型](docs/01-brand-strategy-and-positioning.md) — 5 大平装产品线与自锁五金架构
   * [docs/02 独立站全站英文文案与标语主指南](docs/02-brand-copywriting-master-guide.md) — 品牌宣言、PDP 转化文案与邮件营销 (EDM)
   * [docs/03 DDP 门到门竞品对标与零退货风控](docs/03-ddp-direct-ship-and-competitor-matrix.md) — 全球竞品矩阵与“以捐代退”风控

@@ -2,7 +2,7 @@
 
 @AGENTS.md
 
-Next.js 16 App Router + Payload CMS 3 (Postgres) + `next-intl` + Stripe via `@payloadcms/plugin-ecommerce`. One app hosts storefront and `/admin`. Package manager `pnpm`, Node >= 20.9. Dev and build need `DATABASE_URL` + `PAYLOAD_SECRET` (`cp .env.example .env`).
+Next.js 16 App Router + Payload CMS 3 (Postgres) + `next-intl` + Stripe via `@payloadcms/plugin-ecommerce`. One app hosts storefront and `/admin`. Package manager `pnpm`, Node >= 20.9. `cp .env.example .env` to configure; `DATABASE_URL` and `PAYLOAD_SECRET` have dev fallbacks, and only `NODE_ENV=production` without `PAYLOAD_SECRET` fails to boot.
 
 ## Commands
 
@@ -28,7 +28,7 @@ CI runs exactly `tsc --noEmit`, `eslint --max-warnings=-1`, `pnpm build`. Existi
 - Checkout is fail-closed: enabled only when `CHECKOUT_ENABLED=true` and all three Stripe env values are present and in the same mode. The accepted-countries list must stay identical across `ddp.ts`, the quote endpoint, the cart selector, and the Payload addresses config.
 - Canonical host is always `https://theflatset.com`; `canonicalUrl.ts` deliberately ignores `localhost`/`canbee.cn` in `NEXT_PUBLIC_SITE_URL`. `robots.ts` / `sitemap.ts` / `llms.txt` are route handlers, not static files.
 - `pnpm build` must succeed without a reachable database (Dockerfile builds with dummy env). Never add build-time code that queries Postgres. Production: `https://flatpack.dev.canbee.cn` behind `theflatset.com`; `redirects.ts` maps legacy Stitch `*.html` URLs, keep it in sync when renaming a top-level page.
-- `payload.config.ts` `onInit` self-provisions on boot (admin user, seed content, full catalogue seed only when `products` is empty). `PAYLOAD_RUN_MIGRATIONS=true` is only safe on an empty database.
+- `payload.config.ts` `onInit` self-provisions on boot: verifies an existing admin, creates one only when `INITIAL_ADMIN_PASSWORD` is set (otherwise just logs an error), seeds content, and runs the full catalogue seed only when `products` is empty. Errors inside `onInit` are logged as warnings, never thrown. `PAYLOAD_RUN_MIGRATIONS=true` is only safe on an empty database.
 - On Supabase, `DATABASE_URL` must use the session-mode pooler or direct 5432. The transaction pooler (6543) breaks Payload's prepared statements and shows up as intermittent 500s (see `.env.example`).
 
 ## Reference docs
