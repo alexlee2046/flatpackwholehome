@@ -2,11 +2,18 @@
 
 import { Link, usePathname, useRouter } from '@/i18n/navigation'
 import { localeDetails } from '@/i18n/routing'
+import { AnimatedImageSwap } from '@/components/motion/AnimatedImageSwap'
+import { resolveStorefrontMedia } from '@/utilities/storefrontMedia'
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
 import Image from 'next/image'
 import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
+import { ArrowLeft, ArrowRight, CircleCheck, Gift, Info, Moon, ShoppingCart, Truck, Wrench } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
-import React, { Suspense, useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useRef, useState } from 'react'
+
+gsap.registerPlugin(useGSAP)
 
 type SpaceKey = 'full' | 'living' | 'bedroom'
 
@@ -45,6 +52,22 @@ const SPACES: Record<
     img: '/assets/1-bedroom-kit-builder/188581c175.png',
     price: 69900,
   },
+}
+
+const SEEDED_SPACE_IMAGES = new Set(Object.values(SPACES).map((space) => space.img))
+
+function resolveSpaceImage(space: SpaceKey, hero: KitBuilderSpaceData['hero']): string {
+  const cmsImage = resolveStorefrontMedia(
+    (typeof hero === 'object' && hero?.url) || (typeof hero === 'string' && hero),
+  )
+
+  // Preserve custom CMS media, but repair stale databases where the known seeded
+  // room renders were linked to the wrong space record.
+  if (!cmsImage || (SEEDED_SPACE_IMAGES.has(cmsImage) && cmsImage !== SPACES[space].img)) {
+    return SPACES[space].img
+  }
+
+  return cmsImage
 }
 
 const BOX_LIST = [
@@ -138,18 +161,13 @@ function KitBuilderInner({
   const [hasMattress, setHasMattress] = useState(searchParams.get('mattress') === '1')
   const [isAdded, setIsAdded] = useState(false)
   const [cartError, setCartError] = useState(false)
+  const [showMobilePurchaseBar, setShowMobilePurchaseBar] = useState(false)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const previousSpace = useRef<SpaceKey>(space)
 
   const spaceWholeHome = spaces?.find((s) => s.slug === 'whole-home')
   const spaceLivingDoc = spaces?.find((s) => s.slug === 'living-room')
   const spaceBedroomDoc = spaces?.find((s) => s.slug === 'bedroom')
-
-  const normalizeUrl = (url?: unknown) => {
-    if (!url || typeof url !== 'string') return null
-    return url
-      .replace(/^https?:\/\/[^/]+/, '')
-      .replace(/^\/api\/media\/file\//, '/media/')
-      .replace(/-\d+(\.[a-zA-Z0-9]+)$/, '$1')
-  }
 
   const dynamicSpaces: Record<
     SpaceKey,
@@ -167,11 +185,7 @@ function KitBuilderInner({
       boxes: ['b5', 'b6'],
       caption: spaceBedroomDoc?.intro || SPACES.bedroom.caption,
       cta: spaceBedroomDoc?.title || tKit('bedroom'),
-      img:
-        normalizeUrl(
-          (typeof spaceBedroomDoc?.hero === 'object' && spaceBedroomDoc?.hero?.url) ||
-          (typeof spaceBedroomDoc?.hero === 'string' && spaceBedroomDoc.hero)
-        ) || SPACES.bedroom.img,
+      img: resolveSpaceImage('bedroom', spaceBedroomDoc?.hero),
       price: bedProduct?.priceInUSD || SPACES.bedroom.price,
     },
     full: {
@@ -179,11 +193,7 @@ function KitBuilderInner({
       boxes: ['b1', 'b2', 'b3', 'b4', 'b5', 'b6'],
       caption: spaceWholeHome?.intro || SPACES.full.caption,
       cta: spaceWholeHome?.title || tKit('fullHome'),
-      img:
-        normalizeUrl(
-          (typeof spaceWholeHome?.hero === 'object' && spaceWholeHome?.hero?.url) ||
-          (typeof spaceWholeHome?.hero === 'string' && spaceWholeHome.hero)
-        ) || SPACES.full.img,
+      img: resolveSpaceImage('full', spaceWholeHome?.hero),
       price: bundleProduct?.priceInUSD || SPACES.full.price,
     },
     living: {
@@ -191,11 +201,7 @@ function KitBuilderInner({
       boxes: ['b1', 'b2'],
       caption: spaceLivingDoc?.intro || SPACES.living.caption,
       cta: spaceLivingDoc?.title || tKit('living'),
-      img:
-        normalizeUrl(
-          (typeof spaceLivingDoc?.hero === 'object' && spaceLivingDoc?.hero?.url) ||
-          (typeof spaceLivingDoc?.hero === 'string' && spaceLivingDoc.hero)
-        ) || SPACES.living.img,
+      img: resolveSpaceImage('living', spaceLivingDoc?.hero),
       price: livingProduct?.priceInUSD || SPACES.living.price,
     },
   }
@@ -220,6 +226,23 @@ function KitBuilderInner({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [space, bed, fabric, wood, hasMattress, isLiving])
+
+  useEffect(() => {
+    const customizer = rootRef.current?.querySelector('[data-kit-customizer]')
+    if (!customizer || !window.matchMedia('(max-width: 767px)').matches) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setShowMobilePurchaseBar(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '0px 0px -20% 0px', threshold: 0.05 },
+    )
+    observer.observe(customizer)
+    return () => observer.disconnect()
+  }, [])
 
   const boxBreakdownMap = new Map(
     (bundleProduct?.boxBreakdown || []).map((b) => [b.boxId, b]),
@@ -249,6 +272,60 @@ function KitBuilderInner({
           : []),
       ]
   const total = currentSpace.price + addOns.reduce((sum, a) => sum + a.price, 0)
+
+  useGSAP(
+    () => {
+      if (previousSpace.current === space) return
+      previousSpace.current = space
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const includedBoxes = gsap.utils.toArray<HTMLElement>('[data-box-included="true"]')
+      const totalEl = rootRef.current?.querySelector<HTMLElement>('[data-kit-total]')
+      const targets = [...includedBoxes, ...(totalEl ? [totalEl] : [])]
+      gsap.killTweensOf(targets)
+      gsap.fromTo(
+        includedBoxes,
+        { autoAlpha: 0.55, scale: reduceMotion ? 1 : 0.96 },
+        {
+          autoAlpha: 1,
+          scale: 1,
+          duration: reduceMotion ? 0.12 : 0.32,
+          ease: 'power3.out',
+          stagger: { amount: reduceMotion ? 0.02 : 0.12 },
+          overwrite: 'auto',
+          willChange: 'transform,opacity',
+          clearProps: 'transform,opacity,visibility,willChange',
+        },
+      )
+      if (totalEl) {
+        gsap.fromTo(
+          totalEl,
+          { autoAlpha: 0.62, y: reduceMotion ? 0 : 6 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: reduceMotion ? 0.12 : 0.3,
+            ease: 'power3.out',
+            overwrite: 'auto',
+            willChange: 'transform,opacity',
+            clearProps: 'transform,opacity,visibility,willChange',
+          },
+        )
+      }
+    },
+    { dependencies: [space], scope: rootRef },
+  )
+
+  useGSAP(
+    () => {
+      if (!isAdded) return
+      const button = rootRef.current?.querySelector<HTMLElement>('[data-kit-add]')
+      if (!button) return
+      gsap.timeline({ defaults: { overwrite: 'auto' } })
+        .to(button, { scale: 0.975, duration: 0.07, ease: 'power1.out', willChange: 'transform' })
+        .to(button, { scale: 1, duration: 0.1, ease: 'power3.out', clearProps: 'transform,willChange' })
+    },
+    { dependencies: [isAdded], scope: rootRef },
+  )
 
   const handleAddToCart = () => {
     const cart = typeof window !== 'undefined' ? (window as any).modulivCart : null
@@ -284,7 +361,7 @@ function KitBuilderInner({
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full" ref={rootRef}>
       <main
         className="w-full max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop pt-8 pb-section-gap"
         id="main"
@@ -295,7 +372,7 @@ function KitBuilderInner({
           <Link className="hover:text-primary transition-colors" href="/">
             {tCommon('home')}
           </Link>
-          <span aria-hidden="true" className="material-symbols-outlined text-[16px]">{isRtl ? 'chevron_left' : 'chevron_right'}</span>
+          {isRtl ? <ArrowLeft aria-hidden="true" size={16} /> : <ArrowRight aria-hidden="true" size={16} />}
           <span className="text-on-surface font-medium">{tKit('title')}</span>
         </nav>
 
@@ -316,13 +393,12 @@ function KitBuilderInner({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter relative items-start">
           {/* Left Column: Interactive Render */}
           <div className="lg:col-span-7 lg:sticky top-32 flex flex-col gap-6 w-full z-10">
-            <div className="w-full aspect-[4/3] md:aspect-video bg-surface-container-low rounded-xl overflow-hidden relative group shadow-sm transition-all duration-500">
-              <Image
+            <div className="w-full aspect-[4/3] md:aspect-video bg-surface-container-low rounded-xl overflow-hidden relative group shadow-sm transition-shadow duration-500">
+              <AnimatedImageSwap
                 alt={currentSpace.alt}
-                className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
-                id="kit-hero-render"
+                className="absolute inset-0"
+                imageClassName="object-cover"
                 src={currentSpace.img}
-                fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 55vw"
               />
@@ -367,6 +443,7 @@ function KitBuilderInner({
                   const included = currentSpace.boxes.includes(b.id)
                   return (
                     <div
+                      data-box-included={included}
                       className={`min-w-[120px] max-w-[120px] flex flex-col gap-2 group transition-opacity ${
                         included ? 'opacity-100' : 'opacity-30'
                       }`}
@@ -400,7 +477,7 @@ function KitBuilderInner({
           </div>
 
           {/* Right Column: Customizer Steps */}
-          <div className="lg:col-span-5 flex flex-col gap-12 pt-8 lg:pt-0">
+          <div className="lg:col-span-5 flex flex-col gap-12 pt-8 lg:pt-0" data-kit-customizer="">
             {/* Step 1: Fabric */}
             <section className="border-b border-outline-variant pb-10">
               <div className="flex justify-between items-end mb-6">
@@ -479,9 +556,7 @@ function KitBuilderInner({
                       <div className="flex justify-between items-center px-1">
                         <span className="font-body-md text-[15px]">{item.label}</span>
                         {sel && (
-                          <span aria-hidden="true" className="material-symbols-outlined text-primary text-[20px]">
-                            check_circle
-                          </span>
+                          <CircleCheck aria-hidden="true" className="text-primary" size={20} />
                         )}
                       </div>
                     </button>
@@ -570,7 +645,7 @@ function KitBuilderInner({
 
                 <div className="flex items-start gap-4 p-5 rounded-xl border border-outline-variant bg-surface-container-low">
                   <div className="flex items-center h-6 pt-1">
-                    <span aria-hidden="true" className="material-symbols-outlined text-primary text-[24px]">redeem</span>
+                    <Gift aria-hidden="true" className="text-primary" size={24} />
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-center mb-1">
@@ -595,15 +670,15 @@ function KitBuilderInner({
             {/* Mini Trust Strip */}
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2 pb-4 text-on-surface-variant">
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
-                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-primary">handyman</span>
+                <Wrench aria-hidden="true" className="text-primary" size={16} />
                 {tKit('zeroScrews')}
               </span>
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
-                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-primary">nights_stay</span>
+                <Moon aria-hidden="true" className="text-primary" size={16} />
                 {tKit('trial')}
               </span>
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
-                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-primary">local_shipping</span>
+                <Truck aria-hidden="true" className="text-primary" size={16} />
                 {tKit('dutiesIncluded')}
               </span>
             </div>
@@ -612,11 +687,11 @@ function KitBuilderInner({
       </main>
 
       {/* Sticky Bottom Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-md border-t border-outline-variant shadow-[0_-4px_20px_rgba(26,28,29,0.04)] z-50 pb-[env(safe-area-inset-bottom)]">
-        <div className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div aria-live="polite" className="flex flex-col items-center md:items-start w-full md:w-auto">
+      <div className={`${showMobilePurchaseBar ? 'block' : 'hidden'} md:block fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-md border-t border-outline-variant shadow-[0_-4px_20px_rgba(26,28,29,0.04)] z-50 pb-[env(safe-area-inset-bottom)]`}>
+        <div className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-3 md:py-4 flex flex-row justify-between items-center gap-3 md:gap-4">
+          <div aria-live="polite" className="flex flex-col items-start min-w-0 md:w-auto">
             <div className="flex items-end gap-3">
-              <span className="font-headline-md text-3xl text-on-surface" dir="ltr" id="kit-total">
+              <span data-kit-total="" className="font-headline-md text-xl md:text-3xl text-on-surface whitespace-nowrap" dir="ltr" id="kit-total">
                 {formatCurrency(total, { locale })}
               </span>
               {space === 'full' && (
@@ -626,19 +701,19 @@ function KitBuilderInner({
                   </span>
                   <Link
                     href="/us-vs-ikea"
-                    className="font-label-md text-xs text-primary bg-primary/10 hover:bg-primary/20 px-2.5 py-0.5 rounded-full mb-1.5 ms-2 transition-colors inline-flex items-center gap-1"
+                    className="hidden md:inline-flex font-label-md text-xs text-primary bg-primary/10 hover:bg-primary/20 px-2.5 py-0.5 rounded-full mb-1.5 ms-2 transition-colors items-center gap-1"
                     title="Compare item-by-item with local US IKEA"
                   >
                     <span>
                       {tKit('saveBadge')} <span dir="ltr">vs IKEA (-20.8%)</span>
                     </span>
-                    <span aria-hidden="true" className="material-symbols-outlined text-[13px]">info</span>
+                    <Info aria-hidden="true" size={13} />
                   </Link>
                 </>
               )}
             </div>
-            <div className="flex items-center gap-1.5 mt-1 text-on-surface-variant">
-              <span aria-hidden="true" className="material-symbols-outlined text-[16px]">local_shipping</span>
+            <div className="hidden md:flex items-center gap-1.5 mt-1 text-on-surface-variant">
+              <Truck aria-hidden="true" size={16} />
               <span className="font-body-md text-[13px]">
                 {tKit('deliveryNotice', { count: currentSpace.boxes.length })}
               </span>
@@ -649,15 +724,16 @@ function KitBuilderInner({
               </p>
             )}
           </div>
-          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <div className="flex flex-row gap-3 flex-1 justify-end md:w-auto">
             <Link
-              className="px-6 py-4 rounded-full border border-on-surface text-on-surface font-label-md text-sm uppercase tracking-wider hover:bg-on-background hover:text-on-primary transition-colors text-center"
+              className="hidden md:block px-6 py-4 rounded-full border border-on-surface text-on-surface font-label-md text-sm uppercase tracking-wider hover:bg-on-background hover:text-on-primary transition-colors text-center"
               href="/free-swatch-box-material-discovery"
             >
               {tKit('orderSwatchesFirst')}
             </Link>
             <button
-              className="px-8 py-4 rounded-full bg-on-surface text-on-primary font-label-md text-sm uppercase tracking-wider hover:bg-primary transition-colors flex justify-center items-center gap-2 cursor-pointer disabled:opacity-75"
+              data-kit-add=""
+              className="px-4 md:px-8 py-3 md:py-4 rounded-full bg-on-surface text-on-primary font-label-md text-xs md:text-sm uppercase tracking-wider hover:bg-primary transition-colors flex justify-center items-center gap-2 cursor-pointer disabled:opacity-75 min-w-0"
               disabled={isAdded}
               id="kit-add"
               onClick={handleAddToCart}
@@ -668,9 +744,11 @@ function KitBuilderInner({
                   ? tKit('addedOpeningCart')
                   : tKit('addToCartButton', { space: currentSpace.cta, count: currentSpace.boxes.length })}
               </span>
-              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
-                {isRtl ? 'arrow_back' : 'arrow_forward'}
-              </span>
+              {isAdded
+                ? <CircleCheck aria-hidden="true" size={18} />
+                : isRtl
+                  ? <ArrowLeft aria-hidden="true" size={18} />
+                  : <ShoppingCart aria-hidden="true" size={18} />}
             </button>
           </div>
         </div>

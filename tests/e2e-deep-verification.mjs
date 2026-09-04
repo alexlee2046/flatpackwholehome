@@ -85,9 +85,10 @@ async function runDeepE2E() {
     // 3. Kit Builder 6-Box Verification
     console.log('\n3. Testing Kit Builder 6-Box Cards...');
     await page.goto(`${BASE_URL}/en/1-bedroom-kit-builder`, { waitUntil: 'networkidle' });
-    const boxCards = page.locator('div[class*="border"] h4');
+    const boxCards = page.locator('[data-box-included]');
     const boxCount = await boxCards.count();
-    console.log(`   Found box headings count: ${boxCount}`);
+    console.log(`   Found box card count: ${boxCount}`);
+    if (boxCount !== 6) failures++;
 
     // 4. Free Swatch Box Form Submission (Live Lead API)
     console.log('\n4. Testing Free Swatch Box Lead Submission Form...');
@@ -154,6 +155,7 @@ async function runDeepE2E() {
       console.log(' DEEP E2E VERIFICATION PASSED: ALL SCENARIOS 100% HEALTHY!');
     } else {
       console.error(` DEEP E2E COMPLETED WITH ${failures} WARNINGS/FAILURES`);
+      process.exitCode = 1;
     }
     console.log('==============================================\n');
   } catch (err) {

@@ -2,6 +2,7 @@ import { Link } from '@/i18n/navigation'
 import { localeDetails, type AppLocale } from '@/i18n/routing'
 import { getLocale, getTranslations } from 'next-intl/server'
 import React from 'react'
+import { StorefrontIcon } from './StorefrontIcon'
 
 type HowItWorksProps = {
   hero?: {
@@ -105,11 +106,11 @@ export async function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
               </p>
               <div className="flex gap-4">
                 <div className="flex items-center gap-2">
-                  <span aria-hidden="true" className="material-symbols-outlined text-primary">check_circle</span>
+                  <StorefrontIcon className="text-primary" name="check_circle" />
                   <span className="font-label-md text-xs uppercase tracking-wider">{t('badgeDutiesCovered')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span aria-hidden="true" className="material-symbols-outlined text-primary">elevator</span>
+                  <StorefrontIcon className="text-primary" name="elevator" />
                   <span className="font-label-md text-xs uppercase tracking-wider">{t('badgeElevatorReady')}</span>
                 </div>
               </div>
@@ -180,7 +181,7 @@ export async function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
                 key={step.title}
               >
                 <div className="w-12 h-12 rounded-full bg-primary-fixed/30 border border-primary text-primary flex items-center justify-center mb-4">
-                  <span aria-hidden="true" className="material-symbols-outlined text-[22px]">{step.icon}</span>
+                  <StorefrontIcon name={step.icon} size={22} />
                 </div>
                 <h3 className="font-label-md text-sm font-semibold text-on-surface mb-1">{step.title}</h3>
                 <span className="font-label-md text-xs text-primary mb-2">{step.stage}</span>
@@ -195,12 +196,7 @@ export async function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
               href="/1-bedroom-kit-builder"
             >
               <span>{t('ctaBuildKit')}</span>
-              <span
-                aria-hidden="true"
-                className={`material-symbols-outlined text-[18px]${isRtl ? ' scale-x-[-1]' : ''}`}
-              >
-                arrow_forward
-              </span>
+              <StorefrontIcon name={isRtl ? 'arrow_back' : 'arrow_forward'} size={18} />
             </Link>
           </div>
         </div>

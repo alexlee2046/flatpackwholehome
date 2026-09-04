@@ -5,6 +5,7 @@ import { localeDetails, type AppLocale } from '@/i18n/routing'
 import Image from 'next/image'
 import { useLocale, useTranslations } from 'next-intl'
 import React, { useState } from 'react'
+import { StorefrontIcon } from './StorefrontIcon'
 
 export function SwatchView({
   materials,
@@ -60,7 +61,7 @@ export function SwatchView({
       if (typeof window !== 'undefined') {
         try {
           localStorage.setItem('moduliv-swatch-ordered', '1')
-        } catch (err) {}
+        } catch {}
       }
       setIsSuccess(true)
     } catch (err: any) {
@@ -80,9 +81,7 @@ export function SwatchView({
         <Link className="hover:text-primary transition-colors" href="/">
           {tCommon('home')}
         </Link>
-        <span className={`material-symbols-outlined text-[16px]${isRtl ? ' scale-x-[-1]' : ''}`}>
-          chevron_right
-        </span>
+        <StorefrontIcon name={isRtl ? 'chevron_left' : 'chevron_right'} size={16} />
         <span className="text-on-surface font-medium">{t('breadcrumb')}</span>
       </nav>
 
@@ -133,15 +132,15 @@ export function SwatchView({
             </p>
             <ul className="font-body-md text-body-md text-on-surface-variant flex flex-col gap-3 mt-2">
               <li className="flex items-start gap-3">
-                <span className="material-symbols-outlined text-primary mt-0.5">check_circle</span>
+                <StorefrontIcon className="mt-0.5 shrink-0 text-primary" name="check_circle" />
                 {t('trustItem1')}
               </li>
               <li className="flex items-start gap-3">
-                <span className="material-symbols-outlined text-primary mt-0.5">check_circle</span>
+                <StorefrontIcon className="mt-0.5 shrink-0 text-primary" name="check_circle" />
                 {t('trustItem2')}
               </li>
               <li className="flex items-start gap-3">
-                <span className="material-symbols-outlined text-primary mt-0.5">check_circle</span>
+                <StorefrontIcon className="mt-0.5 shrink-0 text-primary" name="check_circle" />
                 {t('trustItem3')}
               </li>
             </ul>
@@ -171,7 +170,7 @@ export function SwatchView({
                 className="bg-surface-container-lowest border border-outline-variant/50 p-8 md:p-10 flex flex-col items-start gap-4 rounded-xl"
                 role="status"
               >
-                <span className="material-symbols-outlined text-primary text-[40px]">check_circle</span>
+                <StorefrontIcon className="text-primary" name="check_circle" size={40} />
                 <h3 className="font-headline-md text-headline-md text-on-surface">
                   {t('reservedTitle')}
                 </h3>
@@ -179,7 +178,7 @@ export function SwatchView({
                   {t('reservedDesc')}
                 </p>
                 <p className="font-body-md text-sm text-primary flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px]">redeem</span>
+                  <StorefrontIcon name="redeem" size={18} />
                   {t('voucherCode')}
                 </p>
                 <Link
@@ -200,15 +199,12 @@ export function SwatchView({
                     {errorMsg}
                   </p>
                 )}
-                {/* honeypot: off-screen (not display:none) so bots that skip hidden fields still fill it */}
+                {/* Kept in the DOM for simple bot traps, but removed from keyboard and accessibility trees. */}
                 <input
-                  aria-hidden="true"
                   autoComplete="off"
-                  className="absolute -left-[9999px] w-px h-px overflow-hidden"
                   name="website"
                   onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                  tabIndex={-1}
-                  type="text"
+                  type="hidden"
                   value={formData.website}
                 />
                 <div>

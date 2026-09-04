@@ -54,6 +54,7 @@ export function ModulivFooter({
           className="group flex items-baseline gap-1.5 shrink-0 text-on-surface hover:opacity-85 transition-opacity"
           href="/"
           aria-label="The Flat Set — Home"
+          dir="ltr"
         >
           <span className="font-headline-md italic font-normal text-[17px] tracking-wider text-on-surface/80">
             The

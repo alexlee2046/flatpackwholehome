@@ -2,10 +2,17 @@
 
 import { Link, useRouter } from '@/i18n/navigation'
 import { localeDetails } from '@/i18n/routing'
+import { AnimatedImageSwap } from '@/components/motion/AnimatedImageSwap'
+import { resolveStorefrontMedia } from '@/utilities/storefrontMedia'
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
 import Image from 'next/image'
 import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
+import { ArrowLeft, ArrowRight, CircleCheck, Moon, Palette, ShoppingCart, Star, Truck, Wrench, Zap } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
+
+gsap.registerPlugin(useGSAP)
 
 type ProductDetailProps = {
   product?: {
@@ -45,6 +52,17 @@ type ProductDetailProps = {
   }> | null
 }
 
+function materialMatchesFabric(material: NonNullable<ProductDetailProps['materials']>[number], fabricId: string) {
+  const searchable = `${material.slug || ''} ${material.title}`.toLocaleLowerCase()
+  const terms: Record<string, string[]> = {
+    boucle: ['boucle', 'bouclé'],
+    chenille: ['chenille'],
+    corduroy: ['corduroy'],
+    techGrey: ['tech', 'grey', 'gray'],
+  }
+  return terms[fabricId]?.some((term) => searchable.includes(term)) ?? false
+}
+
 const FABRICS = [
   { id: 'corduroy', img: '/assets/1-bedroom-kit-builder/42c66f93ee.png', name: 'Caramel Corduroy', tag: 'Best Seller' },
   { id: 'boucle', img: '/assets/1-bedroom-kit-builder/ec621fdd7b.png', name: 'Cream Bouclé', tag: 'Textured' },
@@ -61,48 +79,41 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
   const { formatCurrency } = useCurrency()
   const isSofa = !product?.slug || product.slug === 'modusofa'
 
-  const activeFabrics =
-    materials && materials.length > 0
-      ? materials.map((m, idx) => {
-          let img = FABRICS[idx % FABRICS.length]?.img || '/assets/1-bedroom-kit-builder/42c66f93ee.png'
-          if (m.hero && typeof m.hero === 'object' && m.hero.url) {
-            img = m.hero.url.replace(/^https?:\/\/[^/]+/, '').replace(/^\/api\/media\/file\//, '/media/')
-          }
-          return {
-            id: String(m.id || m.slug || idx),
-            img,
-            name: m.title,
-            tag: 'Curated',
-          }
-        })
-      : FABRICS
+  // The CMS collection contains both timber and upholstery. Keep the four
+  // fabric choices stable and only use matching CMS records to enrich them;
+  // never surface oak or walnut as a "Fabric Upholstery" option.
+  const activeFabrics = FABRICS.map((fabric) => {
+    const material = materials?.find((candidate) => materialMatchesFabric(candidate, fabric.id))
+    const cmsImage =
+      material?.hero && typeof material.hero === 'object' && material.hero.url
+        ? resolveStorefrontMedia(material.hero.url)
+        : null
+    return {
+      ...fabric,
+      img: cmsImage || fabric.img,
+      name: material?.title || fabric.name,
+    }
+  })
 
   const [selectedFabric, setSelectedFabric] = useState(activeFabrics[0]?.name || 'Caramel Corduroy')
   const [selectedLeg, setSelectedLeg] = useState(isSofa ? 'Natural Oak' : 'Queen')
   const [qty, setQty] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
   const [cartError, setCartError] = useState(false)
+  const rootRef = useRef<HTMLElement>(null)
 
   const title = product?.title || (isSofa ? t('defaultTitle') : 'SnapBed Frame')
-  const price = product?.price || 699
+  const price = product?.price || 69900
   const boxCount = product?.boxCount || (isSofa ? 2 : 3)
   const assemblyMinutes = product?.assemblyMinutes || 15
 
   // Resolve Payload gallery images or static fallbacks
-  const normalizeUrl = (url?: string | null) => {
-    if (!url) return null
-    return url
-      .replace(/^https?:\/\/[^/]+/, '')
-      .replace(/^\/api\/media\/file\//, '/media/')
-      .replace(/-\d+(\.[a-zA-Z0-9]+)$/, '$1')
-  }
-
   const galleryUrls = (product?.gallery || [])
     .map((item) => {
       if (!item) return null
-      if (typeof item.image === 'string') return normalizeUrl(item.image)
+      if (typeof item.image === 'string') return resolveStorefrontMedia(item.image)
       if (typeof item.image === 'object' && item.image && 'url' in item.image && item.image.url) {
-        return normalizeUrl(item.image.url)
+        return resolveStorefrontMedia(item.image.url)
       }
       return null
     })
@@ -163,10 +174,23 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
     }
   }
 
+  useGSAP(
+    () => {
+      if (!isAdded) return
+      const button = rootRef.current?.querySelector<HTMLElement>('[data-pdp-add]')
+      if (!button) return
+      gsap.timeline({ defaults: { overwrite: 'auto' } })
+        .to(button, { scale: 0.975, duration: 0.07, ease: 'power1.out', willChange: 'transform' })
+        .to(button, { scale: 1, duration: 0.1, ease: 'power3.out', clearProps: 'transform,willChange' })
+    },
+    { dependencies: [isAdded], scope: rootRef },
+  )
+
   return (
     <main
       className="max-w-[1440px] mx-auto w-full px-margin-mobile md:px-margin-desktop pt-8 pb-section-gap"
       id="main"
+      ref={rootRef}
       tabIndex={-1}
     >
       {/* Breadcrumbs */}
@@ -174,11 +198,11 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
         <Link className="hover:text-primary transition-colors" href="/">
           {tCommon('home')}
         </Link>
-        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">{isRtl ? 'chevron_left' : 'chevron_right'}</span>
+        {isRtl ? <ArrowLeft aria-hidden="true" size={16} /> : <ArrowRight aria-hidden="true" size={16} />}
         <Link className="hover:text-primary transition-colors" href="/1-bedroom-kit-builder">
           {categoryName}
         </Link>
-        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">{isRtl ? 'chevron_left' : 'chevron_right'}</span>
+        {isRtl ? <ArrowLeft aria-hidden="true" size={16} /> : <ArrowRight aria-hidden="true" size={16} />}
         <span className="text-on-surface font-medium">{title}</span>
       </nav>
 
@@ -186,22 +210,21 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-section-gap items-start">
         {/* Left Column: Visuals */}
         <div className="lg:col-span-7 flex flex-col gap-4">
-          <div className="relative aspect-[4/3] w-full bg-surface-container rounded-xl overflow-hidden shadow-sm">
-            <Image
+          <AnimatedImageSwap
               alt={title}
-              className="object-cover transition-transform duration-700 hover:scale-105"
-              fill
+              className="aspect-[4/3] w-full bg-surface-container rounded-xl shadow-sm"
+              imageClassName="object-cover"
               priority
               sizes="(max-width: 1024px) 100vw, 55vw"
               src={activeMainImage}
             />
-          </div>
           <div className="grid grid-cols-3 gap-4">
             {thumbImages.map((thumb, idx) => {
               const isSelected = activeMainImage === thumb
               return (
                 <button
                   aria-label={t('viewAngle', { number: idx + 1 })}
+                  aria-pressed={isSelected}
                   className={`relative aspect-square bg-surface-container rounded-lg overflow-hidden border-2 transition-all cursor-pointer text-start ${
                     isSelected
                       ? 'border-primary ring-2 ring-primary/40'
@@ -243,7 +266,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
               className="flex items-center gap-1.5 font-label-md text-sm text-primary hover:underline"
               href="#reviews"
             >
-              <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-amber-500">star</span>
+              <Star aria-hidden="true" className="fill-amber-500 text-amber-500" size={18} />
               <span className="font-medium text-on-surface">4.9</span>
               <span className="text-on-surface-variant">{t('reviewsCount', { count: 348 })}</span>
             </a>
@@ -254,7 +277,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
           </div>
 
           <div className="flex items-baseline gap-3 mb-8">
-            <span className="font-headline-lg text-[36px] text-on-surface" dir="ltr">
+            <span className="font-headline-lg text-[36px] text-on-surface" data-product-price="" dir="ltr">
               {formatCurrency(price, { locale })}
             </span>
             <span className="font-body-md text-sm text-on-surface-variant">{t('deliveryIncluded')}</span>
@@ -365,6 +388,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
             </div>
 
             <button
+              data-pdp-add=""
               className="w-full bg-on-background text-on-primary py-4 rounded-full uppercase tracking-wider text-label-md font-label-md hover:bg-primary transition-colors flex justify-center items-center gap-2 cursor-pointer disabled:opacity-75"
               disabled={isAdded}
               id="pdp-add"
@@ -374,19 +398,13 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
               <span>
                 {isAdded
                   ? t('addedToCart')
-                  : t('addToCartWithPrice', {
-                      // addToCartWithPrice's message text carries a hardcoded "$" prefix
-                      // (messages/ is out of scope here), so this is a plain locale-formatted
-                      // decimal, not a currency string.
-                      price: new Intl.NumberFormat(locale, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).format(price * qty),
-                    })}
+                  : t('addToCartWithPrice', { price: formatCurrency(price * qty, { locale }) })}
               </span>
-              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
-                {isRtl ? 'arrow_back' : 'arrow_forward'}
-              </span>
+              {isAdded
+                ? <CircleCheck aria-hidden="true" size={18} />
+                : isRtl
+                  ? <ArrowLeft aria-hidden="true" size={18} />
+                  : <ShoppingCart aria-hidden="true" size={18} />}
             </button>
 
             {cartError && (
@@ -402,21 +420,21 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
               type="button"
             >
               {t('buyNow')}
-              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">bolt</span>
+              <Zap aria-hidden="true" size={18} />
             </button>
 
             {/* Mini Trust Strip */}
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-1 pt-2 text-on-surface-variant">
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
-                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-primary">handyman</span>
+                <Wrench aria-hidden="true" className="text-primary" size={16} />
                 {t('zeroScrews')}
               </span>
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
-                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-primary">nights_stay</span>
+                <Moon aria-hidden="true" className="text-primary" size={16} />
                 {t('trial')}
               </span>
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
-                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-primary">local_shipping</span>
+                <Truck aria-hidden="true" className="text-primary" size={16} />
                 {t('dutiesIncluded')}
               </span>
             </div>
@@ -424,7 +442,7 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
 
           {/* Swatch Promo Card */}
           <div className="bg-surface-container rounded-xl p-4 flex items-start gap-4 mb-8">
-            <span aria-hidden="true" className="material-symbols-outlined text-primary mt-1">palette</span>
+            <Palette aria-hidden="true" className="mt-1 text-primary" size={24} />
             <div>
               <Link
                 className="font-label-md text-sm underline hover:text-primary transition-colors block mb-1 text-on-surface"

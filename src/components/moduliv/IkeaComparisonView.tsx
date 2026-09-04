@@ -5,6 +5,7 @@ import { localeDetails, type AppLocale } from '@/i18n/routing'
 import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
 import { useLocale, useTranslations } from 'next-intl'
 import React, { useState } from 'react'
+import { StorefrontIcon } from './StorefrontIcon'
 
 const CITY_DATA = [
   { id: 'la', taxRate: 0.1025 },
@@ -44,16 +45,14 @@ export function IkeaComparisonView() {
   const taxRatePercent = (currentCity.taxRate * 100).toFixed(2)
 
   return (
-    <div className="w-full bg-background text-on-surface pb-24">
+    <main className="w-full bg-background text-on-surface pb-24" id="main" tabIndex={-1}>
       {/* Header Breadcrumbs */}
       <div className="max-w-[1440px] mx-auto px-5 sm:px-12 pt-8">
         <nav className="flex items-center text-sm font-label-md text-on-surface-variant mb-6 gap-2">
           <Link className="hover:text-primary transition-colors" href="/">
             {tCommon('home')}
           </Link>
-          <span className={`material-symbols-outlined text-[16px] ${isRtl ? 'scale-x-[-1]' : ''}`}>
-            chevron_right
-          </span>
+          <StorefrontIcon name={isRtl ? 'chevron_left' : 'chevron_right'} size={16} />
           <span className="text-on-surface font-medium">{t('breadcrumbCurrent')}</span>
         </nav>
 
@@ -360,17 +359,17 @@ export function IkeaComparisonView() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-7 grid sm:grid-cols-3 gap-5">
               <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/80">
-                <span className="material-symbols-outlined text-primary mb-2 block">compress</span>
+                <StorefrontIcon className="mb-2 text-primary" name="compress" />
                 <h3 className="font-bold text-on-surface text-sm mb-1">{t('reasonCompactTitle')}</h3>
                 <p className="text-xs text-on-surface-variant leading-relaxed">{t('reasonCompactBody')}</p>
               </div>
               <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/80">
-                <span className="material-symbols-outlined text-primary mb-2 block">local_shipping</span>
+                <StorefrontIcon className="mb-2 text-primary" name="local_shipping" />
                 <h3 className="font-bold text-on-surface text-sm mb-1">{t('reasonDdpTitle')}</h3>
                 <p className="text-xs text-on-surface-variant leading-relaxed">{t('reasonDdpBody')}</p>
               </div>
               <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/80">
-                <span className="material-symbols-outlined text-primary mb-2 block">storefront</span>
+                <StorefrontIcon className="mb-2 text-primary" name="storefront" />
                 <h3 className="font-bold text-on-surface text-sm mb-1">{t('reasonDirectTitle')}</h3>
                 <p className="text-xs text-on-surface-variant leading-relaxed">{t('reasonDirectBody')}</p>
               </div>
@@ -378,7 +377,7 @@ export function IkeaComparisonView() {
 
             <div className="lg:col-span-5 bg-surface-container-low p-6 rounded-xl border border-outline-variant text-on-surface-variant text-sm leading-relaxed space-y-3">
               <div className="flex items-center gap-2 font-bold text-on-surface">
-                <span className="material-symbols-outlined text-primary">lightbulb</span>
+                <StorefrontIcon className="text-primary" name="lightbulb" />
                 {t('ctaCardTitle')}
               </div>
               <p>
@@ -399,15 +398,13 @@ export function IkeaComparisonView() {
                   className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 rounded-full bg-primary text-white font-label-md text-sm uppercase tracking-wider hover:bg-primary/90 transition-colors"
                 >
                   <span>{t('ctaButton')}</span>
-                  <span className={`material-symbols-outlined text-[18px] ${isRtl ? 'scale-x-[-1]' : ''}`}>
-                    arrow_forward
-                  </span>
+                  <StorefrontIcon name={isRtl ? 'arrow_back' : 'arrow_forward'} size={18} />
                 </Link>
               </div>
             </div>
           </div>
         </section>
       </div>
-    </div>
+    </main>
   )
 }

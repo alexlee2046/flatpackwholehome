@@ -13,7 +13,7 @@ async function testPlaywright() {
   try {
     // 1. Visit Kit Builder
     console.log('1. Testing Kit Builder page...');
-    await page.goto(`${BASE_URL}/en/1-bedroom-kit-builder`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/en/1-bedroom-kit-builder`, { waitUntil: 'domcontentloaded' });
     const heading = await page.textContent('h1');
     console.log('   Heading:', heading?.trim());
 
@@ -21,13 +21,17 @@ async function testPlaywright() {
     console.log('2. Clicking Add to Cart...');
     const addButton = page.locator('#kit-add');
     await addButton.click();
-    await page.waitForTimeout(1000);
+    await page.waitForURL(/\/cart$/);
 
-    // 3. Verify on Cart page
-    console.log('3. Verifying Cart page...');
-    await page.goto(`${BASE_URL}/en/cart`, { waitUntil: 'networkidle' });
+    // 3. Verify on Cart page, including a hard reload so persisted cart state hydrates cleanly.
+    console.log('3. Verifying Cart page and persisted state...');
+    await page.goto(`${BASE_URL}/en/cart`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(300);
     const cartItemCount = await page.locator('#cart-items, article').count();
     console.log('   Cart articles count:', cartItemCount);
+    if (cartItemCount < 1) {
+      throw new Error('Added bundle did not persist on the cart page');
+    }
 
     // 4. Test Promo Code
     console.log('4. Testing Promo Code SWATCH50...');
@@ -42,7 +46,7 @@ async function testPlaywright() {
 
     // 5. Test FAQ Live Search
     console.log('5. Testing FAQ search...');
-    await page.goto(`${BASE_URL}/en/faq`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/en/faq`, { waitUntil: 'domcontentloaded' });
     const faqInput = page.locator('input[placeholder*="Filter questions"]');
     await faqInput.fill('duties');
     await page.waitForTimeout(300);
@@ -51,7 +55,7 @@ async function testPlaywright() {
 
     // 6. Test Language Switcher
     console.log('6. Testing Language Switcher to zh-CN...');
-    await page.goto(`${BASE_URL}/en`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/en`, { waitUntil: 'domcontentloaded' });
     const langSelect = page.locator('header select[aria-label="Language selector"]');
     if (await langSelect.isVisible()) {
       await langSelect.selectOption('zh-CN');
@@ -84,7 +88,7 @@ async function testPlaywright() {
     // 9. Test Mobile Drawer UX (390x844 viewport)
     console.log('9. Testing Mobile Drawer Navigation (390x844 viewport)...');
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(`${BASE_URL}/en`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/en`, { waitUntil: 'domcontentloaded' });
 
     const mobileMenuTrigger = page.locator('#mobile-menu-trigger');
     const isTriggerVisible = await mobileMenuTrigger.isVisible();

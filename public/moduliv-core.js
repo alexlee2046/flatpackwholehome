@@ -1,7 +1,6 @@
 /**
  * MODULIV Core Shared Engine (Warm Japandi Editorial)
  * - Unified Shopping Cart State Machine & LocalStorage Persistence
- * - Scroll Reveal Observer
  *
  * Global search and the mobile navigation drawer are now the React
  * <SearchModal> / <ModulivHeader> components (src/components/moduliv/) —
@@ -111,9 +110,12 @@
                 badge.textContent = count > 99 ? '99+' : count;
                 badge.style.display = count > 0 ? '' : 'none';
                 if (pulse && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                    badge.classList.remove('cart-badge--pulse');
-                    void badge.offsetWidth; // trigger reflow
-                    badge.classList.add('cart-badge--pulse');
+                    badge.getAnimations().forEach(function (animation) { animation.cancel(); });
+                    badge.animate([
+                        { transform: 'scale(.72)', opacity: .7 },
+                        { transform: 'scale(1.16)', opacity: 1, offset: .58 },
+                        { transform: 'scale(1)', opacity: 1 }
+                    ], { duration: 320, easing: 'cubic-bezier(.16, 1, .3, 1)' });
                 }
             }
         });
@@ -128,32 +130,10 @@
     };
 
     /* ==========================================================================
-       2. SCROLL REVEAL
-       ========================================================================== */
-    function wireScrollReveal() {
-        var els = document.querySelectorAll('.reveal');
-        if (!els.length) return;
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
-            els.forEach(function (el) { el.classList.add('reveal--in'); });
-        } else {
-            var io = new IntersectionObserver(function (entries) {
-                entries.forEach(function (en) {
-                    if (en.isIntersecting) {
-                        en.target.classList.add('reveal--in');
-                        io.unobserve(en.target);
-                    }
-                });
-            }, { threshold: 0.12 });
-            els.forEach(function (el) { io.observe(el); });
-        }
-    }
-
-    /* ==========================================================================
        INITIALIZATION
        ========================================================================== */
     function init() {
         paintCartBadges(false);
-        wireScrollReveal();
     }
 
     if (document.readyState === 'loading') {

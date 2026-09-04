@@ -11,6 +11,7 @@ import { ODSAI_DESTINATIONS } from '@/lib/commerce/ddp'
 import { isValidVoucherCode, normalizeVoucherCode } from '@/lib/commerce/vouchers'
 import { CheckoutValidationError, normalizeCheckoutAddress } from '@/lib/commerce/checkoutValidation'
 import { localeDetails } from '@/i18n/routing'
+import { StorefrontIcon } from './StorefrontIcon'
 
 const THUMBS: Record<string, string> = {
   'bundle-1bed': '/assets/1-bedroom-kit-builder/b4e5f4d8a0.png',
@@ -38,8 +39,6 @@ const PRODUCT_SLUG_ALIASES: Record<string, string> = {
 const STATE_HINT_COUNTRIES = new Set(['US', 'CA', 'AU'])
 
 type CheckoutStep = 'cart' | 'address' | 'payment'
-type StripeStatus = 'unknown' | 'configured' | 'disabled' | 'misconfigured'
-
 type AddressFormValues = {
   email: string
   firstName: string
@@ -96,9 +95,10 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
   const locale = useLocale()
   const isRtl = localeDetails[locale as keyof typeof localeDetails]?.dir === 'rtl'
 
-  // Client-first localStorage read avoids an empty-cart flash on first paint.
-  const [items, setItems] = useState<any[]>(() => readCartFromStorage())
-  const [appliedVoucherCode, setAppliedVoucherCode] = useState(() => readVoucherFromStorage())
+  // The server cannot read localStorage, so the first client render must use the
+  // same values as SSR. Hydrate persisted cart state immediately after mount.
+  const [items, setItems] = useState<any[]>([])
+  const [appliedVoucherCode, setAppliedVoucherCode] = useState('')
   const voucherApplied = isValidVoucherCode(appliedVoucherCode)
   const [promoCode, setPromoCode] = useState('')
   const [promoMessage, setPromoMessage] = useState<{ text: string; type: 'error' | 'success' } | null>(
@@ -152,6 +152,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
 
   useEffect(() => {
     const handleCartUpdate = () => loadCart()
+    loadCart()
     window.addEventListener('moduliv:cart-updated', handleCartUpdate)
     window.addEventListener('storage', handleCartUpdate)
     return () => {
@@ -420,6 +421,19 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
   }
 
   const checkoutDisabled = !stripeReady
+  const conciergeHref = `mailto:concierge@theflatset.com?subject=${encodeURIComponent(
+    'Help completing my The Flat Set order',
+  )}&body=${encodeURIComponent(
+    [
+      'Hello The Flat Set concierge,',
+      '',
+      'Please help me complete this saved cart:',
+      ...items.map((item) => `• ${item.qty || 1} × ${item.name} — ${formatCurrency((item.price || 0) * (item.qty || 1), { locale })}`),
+      `Total: ${formatCurrency(total, { locale })}`,
+      '',
+      'Please reply with the secure next step. I have not included payment details in this email.',
+    ].join('\n'),
+  )}`
   const ctaClass =
     'bg-on-background text-on-primary py-4 px-8 font-label-md text-label-md uppercase hover:bg-primary transition-colors duration-300 inline-flex items-center justify-center rounded-full'
 
@@ -434,7 +448,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
         <Link className="hover:text-primary transition-colors" href="/">
           {tCommon('home')}
         </Link>
-        <span className="material-symbols-outlined text-[16px]">{isRtl ? 'chevron_left' : 'chevron_right'}</span>
+        <StorefrontIcon name={isRtl ? 'chevron_left' : 'chevron_right'} size={16} />
         <span className="text-on-surface font-medium">{t('cartTitle')}</span>
       </nav>
 
@@ -449,7 +463,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
       {isOrdered ? (
         <section className="border border-outline-variant/40 bg-surface-container-lowest px-6 py-16 md:py-24 text-center rounded-xl">
           <span className="inline-flex w-16 h-16 rounded-full bg-primary-fixed/30 items-center justify-center mb-6">
-            <span className="material-symbols-outlined text-[36px] text-primary">check_circle</span>
+            <StorefrontIcon className="text-primary" name="check_circle" size={36} />
           </span>
           <h2 className="font-headline-md text-headline-md text-on-surface mb-2">
             {t('orderConfirmed')}
@@ -475,7 +489,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
       ) : items.length === 0 ? (
         /* Empty State */
         <section className="border border-outline-variant/40 bg-surface-container-lowest px-6 py-16 md:py-24 text-center rounded-xl">
-          <span className="material-symbols-outlined text-[56px] text-outline">shopping_cart</span>
+          <StorefrontIcon className="mx-auto text-outline" name="shopping_cart" size={56} />
           <h2 className="font-headline-md text-headline-md text-on-surface mt-4 mb-2">
             {t('emptyCart')}
           </h2>
@@ -593,7 +607,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
               {/* DDP Logistics & IKEA Savings Callout */}
               <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg text-xs space-y-1.5">
                 <div className="flex items-center gap-1.5 font-semibold text-primary">
-                  <span className="material-symbols-outlined text-[15px]">verified</span>
+                  <StorefrontIcon name="verified" size={15} />
                   <span>{t('freeShippingBadge', { amount: formatCurrency(25500, { locale }) })}</span>
                 </div>
                 <p className="text-neutral-600 leading-relaxed text-[11px]">
@@ -622,7 +636,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                       onClick={handleRemoveVoucher}
                       type="button"
                     >
-                      <span className="material-symbols-outlined text-[18px]">close</span>
+                      <StorefrontIcon name="close" size={18} />
                     </button>
                   </dd>
                 </div>
@@ -692,23 +706,33 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                   type="button"
                 >
                   {t('checkout')}
-                  <span className="material-symbols-outlined text-[18px] ms-2">
-                    {isRtl ? 'arrow_back' : 'arrow_forward'}
-                  </span>
+                  <StorefrontIcon className="ms-2" name={isRtl ? 'arrow_back' : 'arrow_forward'} size={18} />
                 </button>
                 {checkoutDisabled && (
-                  <p className="mt-2 text-xs text-error" role="alert">
-                    {t('checkoutUnavailable')}
-                  </p>
+                  <div className="mt-4 rounded-xl bg-surface-container p-4" role="status">
+                    <p className="font-label-md text-sm text-on-surface">{t('checkoutUnavailable')}</p>
+                    <p className="mt-1 text-sm text-on-surface-variant">{t('checkoutUnavailableHelp')}</p>
+                    <a
+                      className="mt-3 inline-flex items-center gap-2 font-label-md text-sm text-primary underline underline-offset-4 hover:text-on-surface transition-colors"
+                      href={conciergeHref}
+                    >
+                      {t('contactConcierge')}
+                      <StorefrontIcon name={isRtl ? 'arrow_back' : 'arrow_forward'} size={16} />
+                    </a>
+                  </div>
                 )}
-                <p className="mt-4 font-body-md text-[13px] text-on-surface-variant flex items-start gap-2">
-                  <span className="material-symbols-outlined text-[16px] mt-0.5 text-primary">credit_card</span>
-                  {t('paymentMethodsNote')}
-                </p>
-                <p className="mt-2 font-body-md text-[13px] text-on-surface-variant flex items-start gap-2">
-                  <span className="material-symbols-outlined text-[16px] mt-0.5 text-primary">verified</span>
-                  {t('checkoutSecure')}
-                </p>
+                {!checkoutDisabled && (
+                  <>
+                    <p className="mt-4 font-body-md text-[13px] text-on-surface-variant flex items-start gap-2">
+                      <StorefrontIcon className="mt-0.5 text-primary" name="credit_card" size={16} />
+                      {t('paymentMethodsNote')}
+                    </p>
+                    <p className="mt-2 font-body-md text-[13px] text-on-surface-variant flex items-start gap-2">
+                      <StorefrontIcon className="mt-0.5 text-primary" name="verified" size={16} />
+                      {t('checkoutSecure')}
+                    </p>
+                  </>
+                )}
               </>
             )}
 
@@ -923,7 +947,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                   {t('backToAddress')}
                 </button>
                 <p className="font-body-md text-[13px] text-on-surface-variant flex items-start gap-2">
-                  <span className="material-symbols-outlined text-[16px] mt-0.5 text-primary">credit_card</span>
+                  <StorefrontIcon className="mt-0.5 text-primary" name="credit_card" size={16} />
                   {t('paymentMethodsNote')}
                 </p>
               </div>

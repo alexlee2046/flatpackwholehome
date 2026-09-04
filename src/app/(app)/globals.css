@@ -9,4 +9,15 @@
    the rest of which stays light. */
 :root {
   color-scheme: light;
+  caret-color: #8a4725;
+}
+
+::selection {
+  background: #e8c9b7;
+  color: #1a1c1d;
+}
+
+* {
+  scrollbar-color: #b98b72 #f0ece7;
+  scrollbar-width: thin;
 }

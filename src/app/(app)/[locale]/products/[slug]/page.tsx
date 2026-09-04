@@ -274,7 +274,7 @@ export default async function ProductPage({ params }: Props) {
         inStock={true}
         locale={locale}
         name={productData.title}
-        price={productData.price}
+        price={productData.price / 100}
         ratingValue="4.9"
         reviewCount={reviewCount}
         sku={`TFS-${slug.toUpperCase()}`}

@@ -1,6 +1,7 @@
 'use client'
 
 import { localeDetails } from '@/i18n/routing'
+import { useRouter } from '@/i18n/navigation'
 import React, { useEffect, useState } from 'react'
 
 type GeoBannerProps = {
@@ -69,13 +70,9 @@ function geoDismissed(): boolean {
 }
 
 export function GeoSuggestionBanner({ currentLocale }: GeoBannerProps) {
+  const router = useRouter()
   const [targetLocale, setTargetLocale] = useState<string | null>(null)
-  // 'checking' reserves the banner's height so that showing it later never
-  // shifts already-rendered content (CLS). It collapses to 'hidden' once we
-  // know no suggestion is coming.
-  const [status, setStatus] = useState<'checking' | 'hidden' | 'visible'>(() =>
-    geoDismissed() ? 'hidden' : 'checking',
-  )
+  const [status, setStatus] = useState<'hidden' | 'visible'>('hidden')
 
   useEffect(() => {
     if (geoDismissed()) return
@@ -126,9 +123,9 @@ export function GeoSuggestionBanner({ currentLocale }: GeoBannerProps) {
         newPath = `/${targetLocale}${pathname === '/' ? '' : pathname}`
       }
 
-      window.location.href = newPath
+      router.replace(newPath)
     } catch {
-      window.location.href = `/${targetLocale}`
+      router.replace(`/${targetLocale}`)
     }
   }
 
@@ -141,12 +138,12 @@ export function GeoSuggestionBanner({ currentLocale }: GeoBannerProps) {
 
   return (
     <aside
-      aria-hidden={status === 'checking'}
       aria-label="Language and regional preference"
-      className="min-h-[44px] bg-on-background text-on-primary py-2.5 px-4 text-xs font-label-md transition-all duration-300 relative z-50 border-b border-outline/20"
+      aria-live="polite"
+      className="fixed z-[70] top-3 inset-x-3 sm:inset-x-auto sm:end-4 sm:w-[520px] bg-on-background text-on-primary py-3 px-4 text-xs font-label-md rounded-xl shadow-xl border border-outline/20"
     >
       {prompt && (
-        <div className="max-w-[1440px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-start">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-start">
           <div className="flex items-center justify-center gap-2">
             <span className="text-base leading-none" role="img" aria-label="Country flag">
               {prompt.flag}
