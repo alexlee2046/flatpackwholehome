@@ -98,16 +98,6 @@ export default buildConfig({
       idleTimeoutMillis: 30000,
       max: process.env.DB_POOL_MAX ? parseInt(process.env.DB_POOL_MAX, 10) : 15,
     },
-    // TEMPORARY — one deploy only, reverted straight after.
-    // The production database is a schema generation behind the collections:
-    // faqs and how_it_works have no tables, header_nav_items_locales has no
-    // label column, products has no ikea_benchmark_price. That is why
-    // /api/products returns 500 and every page renders from the static
-    // fallbacks in storefront.ts instead of the CMS. The bundled migration is a
-    // baseline that CREATEs the whole schema, so it cannot run against a
-    // populated database; drizzle's push is the reconciliation mechanism
-    // Payload ships, and this turns it on for a single boot.
-    push: true,
     // Payload runs these at boot in production. The bundled migration is a
     // baseline — it CREATEs the whole schema — so it only applies to a database
     // that is empty. Pointing it at an existing deployment would fail on the
