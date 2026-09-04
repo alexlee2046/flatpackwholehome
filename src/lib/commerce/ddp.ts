@@ -123,7 +123,9 @@ export const ODSAI_DESTINATIONS = [
 export type DDPQuote = {
   chargeableCbm: number
   countryCode: ODSaiDestinationCode
+  /** Transit estimate after made-to-order production. */
   deliveryDays: { min: number; max: number }
+  productionDays: { min: number; max: number }
   freightInUSD: number
   importChargesInUSD: number
   landedTotalInUSD: number
@@ -179,6 +181,7 @@ export function calculateDDPQuote(input: {
     chargeableCbm,
     countryCode,
     deliveryDays: zone.deliveryDays,
+    productionDays: MADE_TO_ORDER_PRODUCTION_DAYS,
     freightInUSD,
     importChargesInUSD,
     landedTotalInUSD: subtotalInUSD + shippingAndImportInUSD,

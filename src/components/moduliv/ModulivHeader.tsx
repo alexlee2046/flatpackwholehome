@@ -32,6 +32,7 @@ export function ModulivHeader({
   const tFooter = useTranslations('Footer')
   const DirectionArrow = isRtl ? ArrowLeft : ArrowRight
   const menuTriggerRef = useRef<HTMLButtonElement>(null)
+  const drawerRef = useRef<HTMLElement>(null)
   const drawerCloseRef = useRef<HTMLButtonElement>(null)
   const hasOpenedDrawerRef = useRef(false)
 
@@ -59,15 +60,47 @@ export function ModulivHeader({
     }
   }, [isDrawerOpen])
 
-  // Close on Escape key
+  // Make the rest of the page truly non-interactive and keep keyboard focus
+  // inside the modal drawer until it closes.
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isDrawerOpen) {
+    if (!isDrawerOpen) return
+    const background = Array.from(document.querySelectorAll<HTMLElement>('main, footer'))
+    background.forEach((element) => {
+      element.inert = true
+    })
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
         setIsDrawerOpen(false)
+        return
+      }
+      if (event.key !== 'Tab' || !drawerRef.current) return
+
+      const focusable = Array.from(
+        drawerRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => element.getClientRects().length > 0)
+      if (!focusable.length) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last?.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first?.focus()
       }
     }
+
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      background.forEach((element) => {
+        element.inert = false
+      })
+    }
   }, [isDrawerOpen])
 
   const openSearch = () => {
@@ -206,7 +239,6 @@ export function ModulivHeader({
                   href="/us-vs-ikea"
                 >
                   <span>{tNav('usVsIkea')}</span>
-                  <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">-20%</span>
                 </Link>
               </>
             )}
@@ -256,6 +288,7 @@ export function ModulivHeader({
         {/* Drawer Panel */}
         <aside
           id="mobile-nav-drawer"
+          ref={drawerRef}
           role="dialog"
           aria-modal="true"
           aria-label={tNav('mobileMenu')}
@@ -305,7 +338,7 @@ export function ModulivHeader({
 
             {/* Navigation Links */}
             <nav className="mt-6 flex flex-col gap-1" aria-label={tNav('mobileMenu')}>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-outline mb-2 px-2">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant mb-2 px-2">
                 {tFooter('furnitureSystemHeading')}
               </span>
               <Link
@@ -369,10 +402,7 @@ export function ModulivHeader({
                 onClick={() => setIsDrawerOpen(false)}
                 className="flex items-center justify-between px-3 py-3 rounded-lg text-primary font-serif text-base font-semibold hover:bg-primary/5 transition-colors"
               >
-                <div className="flex items-center gap-2">
-                  <span>{tNav('usVsIkea')}</span>
-                  <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">-20%</span>
-                </div>
+                <span>{tNav('usVsIkea')}</span>
                 <DirectionArrow aria-hidden="true" className="text-primary" size={18} />
               </Link>
               <Link
@@ -387,7 +417,7 @@ export function ModulivHeader({
 
             {/* Language & Currency Tools */}
             <div className="mt-6 pt-5 border-t border-outline-variant/30">
-              <span className="text-[10px] uppercase font-bold tracking-widest text-outline mb-3 block px-2">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant mb-3 block px-2">
                 {tNav('preferences')}
               </span>
               <div className="flex items-center gap-3 px-2">
@@ -399,18 +429,18 @@ export function ModulivHeader({
             </div>
           </div>
 
-          {/* Bottom Footer: Guarantees & Legal Policies */}
+          {/* Bottom Footer: product facts and legal policies. */}
           <div className="pt-6 border-t border-outline-variant/30 flex flex-col gap-4">
             <div className="bg-surface-container-low p-3.5 rounded-xl border border-outline-variant/30 text-xs text-on-surface-variant">
               <div className="font-semibold text-on-surface mb-1 flex items-center gap-1.5">
                 <BadgeCheck aria-hidden="true" className="text-primary" size={16} />
-                <span>The Flat Set Guarantee</span>
+                <span>The Flat Set</span>
               </div>
               <p className="text-[11px] leading-relaxed text-on-surface-variant">
-                6 Flat Boxes · 60-Minute Assembly · 0 Screws · DDP Guaranteed Delivery.
+                Flat-pack furniture · Tool-free assembly · Delivery details confirmed in a destination quote.
               </p>
             </div>
-            <div className="flex items-center justify-between text-xs text-outline">
+            <div className="flex items-center justify-between text-xs text-on-surface-variant">
               <button
                 type="button"
                 onClick={() => openPolicyModal('moduliv-privacy-modal')}

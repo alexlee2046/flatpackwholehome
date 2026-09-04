@@ -2,36 +2,55 @@
 
 import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
-import { useCart, useCurrency, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
+import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
 import { useLocale, useTranslations } from 'next-intl'
 import React, { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { ODSAI_DESTINATIONS } from '@/lib/commerce/ddp'
-import { isValidVoucherCode, normalizeVoucherCode } from '@/lib/commerce/vouchers'
-import { CheckoutValidationError, normalizeCheckoutAddress } from '@/lib/commerce/checkoutValidation'
+import { isODSaiDestination, ODSAI_DESTINATIONS } from '@/lib/commerce/ddp'
+import {
+  isValidVoucherCode,
+  normalizeVoucherCode,
+  VOUCHER_REDEMPTION_ENABLED,
+} from '@/lib/commerce/vouchers'
+import { normalizeCheckoutAddress } from '@/lib/commerce/checkoutValidation'
+import type { CheckoutQuote } from '@/lib/commerce/checkoutQuote'
+import {
+  CheckoutCartWriteError,
+  CheckoutPaymentStartError,
+  canonicalCheckoutFingerprint,
+  confirmVerifiedCheckoutOrder,
+  createVerifiedCheckoutCart,
+  initiateVerifiedCheckoutPayment,
+  parseCheckoutQuoteResponse,
+  type PreparedCheckoutCart,
+} from '@/lib/commerce/checkoutPaymentClient'
+import {
+  checkoutQuoteErrorCodeFromResponse,
+  type CheckoutQuoteErrorCode,
+} from '@/lib/commerce/quoteErrors'
+import {
+  CART_ITEMS_KEY,
+  DELIVERY_DESTINATION_KEY,
+  LEGACY_CART_ITEMS_KEY,
+  MAX_CART_ITEM_QUANTITY,
+  VOUCHER_CODE_KEY,
+  migrateLegacyCartItems,
+  normalizeCartQuantity,
+  storefrontCartLineKey,
+  type StorefrontCartItem,
+} from '@/lib/commerce/storefrontCart'
 import { localeDetails } from '@/i18n/routing'
 import { StorefrontIcon } from './StorefrontIcon'
 
 const THUMBS: Record<string, string> = {
-  'bundle-1bed': '/assets/1-bedroom-kit-builder/b4e5f4d8a0.png',
+  '1-bedroom-kit': '/assets/1-bedroom-kit-builder/b4e5f4d8a0.png',
   modusofa: '/assets/modusofa-product-detail-page/e38c85e68d.png',
+  snapbed: '/assets/homepage/hero-split.png',
 }
 
-// Local cart items carry synthetic ids from KitBuilder/ProductDetail (e.g. 'bundle-1bed'),
-// which don't always match the real Payload `products.slug`. Individual products already
-// use their real slug as the cart item id — only the bundle needs an alias.
-// Money is handled in cents end to end — the catalog stores cents, the DDP quote
-// requires cents, and Stripe is charged cents. The v1 key held dollar amounts, so
-// it is abandoned rather than reinterpreted: reading an old cart as cents would
-// price a $699 sofa at $6.99.
-const CART_ITEMS_KEY = 'moduliv-cart-items-v2'
-const VOUCHER_DISCOUNT_CENTS = 5000
-const VOUCHER_CODE_KEY = 'moduliv-voucher-code'
-
-const PRODUCT_SLUG_ALIASES: Record<string, string> = {
-  'bundle-1bed': '1-bedroom-kit',
-}
+// Money is cents end to end. Persisted carts are repaired and re-quoted from
+// server-side catalog data before a checkout step is available.
 
 // Mirrors checkoutValidation.ts's (unexported) countriesRequiringState — used here only to
 // show a hint before submit; the server remains the authority and will reject a missing
@@ -39,6 +58,16 @@ const PRODUCT_SLUG_ALIASES: Record<string, string> = {
 const STATE_HINT_COUNTRIES = new Set(['US', 'CA', 'AU'])
 
 type CheckoutStep = 'cart' | 'address' | 'payment'
+class QuoteRequestError extends Error {
+  code: CheckoutQuoteErrorCode
+
+  constructor(code: CheckoutQuoteErrorCode) {
+    super(code)
+    this.name = 'QuoteRequestError'
+    this.code = code
+  }
+}
+
 type AddressFormValues = {
   email: string
   firstName: string
@@ -70,13 +99,44 @@ function loadStripeJs(): Promise<any> {
   return stripeJsPromise
 }
 
-function readCartFromStorage(): any[] {
+function readCartFromStorage(): StorefrontCartItem[] {
   if (typeof window === 'undefined') return []
+
+  const raw = localStorage.getItem(CART_ITEMS_KEY)
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) {
+        const items = migrateLegacyCartItems(parsed)
+        if (JSON.stringify(items) !== raw) localStorage.setItem(CART_ITEMS_KEY, JSON.stringify(items))
+        return items
+      }
+    } catch {
+      // A corrupt v3 value must not hide a recoverable canonical legacy cart.
+    }
+  }
+
   try {
-    const raw = localStorage.getItem(CART_ITEMS_KEY)
-    return raw ? JSON.parse(raw) : []
+    const legacyRaw = localStorage.getItem(LEGACY_CART_ITEMS_KEY)
+    const legacyItems = migrateLegacyCartItems(legacyRaw ? JSON.parse(legacyRaw) : [], {
+      allowParentItems: false,
+    })
+    localStorage.setItem(CART_ITEMS_KEY, JSON.stringify(legacyItems))
+    localStorage.removeItem(LEGACY_CART_ITEMS_KEY)
+    return legacyItems
   } catch {
+    localStorage.setItem(CART_ITEMS_KEY, '[]')
     return []
+  }
+}
+
+function readDestinationFromStorage(): string {
+  if (typeof window === 'undefined') return ''
+  try {
+    const destination = localStorage.getItem(DELIVERY_DESTINATION_KEY)
+    return isODSaiDestination(destination) ? destination : ''
+  } catch {
+    return ''
   }
 }
 
@@ -89,17 +149,25 @@ function readVoucherFromStorage(): string {
   }
 }
 
-export function CartView({ publishableKey }: { publishableKey: string }) {
+export function CartView({
+  checkoutEnabled,
+  publishableKey,
+}: {
+  checkoutEnabled: boolean
+  publishableKey: string
+}) {
   const t = useTranslations('Transaction')
   const tCommon = useTranslations('Common')
+  const tPDP = useTranslations('PDP')
   const locale = useLocale()
   const isRtl = localeDetails[locale as keyof typeof localeDetails]?.dir === 'rtl'
+  const regionNames = new Intl.DisplayNames([locale], { type: 'region' })
 
   // The server cannot read localStorage, so the first client render must use the
   // same values as SSR. Hydrate persisted cart state immediately after mount.
-  const [items, setItems] = useState<any[]>([])
+  const [items, setItems] = useState<StorefrontCartItem[]>([])
   const [appliedVoucherCode, setAppliedVoucherCode] = useState('')
-  const voucherApplied = isValidVoucherCode(appliedVoucherCode)
+  const hasVoucherCandidate = isValidVoucherCode(appliedVoucherCode)
   const [promoCode, setPromoCode] = useState('')
   const [promoMessage, setPromoMessage] = useState<{ text: string; type: 'error' | 'success' } | null>(
     null,
@@ -111,9 +179,9 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const { formatCurrency } = useCurrency()
-  const { addItem, clearCart } = useCart()
-  const { confirmOrder, initiatePayment, paymentMethods } = usePayments()
-  const stripeReady = paymentMethods.some((m) => m.name === 'stripe') && Boolean(publishableKey)
+  // Payment is started with the fresh, verified cart returned by /api/carts,
+  // not the provider's asynchronously updated guest-cart state.
+  const stripeReady = checkoutEnabled && Boolean(publishableKey)
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>('cart')
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [isSubmittingAddress, setIsSubmittingAddress] = useState(false)
@@ -121,12 +189,18 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [checkoutEmail, setCheckoutEmail] = useState('')
   const [amountDueCents, setAmountDueCents] = useState<number | null>(null)
+  const [paymentCart, setPaymentCart] = useState<PreparedCheckoutCart | null>(null)
+  const [quote, setQuote] = useState<CheckoutQuote | null>(null)
+  const [quoteError, setQuoteError] = useState<string | null>(null)
+  const [isQuoting, setIsQuoting] = useState(false)
+  const [quoteRetry, setQuoteRetry] = useState(0)
   const stripeRef = useRef<{ elements: any; stripe: any } | null>(null)
 
   const {
     formState: { errors },
     handleSubmit,
     register,
+    setValue,
     watch,
   } = useForm<AddressFormValues>({
     defaultValues: {
@@ -146,8 +220,60 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
   const watchedCountry = watch('country')
 
   const loadCart = () => {
+    setQuote(null)
+    setQuoteError(null)
+    setClientSecret(null)
+    setAmountDueCents(null)
+    setPaymentCart(null)
+    setCheckoutStep((step) => (step === 'cart' ? step : 'cart'))
     setItems(readCartFromStorage())
     setAppliedVoucherCode(readVoucherFromStorage())
+    const destination = readDestinationFromStorage()
+    if (destination) setValue('country', destination)
+  }
+
+  const cartVariantLabel = (item: StorefrontCartItem): string | undefined => {
+    const options = item.variantOptions
+    if (!options) return item.variant
+    const fabrics: Record<NonNullable<typeof options.upholstery>, string> = {
+      boucle: tPDP('fabrics.boucle'),
+      chenille: tPDP('fabrics.chenille'),
+      corduroy: tPDP('fabrics.corduroy'),
+      techGrey: tPDP('fabrics.techGrey'),
+    }
+    const parts = [
+      options.upholstery ? fabrics[options.upholstery] : undefined,
+      options.woodFinish === 'oak'
+        ? tPDP('finishNaturalOak')
+        : options.woodFinish === 'walnut'
+          ? tPDP('finishWalnut')
+          : undefined,
+      options.bedSize === 'queen'
+        ? tPDP('finishQueen')
+        : options.bedSize === 'king'
+          ? tPDP('finishKing')
+          : undefined,
+    ].filter((part): part is string => Boolean(part))
+    return parts.length ? parts.join(' · ') : item.variant
+  }
+
+  const quoteErrorMessage = (code: CheckoutQuoteErrorCode) => {
+    switch (code) {
+      case 'UNSUPPORTED_DESTINATION':
+        return t('quoteErrorUnsupportedDestination')
+      case 'VARIANT_REQUIRED':
+        return t('quoteErrorVariantRequired')
+      case 'QUANTITY_INVALID':
+        return t('quoteErrorQuantity')
+      case 'INVALID_REQUEST':
+      case 'CART_EMPTY':
+        return t('quoteErrorInvalidRequest')
+      case 'CATALOG_UNAVAILABLE':
+      case 'VARIANT_UNAVAILABLE':
+        return t('quoteErrorCatalogUnavailable')
+      default:
+        return t('quoteErrorGeneric')
+    }
   }
 
   useEffect(() => {
@@ -167,6 +293,86 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
     }
   }, [items.length, checkoutStep])
 
+  const requestQuote = async (countryCode: string, signal?: AbortSignal) => {
+    const response = await fetch('/api/checkout/quote', {
+      body: JSON.stringify({
+        countryCode,
+        lines: items.map((item) => ({
+          id: item.id,
+          qty: normalizeCartQuantity(item.qty),
+          ...(item.variantId ? { variantId: item.variantId } : {}),
+        })),
+        voucherCode: hasVoucherCandidate ? appliedVoucherCode : undefined,
+      }),
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      signal,
+    })
+    const result = await response.json().catch(() => null)
+    if (!response.ok) {
+      throw new QuoteRequestError(checkoutQuoteErrorCodeFromResponse(result))
+    }
+    const quote = parseCheckoutQuoteResponse(result)
+    if (!quote) throw new QuoteRequestError('QUOTE_UNAVAILABLE')
+    return quote
+  }
+
+  useEffect(() => {
+    if (!watchedCountry || items.length === 0) {
+      setQuote(null)
+      setPaymentCart(null)
+      setQuoteError(null)
+      return
+    }
+
+    const controller = new AbortController()
+    setQuote(null)
+    setClientSecret(null)
+    setAmountDueCents(null)
+    setPaymentCart(null)
+    setCheckoutStep((step) => (step === 'cart' ? step : 'cart'))
+    setIsQuoting(true)
+    setQuoteError(null)
+    requestQuote(watchedCountry, controller.signal)
+      .then((result) => {
+        if (controller.signal.aborted) return
+        setQuote(result)
+        if (hasVoucherCandidate) {
+          setPromoMessage({
+            text: result.voucherApplied ? t('promoVerified') : t('promoRejected'),
+            type: result.voucherApplied ? 'success' : 'error',
+          })
+        }
+      })
+      .catch((error) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        if (controller.signal.aborted) return
+        setQuote(null)
+        setQuoteError(
+          error instanceof QuoteRequestError
+            ? quoteErrorMessage(error.code)
+            : quoteErrorMessage('QUOTE_UNAVAILABLE'),
+        )
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setIsQuoting(false)
+      })
+
+    return () => controller.abort()
+    // requestQuote and quoteErrorMessage intentionally use the current render's
+    // cart and locale. The primitive dependencies are the quote fingerprint.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appliedVoucherCode, hasVoucherCandidate, items, quoteRetry, watchedCountry])
+
+  useEffect(() => {
+    if (!isODSaiDestination(watchedCountry)) return
+    try {
+      localStorage.setItem(DELIVERY_DESTINATION_KEY, watchedCountry)
+    } catch {
+      // A blocked storage area only loses the convenience preference.
+    }
+  }, [watchedCountry])
+
   // Mount the Stripe Payment Element once we have a clientSecret for this payment step.
   useEffect(() => {
     if (checkoutStep !== 'payment' || !clientSecret || !publishableKey) return
@@ -182,7 +388,11 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
         stripeRef.current = { elements, stripe }
 
         stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }: any) => {
-          if (!cancelled && paymentIntent) setAmountDueCents(paymentIntent.amount)
+          if (cancelled || !paymentIntent) return
+          setAmountDueCents(paymentIntent.amount)
+          if (quote && paymentIntent.amount !== quote.totalCents) {
+            setCheckoutError(t('priceChanged'))
+          }
         })
       })
       .catch(() => {
@@ -193,12 +403,14 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
       cancelled = true
       stripeRef.current = null
     }
-  }, [checkoutStep, clientSecret, publishableKey, t])
+  }, [checkoutStep, clientSecret, publishableKey, quote, t])
 
   const removeAt = (idx: number) => {
     const removed = items[idx]
     if (!removed) return
     const next = items.filter((_, i) => i !== idx)
+    setQuote(null)
+    setPaymentCart(null)
     setItems(next)
     if (typeof window !== 'undefined' && (window as any).modulivCart) {
       ;(window as any).modulivCart.setItems(next)
@@ -211,12 +423,17 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
   const updateQuantity = (idx: number, delta: number) => {
     const cur = items[idx]
     if (!cur) return
-    const nextQty = (cur.qty || 1) + delta
+    const nextQty = normalizeCartQuantity(cur.qty) + delta
     if (nextQty <= 0) {
       removeAt(idx)
       return
     }
-    const next = items.map((it, i) => (i === idx ? { ...it, qty: nextQty } : it))
+    if (nextQty > MAX_CART_ITEM_QUANTITY) return
+    const next = items.map((it, i) =>
+      i === idx ? { ...it, qty: normalizeCartQuantity(nextQty) } : it,
+    )
+    setQuote(null)
+    setPaymentCart(null)
     setItems(next)
     if (typeof window !== 'undefined' && (window as any).modulivCart) {
       ;(window as any).modulivCart.setItems(next)
@@ -229,6 +446,8 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
     if (!undoState) return
     const next = [...items]
     next.splice(undoState.index, 0, undoState.item)
+    setQuote(null)
+    setPaymentCart(null)
     setItems(next)
     if (typeof window !== 'undefined' && (window as any).modulivCart) {
       ;(window as any).modulivCart.setItems(next)
@@ -239,19 +458,19 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
 
   const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!VOUCHER_REDEMPTION_ENABLED) {
+      setPromoMessage({ text: t('promoUnavailable'), type: 'error' })
+      return
+    }
     const trimmed = normalizeVoucherCode(promoCode)
     if (isValidVoucherCode(trimmed)) {
+      // A syntactically valid code is merely a candidate. Only the successful
+      // server quote can say whether it was recognized and discounted.
+      setQuote(null)
+      setPaymentCart(null)
       setAppliedVoucherCode(trimmed)
       localStorage.setItem(VOUCHER_CODE_KEY, trimmed)
-      setPromoMessage({
-        // promoSuccess's message text carries a hardcoded "−$" prefix (messages/ is out of
-        // scope here), so this is a plain locale-formatted decimal, not a currency string.
-        text: t('promoSuccess', {
-          amount: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(50),
-          code: trimmed,
-        }),
-        type: 'success',
-      })
+      setPromoMessage({ text: t('promoPending'), type: 'success' })
     } else {
       setPromoMessage({
         text: t('promoInvalid'),
@@ -261,42 +480,20 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
   }
 
   const handleRemoveVoucher = () => {
+    setQuote(null)
+    setPaymentCart(null)
     setAppliedVoucherCode('')
     localStorage.removeItem(VOUCHER_CODE_KEY)
     setPromoMessage(null)
   }
 
-  const subtotal = items.reduce((sum, item) => sum + (item.price || 0) * (item.qty || 1), 0)
-  const discount = voucherApplied ? VOUCHER_DISCOUNT_CENTS : 0
-  const total = Math.max(0, subtotal - discount)
-
-  // Resolves local cart items (synthetic ids) to real Payload `products` document ids so
-  // a real cart/transaction can be created. Throws if any item can't be resolved rather
-  // than silently dropping it from the order.
-  const resolveCartItems = async (): Promise<
-    { catalogPrice: number; product: number; quantity: number }[]
-  > => {
-    const slugs = [...new Set(items.map((it) => PRODUCT_SLUG_ALIASES[it.id] || it.id))]
-    const res = await fetch(
-      `/api/products?where[slug][in]=${slugs.map(encodeURIComponent).join(',')}&depth=0&limit=${slugs.length}`,
-    )
-    if (!res.ok) throw new Error(t('itemUnavailable'))
-    const data = await res.json()
-    const bySlug = new Map<string, { id: number; priceInUSD: number }>(
-      (data?.docs || []).map((doc: any) => [doc.slug, { id: doc.id, priceInUSD: doc.priceInUSD }]),
-    )
-
-    return items.map((it) => {
-      const slug = PRODUCT_SLUG_ALIASES[it.id] || it.id
-      const found = bySlug.get(slug)
-      if (!found) throw new Error(t('itemUnavailable'))
-      return {
-        catalogPrice: found.priceInUSD ?? 0,
-        product: found.id,
-        quantity: Math.max(1, it.qty || 1),
-      }
-    })
-  }
+  const localSubtotal = items.reduce(
+    (sum, item) => sum + (item.price || 0) * (item.qty || 1),
+    0,
+  )
+  const subtotal = quote?.subtotalCents ?? localSubtotal
+  const discount = quote?.discountCents ?? 0
+  const total = quote?.totalCents ?? null
 
   const onSubmitAddress = async (values: AddressFormValues) => {
     setCheckoutError(null)
@@ -327,57 +524,59 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
         },
         'shipping',
       )
-    } catch (err) {
-      setCheckoutError(err instanceof CheckoutValidationError ? err.message : t('checkoutErrorGeneric'))
+    } catch {
+      setCheckoutError(t('checkoutErrorGeneric'))
       return
     }
 
     setIsSubmittingAddress(true)
     try {
-      const resolvedItems = await resolveCartItems()
-
-      // Stripe is charged cart.subtotal, which the server recomputes from catalog
-      // prices alone (see the ecommerce plugin's carts/beforeChange). It knows
-      // nothing about the KitBuilder surcharges or the voucher, both of which are
-      // applied locally — so the amount shown here and the amount charged can
-      // diverge in either direction. Refuse instead of letting them.
-      const catalogTotal = resolvedItems.reduce(
-        (sum, item) => sum + item.catalogPrice * item.quantity,
-        0,
-      )
-      if (catalogTotal !== subtotal) {
-        console.error(
-          `[checkout] price mismatch — cart subtotal ${subtotal} cents, catalog says ${catalogTotal} cents. ` +
-            'KitBuilder surcharges and the voucher are not modelled in the catalog.',
-        )
-        throw new Error(t('checkoutErrorGeneric'))
+      const freshQuote = await requestQuote(values.country)
+      setQuote(freshQuote)
+      if (hasVoucherCandidate) {
+        setPromoMessage({
+          text: freshQuote.voucherApplied ? t('promoVerified') : t('promoRejected'),
+          type: freshQuote.voucherApplied ? 'success' : 'error',
+        })
       }
 
-      await clearCart()
-      for (const item of resolvedItems) {
-        await addItem({ product: item.product }, item.quantity)
-      }
-
-      const initiated = (await initiatePayment('stripe', {
+      // Do not call the provider's clearCart/addItem and immediately initiate
+      // payment: its state update is asynchronous for a first guest checkout.
+      // Create the exact quote lines, verify the returned cart fingerprint and
+      // subtotal, then initiate Stripe explicitly against that cart ID.
+      const verifiedCart = await createVerifiedCheckoutCart({
+        expectedItems: freshQuote.items,
+        expectedSubtotalCents: freshQuote.subtotalCents,
+      })
+      const initiated = await initiateVerifiedCheckoutPayment({
         additionalData: {
           billingAddress: address,
           customerEmail: values.email,
           locale,
           shippingAddress: address,
-          // Previewed above, but only honoured if the server recognises it — the
-          // charged amount comes back from the PaymentIntent, not from here.
-          voucherCode: voucherApplied ? appliedVoucherCode : undefined,
+          voucherCode: hasVoucherCandidate ? appliedVoucherCode : undefined,
         },
-      })) as { clientSecret?: string } | undefined
-
-      if (!initiated?.clientSecret) throw new Error(t('checkoutErrorGeneric'))
+        cart: verifiedCart,
+        expectedAmountCents: freshQuote.totalCents,
+      })
 
       setCheckoutEmail(values.email)
+      setPaymentCart(verifiedCart)
       setClientSecret(initiated.clientSecret)
-      setAmountDueCents(null)
+      setAmountDueCents(initiated.amountInUSD)
       setCheckoutStep('payment')
     } catch (err) {
-      setCheckoutError(err instanceof Error ? err.message : t('checkoutErrorGeneric'))
+      if (err instanceof QuoteRequestError) {
+        setQuote(null)
+        setQuoteError(quoteErrorMessage(err.code))
+        setCheckoutStep('cart')
+      } else if (err instanceof CheckoutCartWriteError) {
+        setCheckoutError(t('checkoutCartWriteFailed'))
+      } else if (err instanceof CheckoutPaymentStartError) {
+        setCheckoutError(t('checkoutErrorGeneric'))
+      } else {
+        setCheckoutError(t('checkoutErrorGeneric'))
+      }
     } finally {
       setIsSubmittingAddress(false)
     }
@@ -385,6 +584,17 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
 
   const handlePay = async () => {
     if (!stripeRef.current) return
+    const quoteFingerprint = quote ? canonicalCheckoutFingerprint(quote.items) : null
+    if (
+      !quote ||
+      !paymentCart ||
+      amountDueCents !== quote.totalCents ||
+      !quoteFingerprint ||
+      paymentCart.fingerprint !== quoteFingerprint
+    ) {
+      setCheckoutError(t('priceChanged'))
+      return
+    }
     setCheckoutError(null)
     setIsPaying(true)
     try {
@@ -398,40 +608,56 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
         redirect: 'if_required',
       })
       if (error) throw new Error(error.message || t('checkoutErrorGeneric'))
-      if (!paymentIntent || paymentIntent.status !== 'succeeded') {
-        throw new Error(t('checkoutErrorGeneric'))
+      if (
+        !paymentIntent ||
+        paymentIntent.status !== 'succeeded' ||
+        paymentIntent.amount !== quote.totalCents
+      ) {
+        throw new Error(t('priceChanged'))
       }
 
-      const confirmed = (await confirmOrder('stripe', {
-        additionalData: { customerEmail: checkoutEmail, paymentIntentID: paymentIntent.id },
-      })) as { orderID?: number | string } | undefined
-
-      if (!confirmed?.orderID) throw new Error(t('checkoutErrorGeneric'))
+      const confirmed = await confirmVerifiedCheckoutOrder({
+        cart: paymentCart,
+        customerEmail: checkoutEmail,
+        paymentIntentID: paymentIntent.id,
+      })
 
       setOrderRef(String(confirmed.orderID))
       setIsOrdered(true)
+      setPaymentCart(null)
       if (typeof window !== 'undefined' && (window as any).modulivCart) {
         ;(window as any).modulivCart.setItems([])
       }
     } catch (err) {
-      setCheckoutError(err instanceof Error ? err.message : t('checkoutErrorGeneric'))
+      setCheckoutError(
+        err instanceof CheckoutPaymentStartError ? t('checkoutErrorGeneric') : t('checkoutErrorGeneric'),
+      )
     } finally {
       setIsPaying(false)
     }
   }
 
-  const checkoutDisabled = !stripeReady
+  const checkoutUnavailable = !stripeReady
+  const checkoutDisabled = checkoutUnavailable || !quote || isQuoting || Boolean(quoteError)
   const conciergeHref = `mailto:concierge@theflatset.com?subject=${encodeURIComponent(
-    'Help completing my The Flat Set order',
+    t('conciergeSubject'),
   )}&body=${encodeURIComponent(
     [
-      'Hello The Flat Set concierge,',
+      t('conciergeGreeting'),
       '',
-      'Please help me complete this saved cart:',
-      ...items.map((item) => `• ${item.qty || 1} × ${item.name} — ${formatCurrency((item.price || 0) * (item.qty || 1), { locale })}`),
-      `Total: ${formatCurrency(total, { locale })}`,
+      t('conciergeRequest'),
+      ...items.map((item) =>
+        t('conciergeProductLine', {
+          name: item.name,
+          quantity: normalizeCartQuantity(item.qty),
+          subtotal: formatCurrency(item.price * normalizeCartQuantity(item.qty), { locale }),
+        }),
+      ),
+      quote
+        ? t('conciergeQuotedTotal', { total: formatCurrency(quote.totalCents, { locale }) })
+        : t('conciergeQuotePending'),
       '',
-      'Please reply with the secure next step. I have not included payment details in this email.',
+      t('conciergeNoPaymentDetails'),
     ].join('\n'),
   )}`
   const ctaClass =
@@ -530,25 +756,39 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
             )}
             <div className="divide-y divide-outline-variant/30 border-t border-b border-outline-variant/30">
               {items.map((it, idx) => (
-                <article className="flex flex-col sm:flex-row gap-5 py-6" key={`${it.id}-${idx}`}>
+                <article className="flex flex-col sm:flex-row gap-5 py-6" key={storefrontCartLineKey(it)}>
                   <div className="relative w-full sm:w-28 h-28 bg-surface-container overflow-hidden shrink-0 rounded-lg">
                     <Image
-                      alt={it.name || 'Cart item thumbnail'}
+                      alt={t('cartItemImage', { name: it.name })}
                       className="object-cover"
                       fill
                       sizes="112px"
-                      src={THUMBS[it.id] || '/assets/homepage/hero-split.png'}
+                      src={it.image || THUMBS[it.id] || '/assets/homepage/hero-split.png'}
                     />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between gap-4 items-baseline">
                       <h3 className="font-headline-sm text-[19px] text-on-surface">{it.name}</h3>
-                      <span className="font-medium text-on-surface whitespace-nowrap" dir="ltr">
-                        {formatCurrency((it.price || 0) * (it.qty || 1), { locale })}
-                      </span>
+                      <div className="shrink-0 text-end" dir="ltr">
+                        <span className="block font-medium text-on-surface whitespace-nowrap">
+                          {formatCurrency((it.price || 0) * (it.qty || 1), { locale })}
+                        </span>
+                        {(it.qty || 1) > 1 && (
+                          <span className="block text-[11px] text-on-surface-variant whitespace-nowrap">
+                            {formatCurrency(it.price || 0, { locale })} × {it.qty}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    {it.variant && (
-                      <p className="font-body-md text-sm text-on-surface-variant mt-1">{it.variant}</p>
+                    {cartVariantLabel(it) && (
+                      <p className="font-body-md text-sm text-on-surface-variant mt-1">
+                        {cartVariantLabel(it)}
+                      </p>
+                    )}
+                    {it.imageIsRepresentative && (
+                      <p className="mt-1 text-xs text-on-surface-variant" data-cart-image-disclosure="">
+                        {t('representativeImage')}
+                      </p>
                     )}
                     <div className="flex items-center gap-5 mt-4">
                       <div className="inline-flex items-center border border-outline-variant rounded">
@@ -560,18 +800,25 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                         >
                           −
                         </button>
-                        <span aria-live="polite" className="w-9 text-center font-label-md text-sm">
+                        <output
+                          aria-label={t('quantityValue', { quantity: normalizeCartQuantity(it.qty) })}
+                          className="w-9 text-center font-label-md text-sm"
+                        >
                           {it.qty}
-                        </span>
+                        </output>
                         <button
                           aria-label={t('increaseQuantity')}
-                          className="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
+                          className="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-45"
+                          disabled={it.qty >= MAX_CART_ITEM_QUANTITY}
                           onClick={() => updateQuantity(idx, 1)}
                           type="button"
                         >
                           +
                         </button>
                       </div>
+                      {it.qty >= MAX_CART_ITEM_QUANTITY && (
+                        <span className="text-xs text-on-surface-variant">{t('quantityLimitReached')}</span>
+                      )}
                       <button
                         className="font-label-md text-[12px] uppercase tracking-wider text-on-surface-variant underline hover:text-error transition-colors cursor-pointer"
                         onClick={() => removeItem(idx)}
@@ -589,47 +836,124 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
           {/* Summary Box */}
           <div className="lg:col-span-5 bg-surface-container-low border border-outline-variant/60 rounded-xl p-6 lg:p-8 sticky top-28">
             <h2 className="font-headline-sm text-xl text-on-surface mb-6">{t('orderSummary')}</h2>
+            {checkoutStep === 'cart' && (
+              <div className="mb-5">
+                <label
+                  className="mb-1.5 block font-label-md text-[11px] uppercase tracking-wider text-on-surface-variant"
+                  htmlFor="cart-destination"
+                >
+                  {t('deliveryDestination')}
+                </label>
+                <select
+                  className="w-full rounded border border-outline-variant/60 bg-surface px-3 py-3 text-sm text-on-surface focus:border-primary focus:outline-none"
+                  id="cart-destination"
+                  onChange={(event) => {
+                    setQuote(null)
+                    setPaymentCart(null)
+                    setValue('country', event.target.value, { shouldValidate: true })
+                  }}
+                  value={watchedCountry}
+                >
+                  <option value="">{t('selectCountry')}</option>
+                  {ODSAI_DESTINATIONS.map((country) => (
+                    <option key={country.value} value={country.value}>
+                      {regionNames.of(country.value) || country.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <dl className="space-y-4 font-body-md text-sm">
               <div className="flex justify-between gap-4">
-                <dt className="text-on-surface-variant">{t('subtotal')}</dt>
+                <dt className="text-on-surface-variant">{t('productSubtotalBeforeDelivery')}</dt>
                 <dd className="font-medium text-on-surface" dir="ltr">{formatCurrency(subtotal, { locale })}</dd>
               </div>
+              {!quote && (
+                <div>
+                  <dt className="sr-only">{t('productSubtotalBeforeDelivery')}</dt>
+                  <dd className="text-[11px] text-on-surface-variant">
+                    {t('subtotalPendingVerification')}
+                  </dd>
+                </div>
+              )}
               <div className="flex justify-between gap-4">
                 <dt className="text-on-surface-variant flex items-center gap-1">
                   <span>{t('shipping')}</span>
                   <span className="text-[11px] text-neutral-600 font-normal">{t('shippingDdpNote')}</span>
                 </dt>
-                <dd className="text-primary font-medium">
-                  {t('included')} <span dir="ltr">({formatCurrency(0, { locale })})</span>
+                <dd className="text-primary font-medium" dir="ltr">
+                  {quote
+                    ? formatCurrency(quote.shippingAndImportCents, { locale })
+                    : t('ddpTotalPending')}
                 </dd>
               </div>
 
-              {/* DDP Logistics & IKEA Savings Callout */}
-              <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg text-xs space-y-1.5">
-                <div className="flex items-center gap-1.5 font-semibold text-primary">
+              <div>
+                <dt className="sr-only">{t('ddpQuoteReady')}</dt>
+                <dd className="p-3 bg-primary/5 border border-primary/20 rounded-lg text-xs space-y-1.5">
+                  <div className="flex items-center gap-1.5 font-semibold text-primary">
                   <StorefrontIcon name="verified" size={15} />
-                  <span>{t('freeShippingBadge', { amount: formatCurrency(25500, { locale }) })}</span>
+                  <span>{quote ? t('ddpQuoteReady') : t('ddpQuotePrompt')}</span>
                 </div>
-                <p className="text-neutral-600 leading-relaxed text-[11px]">
-                  {t('freeShippingDetail', { boxes: 6, weight: 102 })}
-                </p>
-                <div className="pt-1 border-t border-primary/10 flex justify-between items-center text-[11px]">
-                  <span className="text-neutral-600">{t('ikeaCompareLabel')}</span>
-                  <Link href="/us-vs-ikea" className="font-bold text-emerald-700 hover:underline">
-                    {t('ikeaCompareCta', { amount: formatCurrency(69000, { locale }) })}
-                  </Link>
-                </div>
+                {quote ? (
+                  <>
+                    <p className="text-neutral-700 leading-relaxed text-[11px]">
+                      {t('ddpQuoteDetail', {
+                        daysMax: quote.deliveryDays.max,
+                        daysMin: quote.deliveryDays.min,
+                        productionDaysMax: quote.productionDays.max,
+                        productionDaysMin: quote.productionDays.min,
+                        zone: quote.zone,
+                      })}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-neutral-700 leading-relaxed text-[11px]">
+                    {t('ddpQuotePromptDetail')}
+                  </p>
+                )}
+                {isQuoting && <p className="text-[11px] text-on-surface-variant">{t('quoting')}</p>}
+                {quoteError && (
+                  <div className="space-y-2" id="quote-error-recovery" role="alert">
+                    <p className="text-[11px] text-error">{quoteError}</p>
+                    <p className="text-[11px] text-on-surface-variant">{t('quoteRecovery')}</p>
+                    <div className="flex flex-wrap gap-3 text-[11px]">
+                      <button
+                        className="font-label-md uppercase tracking-wider text-primary underline"
+                        onClick={() => setQuoteRetry((retry) => retry + 1)}
+                        type="button"
+                      >
+                        {t('retryQuote')}
+                      </button>
+                      <a className="font-label-md uppercase tracking-wider text-primary underline" href={conciergeHref}>
+                        {t('contactConcierge')}
+                      </a>
+                    </div>
+                  </div>
+                )}
+                </dd>
               </div>
 
-              {voucherApplied && (
-                <div className="flex justify-between gap-4 items-center border border-primary/30 bg-primary-fixed/20 px-3 py-2 rounded">
+              {hasVoucherCandidate && (
+                <div className="flex justify-between gap-4 items-center border border-primary/30 bg-primary-fixed/20 px-3 py-2 rounded" data-voucher-status="">
                   <dt className="text-on-surface">
-                    {t('voucher')} <span className="font-label-md text-[12px] uppercase tracking-wider text-primary">SWATCH50</span>
+                    {t('voucher')}
+                    <span className="ms-2 text-xs text-on-surface-variant">
+                      {isQuoting
+                        ? t('promoPending')
+                        : quote?.voucherApplied
+                          ? t('promoVerified')
+                          : quote
+                            ? t('promoRejected')
+                            : t('promoPending')}
+                    </span>
                   </dt>
                   <dd className="flex items-center gap-3">
-                    <span className="text-primary font-medium" dir="ltr">
-                      −{formatCurrency(discount, { locale })}
-                    </span>
+                    {quote?.voucherApplied && discount > 0 && (
+                      <span className="text-primary font-medium" dir="ltr">
+                        −{formatCurrency(discount, { locale })}
+                      </span>
+                    )}
                     <button
                       aria-label={t('removeVoucher')}
                       className="p-2 text-on-surface-variant hover:text-error transition-colors cursor-pointer"
@@ -643,11 +967,13 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
               )}
 
               {checkoutStep === 'cart' && (
-                <div className="pt-3 border-t border-outline-variant/30" id="promo-code-section">
-                  <label
-                    className="block font-label-md text-[11px] uppercase tracking-wider text-on-surface-variant mb-1.5"
-                    htmlFor="promo-code-input"
-                  >
+                <div>
+                  <dt className="sr-only">{t('promoLabel')}</dt>
+                  <dd className="pt-3 border-t border-outline-variant/30" id="promo-code-section">
+                    <label
+                      className="block font-label-md text-[11px] uppercase tracking-wider text-on-surface-variant mb-1.5"
+                      htmlFor="promo-code-input"
+                    >
                     {t('promoLabel')}
                   </label>
                   <form className="flex gap-2" onSubmit={handleApplyPromo}>
@@ -668,24 +994,27 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                       {t('promoApply')}
                     </button>
                   </form>
-                  {promoMessage && (
-                    <p
-                      className={`text-xs mt-1.5 ${
-                        promoMessage.type === 'success' ? 'text-primary' : 'text-error'
-                      }`}
-                      id="promo-feedback"
-                      role="alert"
-                    >
-                      {promoMessage.text}
-                    </p>
-                  )}
+                    {promoMessage && (
+                      <p
+                        className={`text-xs mt-1.5 ${
+                          promoMessage.type === 'success' ? 'text-primary' : 'text-error'
+                        }`}
+                        id="promo-feedback"
+                        role="alert"
+                      >
+                        {promoMessage.text}
+                      </p>
+                    )}
+                  </dd>
                 </div>
               )}
 
               <div className="flex justify-between gap-4 pt-4 border-t border-outline-variant/40 text-lg">
-                <dt className="font-medium text-on-surface">{t('total')}</dt>
+                <dt className="font-medium text-on-surface">
+                  {quote ? t('total') : t('ddpQuotePrompt')}
+                </dt>
                 <dd className="font-headline-sm text-headline-sm text-on-surface" dir="ltr" id="sum-total">
-                  {formatCurrency(total, { locale })}
+                  {total === null ? t('ddpTotalPending') : formatCurrency(total, { locale })}
                 </dd>
               </div>
             </dl>
@@ -699,6 +1028,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
             {checkoutStep === 'cart' && (
               <>
                 <button
+                  aria-describedby={quoteError ? 'quote-error-recovery' : undefined}
                   className={`mt-8 w-full ${ctaClass} disabled:opacity-50 disabled:cursor-not-allowed`}
                   disabled={checkoutDisabled}
                   id="checkout-btn"
@@ -708,7 +1038,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                   {t('checkout')}
                   <StorefrontIcon className="ms-2" name={isRtl ? 'arrow_back' : 'arrow_forward'} size={18} />
                 </button>
-                {checkoutDisabled && (
+                {checkoutUnavailable && (
                   <div className="mt-4 rounded-xl bg-surface-container p-4" role="status">
                     <p className="font-label-md text-sm text-on-surface">{t('checkoutUnavailable')}</p>
                     <p className="mt-1 text-sm text-on-surface-variant">{t('checkoutUnavailableHelp')}</p>
@@ -721,7 +1051,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                     </a>
                   </div>
                 )}
-                {!checkoutDisabled && (
+                {!checkoutUnavailable && quote && (
                   <>
                     <p className="mt-4 font-body-md text-[13px] text-on-surface-variant flex items-start gap-2">
                       <StorefrontIcon className="mt-0.5 text-primary" name="credit_card" size={16} />
@@ -873,7 +1203,7 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                       <option value="">{t('countryPlaceholder')}</option>
                       {ODSAI_DESTINATIONS.map((c) => (
                         <option key={c.value} value={c.value}>
-                          {c.label}
+                          {regionNames.of(c.value) || c.label}
                         </option>
                       ))}
                     </select>
@@ -928,7 +1258,12 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                 <div id="checkout-payment-element" />
                 <button
                   className={`w-full ${ctaClass} disabled:opacity-50 disabled:cursor-not-allowed`}
-                  disabled={isPaying}
+                  disabled={
+                    isPaying ||
+                    !paymentCart ||
+                    !quote ||
+                    amountDueCents !== quote.totalCents
+                  }
                   onClick={handlePay}
                   type="button"
                 >
@@ -940,6 +1275,8 @@ export function CartView({ publishableKey }: { publishableKey: string }) {
                   onClick={() => {
                     setCheckoutError(null)
                     setClientSecret(null)
+                    setAmountDueCents(null)
+                    setPaymentCart(null)
                     setCheckoutStep('address')
                   }}
                   type="button"

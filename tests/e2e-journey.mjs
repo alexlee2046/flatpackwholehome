@@ -17,7 +17,7 @@ try {
     if (message.type() === 'error') consoleErrors.push(message.text())
   })
   page.on('response', (response) => {
-    if (response.request().resourceType() === 'image' && !response.ok()) {
+    if (response.request().resourceType() === 'image' && response.status() >= 400) {
       failedImages.push(`${response.status()} ${response.url()}`)
     }
   })
@@ -26,9 +26,10 @@ try {
   await page.keyboard.press('Tab')
   assert.equal(await page.locator('.skip-link').evaluate((node) => node === document.activeElement), true)
 
-  const testimonials = await page.locator('blockquote').allTextContents()
-  assert.equal(testimonials.length, 3)
-  assert.ok(testimonials.every((quote) => quote.replace(/[“”\s]/g, '').length > 20), 'Testimonials must contain meaningful copy')
+  const trustStrip = (await page.locator('[data-home-stat]').allTextContents()).join(' ')
+  assert.match(trustStrip, /6/)
+  assert.match(trustStrip, /0/)
+  assert.doesNotMatch(trustStrip.toLowerCase(), /verified reviews/)
 
   await open(page, '/en/1-bedroom-kit-builder')
   const builderImage = page.locator('[data-animated-image-swap] img').first()
@@ -50,7 +51,7 @@ try {
   await open(page, '/en/products/modusofa')
   const displayedPrice = (await page.locator('[data-product-price]').textContent()).trim()
   const addButton = page.locator('[data-pdp-add]')
-  assert.ok((await addButton.textContent()).includes(displayedPrice), 'PDP price and CTA amount must match')
+  const purchaseAvailable = (await addButton.count()) === 1
   const structuredProductPrice = await page.evaluate(() =>
     [...document.querySelectorAll('script[type="application/ld+json"]')]
       .map((script) => {
@@ -58,7 +59,13 @@ try {
       })
       .find((value) => value?.['@type'] === 'Product')?.offers?.price,
   )
-  assert.equal(structuredProductPrice, 699, 'Product structured data must expose dollars, not cents')
+  if (purchaseAvailable) {
+    assert.ok((await addButton.textContent()).includes(displayedPrice), 'PDP price and CTA amount must match')
+    assert.equal(structuredProductPrice, 699, 'Product structured data must expose dollars, not cents')
+  } else {
+    assert.equal(await page.locator('[data-pdp-purchase-unavailable]').isVisible(), true)
+    assert.equal(structuredProductPrice, undefined, 'Unavailable catalog data must not emit a live offer')
+  }
 
   const fabricButtons = page.locator('button[aria-label^="Select "]')
   assert.equal(await fabricButtons.count(), 4)
@@ -73,31 +80,83 @@ try {
     assert.ok(await image.evaluate((node) => node.complete && node.naturalWidth > 0))
   }
 
-  await addButton.click()
+  await fabricButtons.nth(1).click()
+  await page.getByRole('button', { name: 'Smoked Walnut', exact: true }).click()
+  const visualConfiguration = page.locator('[data-product-visual-configuration]')
+  const configurationSummary = page.locator('[data-pdp-configuration-summary]')
+  assert.match(await visualConfiguration.innerText(), /Cream Bouclé/)
+  assert.match(await visualConfiguration.innerText(), /Smoked Walnut/)
+  assert.match(await configurationSummary.innerText(), /Cream Bouclé/)
+  assert.match(await configurationSummary.innerText(), /Smoked Walnut/)
+
+  if (purchaseAvailable) await addButton.click()
   await open(page, '/en/cart')
   await page.waitForTimeout(250)
-  const checkout = page.locator('#checkout-btn')
-  if (await checkout.isDisabled()) {
-    assert.equal(await page.locator('a[href^="mailto:concierge@theflatset.com"]').isVisible(), true)
-    assert.equal(await page.getByText(/Apple Pay and Google Pay/).count(), 0)
+  if (purchaseAvailable) {
+    const checkout = page.locator('#checkout-btn')
+    if (await checkout.isDisabled()) {
+      assert.equal(await page.locator('a[href^="mailto:concierge@theflatset.com"]').isVisible(), true)
+      assert.equal(await page.getByText(/Apple Pay and Google Pay/).count(), 0)
+    }
+  } else {
+    assert.equal(await page.getByText('Your Cart is Empty').isVisible(), true)
   }
 
   await open(page, '/en/free-swatch-box-material-discovery')
   const swatchCopy = (await page.locator('main').innerText()).toLowerCase()
   assert.match(swatchCopy, /\$5/)
   assert.doesNotMatch(swatchCopy, /ships free|free ddp delivery/)
-  assert.equal(await page.locator('input[name="website"]').getAttribute('type'), 'hidden')
+  const swatchHoneypot = page.locator('input[name="website"]')
+  if ((await swatchHoneypot.count()) === 1) {
+    assert.equal(await swatchHoneypot.getAttribute('type'), 'hidden')
+  } else {
+    assert.equal(await page.locator('form').count(), 0, 'Disabled swatch fulfillment must not collect an address')
+    assert.equal(await page.locator('a[href^="mailto:concierge@theflatset.com"]').first().isVisible(), true)
+  }
 
   await page.setViewportSize({ height: 844, width: 390 })
   await open(page, '/en/1-bedroom-kit-builder')
-  assert.equal(await page.locator('#kit-add').isVisible(), false)
-  await page.locator('[data-kit-customizer]').scrollIntoViewIfNeeded()
-  await page.waitForTimeout(250)
-  assert.equal(await page.locator('#kit-add').isVisible(), true)
-  const purchaseBar = await page.locator('#kit-add').locator('xpath=ancestor::div[contains(@class,"fixed")]').boundingBox()
-  assert.ok(purchaseBar && purchaseBar.height < 120, `Mobile purchase bar is too tall: ${purchaseBar?.height}`)
+  const kitAdd = page.locator('#kit-add')
+  if ((await kitAdd.count()) === 1) {
+    assert.equal(await kitAdd.isVisible(), false)
+    await page.locator('[data-kit-customizer]').scrollIntoViewIfNeeded()
+    await page.waitForTimeout(250)
+    assert.equal(await kitAdd.isVisible(), true)
+    const purchaseBar = await kitAdd.locator('xpath=ancestor::div[contains(@class,"fixed")]').boundingBox()
+    assert.ok(purchaseBar && purchaseBar.height < 120, `Mobile purchase bar is too tall: ${purchaseBar?.height}`)
+  } else {
+    await page.locator('[data-kit-customizer]').scrollIntoViewIfNeeded()
+    await page.waitForFunction(() => {
+      const unavailable = document.querySelector('[data-kit-purchase-unavailable]')
+      return unavailable instanceof HTMLElement && unavailable.offsetParent !== null
+    })
+    assert.equal(await page.locator('[data-kit-purchase-unavailable]').isVisible(), true)
+  }
+
+  await open(page, '/en/products/modusofa')
+  assert.equal(await page.locator('[data-mobile-purchase-bar]').count(), 0)
+  if ((await page.locator('#pdp-add').count()) === 1) {
+    await page.locator('[data-pdp-configurator-start]').scrollIntoViewIfNeeded()
+    await page.waitForFunction(() => document.querySelector('[data-mobile-purchase-bar]'))
+    await page.locator('#pdp-add').scrollIntoViewIfNeeded()
+    await page.waitForFunction(() => !document.querySelector('[data-mobile-purchase-bar]'))
+  } else {
+    assert.equal(await page.locator('[data-pdp-purchase-unavailable]').isVisible(), true)
+  }
 
   await open(page, '/en')
+  await page.locator('#mobile-menu-trigger').click()
+  assert.equal(await page.locator('#mobile-nav-drawer').getAttribute('aria-modal'), 'true')
+  assert.equal(await page.locator('main').evaluate((node) => node.inert), true)
+  for (let index = 0; index < 20; index += 1) await page.keyboard.press('Tab')
+  assert.equal(
+    await page.evaluate(() => document.querySelector('#mobile-nav-drawer')?.contains(document.activeElement)),
+    true,
+    'Keyboard focus must stay inside the mobile drawer',
+  )
+  await page.keyboard.press('Escape')
+  assert.equal(await page.locator('main').evaluate((node) => node.inert), false)
+
   await page.locator('[data-home-comparison]').scrollIntoViewIfNeeded()
   assert.ok((await page.locator('[data-home-comparison] article').count()) >= 4)
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth <= 1))

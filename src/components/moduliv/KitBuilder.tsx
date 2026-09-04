@@ -4,11 +4,16 @@ import { Link, usePathname, useRouter } from '@/i18n/navigation'
 import { localeDetails } from '@/i18n/routing'
 import { AnimatedImageSwap } from '@/components/motion/AnimatedImageSwap'
 import { resolveStorefrontMedia } from '@/utilities/storefrontMedia'
+import { findStorefrontVariant, type StorefrontVariant } from '@/lib/commerce/storefrontCart'
+import {
+  getStorefrontCheckoutEligibility,
+  type StorefrontCheckoutProduct,
+} from '@/lib/commerce/catalogEligibility'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import Image from 'next/image'
 import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
-import { ArrowLeft, ArrowRight, CircleCheck, Gift, Info, Moon, ShoppingCart, Truck, Wrench } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CircleCheck, Gift, ShoppingCart, Truck, Wrench } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 import React, { Suspense, useEffect, useRef, useState } from 'react'
@@ -25,7 +30,6 @@ const SPACES: Record<
     caption: string
     cta: string
     img: string
-    price: number
   }
 > = {
   bedroom: {
@@ -34,7 +38,6 @@ const SPACES: Record<
     caption: '2 of 6 boxes — the bedroom set (bed frame + nightstands).',
     cta: 'Bedroom Set',
     img: '/assets/1-bedroom-kit-builder/da48e93272.png',
-    price: 80000,
   },
   full: {
     alt: 'Wide render of the furnished 1-bedroom Japandi apartment included in the kit',
@@ -42,7 +45,6 @@ const SPACES: Record<
     caption: 'All 6 boxes included in the Full Home bundle.',
     cta: 'Full Bundle',
     img: '/assets/1-bedroom-kit-builder/b4e5f4d8a0.png',
-    price: 149900,
   },
   living: {
     alt: 'Living room setup featuring the modular Japandi sofa and coffee table',
@@ -50,7 +52,6 @@ const SPACES: Record<
     caption: '2 of 6 boxes — the ModuSofa living set (sofa base + backs).',
     cta: 'Living Set',
     img: '/assets/1-bedroom-kit-builder/188581c175.png',
-    price: 69900,
   },
 }
 
@@ -96,12 +97,15 @@ export type KitBuilderProductData = {
     weight?: string | null
   }> | null
   boxCount?: number | null
+  checkout?: StorefrontCheckoutProduct
   id?: string | number
   joineryType?: string | null
   priceInUSD?: number | null
+  shippingWeightKg?: number | null
   slug?: string
   subtitle?: string | null
   title?: string
+  variants?: StorefrontVariant[]
 }
 
 export type KitBuilderSpaceData = {
@@ -123,6 +127,7 @@ export type KitBuilderMaterialData = {
 export type KitBuilderProps = {
   bedProduct?: KitBuilderProductData | null
   bundleProduct?: KitBuilderProductData | null
+  checkoutEnabled?: boolean
   livingProduct?: KitBuilderProductData | null
   materials?: KitBuilderMaterialData[] | null
   spaces?: KitBuilderSpaceData[] | null
@@ -131,6 +136,7 @@ export type KitBuilderProps = {
 function KitBuilderInner({
   bedProduct,
   bundleProduct,
+  checkoutEnabled = false,
   livingProduct,
   materials,
   spaces,
@@ -158,11 +164,11 @@ function KitBuilderInner({
   const walnutLabel = walnutMaterial?.title || 'Smoked Walnut'
   const [wood, setWood] = useState(searchParams.get('wood') === 'walnut' ? walnutLabel : defaultWood)
 
-  const [hasMattress, setHasMattress] = useState(searchParams.get('mattress') === '1')
   const [isAdded, setIsAdded] = useState(false)
   const [cartError, setCartError] = useState(false)
   const [showMobilePurchaseBar, setShowMobilePurchaseBar] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
+  const isNavigatingRef = useRef(false)
   const previousSpace = useRef<SpaceKey>(space)
 
   const spaceWholeHome = spaces?.find((s) => s.slug === 'whole-home')
@@ -177,7 +183,6 @@ function KitBuilderInner({
       caption: string
       cta: string
       img: string
-      price: number
     }
   > = {
     bedroom: {
@@ -186,7 +191,6 @@ function KitBuilderInner({
       caption: spaceBedroomDoc?.intro || SPACES.bedroom.caption,
       cta: spaceBedroomDoc?.title || tKit('bedroom'),
       img: resolveSpaceImage('bedroom', spaceBedroomDoc?.hero),
-      price: bedProduct?.priceInUSD || SPACES.bedroom.price,
     },
     full: {
       alt: SPACES.full.alt,
@@ -194,7 +198,6 @@ function KitBuilderInner({
       caption: spaceWholeHome?.intro || SPACES.full.caption,
       cta: spaceWholeHome?.title || tKit('fullHome'),
       img: resolveSpaceImage('full', spaceWholeHome?.hero),
-      price: bundleProduct?.priceInUSD || SPACES.full.price,
     },
     living: {
       alt: SPACES.living.alt,
@@ -202,30 +205,29 @@ function KitBuilderInner({
       caption: spaceLivingDoc?.intro || SPACES.living.caption,
       cta: spaceLivingDoc?.title || tKit('living'),
       img: resolveSpaceImage('living', spaceLivingDoc?.hero),
-      price: livingProduct?.priceInUSD || SPACES.living.price,
     },
   }
 
   const currentSpace = dynamicSpaces[space]
+  const currentProduct =
+    space === 'full' ? bundleProduct : space === 'living' ? livingProduct : bedProduct
   const isLiving = space === 'living'
 
   // Keep the customizer selection shareable/restorable via the URL query string.
   useEffect(() => {
+    if (isNavigatingRef.current) return
     const query: Record<string, string> = {}
     if (space !== 'full') query.space = space
     const fabricId = FABRIC_ITEMS.find((f) => f.label === fabric)?.id
     if (fabricId && fabricId !== 'corduroy') query.fabric = fabricId
     if (wood === walnutLabel) query.wood = 'walnut'
-    if (!isLiving) {
-      if (bed !== 'queen') query.bed = bed
-      if (hasMattress) query.mattress = '1'
-    }
+    if (!isLiving && bed !== 'queen') query.bed = bed
     router.replace(
       Object.keys(query).length > 0 ? { pathname, query } : { pathname },
       { scroll: false },
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [space, bed, fabric, wood, hasMattress, isLiving])
+  }, [space, bed, fabric, wood, isLiving])
 
   useEffect(() => {
     const customizer = rootRef.current?.querySelector('[data-kit-customizer]')
@@ -258,20 +260,23 @@ function KitBuilderInner({
     }
   })
 
-  // Add-ons are separate catalog products so the server can price them. Keeping
-  // them as a surcharge folded into one line item meant the cart showed a total
-  // the checkout had no way to charge.
-  const addOns = isLiving
-    ? []
-    : [
-        ...(bed === 'king'
-          ? [{ id: 'king-bed-upgrade', name: tKit('kingUpgradeTitle'), price: KING_UPGRADE_PRICE }]
-          : []),
-        ...(hasMattress
-          ? [{ id: 'mattress', name: tKit('mattressTitle'), price: MATTRESS_PRICE }]
-          : []),
-      ]
-  const total = currentSpace.price + addOns.reduce((sum, a) => sum + a.price, 0)
+  const fabricId = FABRIC_ITEMS.find((item) => item.label === fabric)?.id || 'corduroy'
+  const selection = {
+    ...(isLiving || space === 'full' ? { upholstery: fabricId } : {}),
+    'wood-finish': wood === walnutLabel ? 'walnut' : 'oak',
+    ...(!isLiving ? { 'bed-size': bed } : {}),
+  }
+  const selectedVariant = findStorefrontVariant(currentProduct?.variants, selection)
+  const checkoutEligibility = currentProduct?.checkout
+    ? getStorefrontCheckoutEligibility(currentProduct.checkout, currentProduct.variants, selection)
+    : { available: false, code: 'CATALOG_UNAVAILABLE', requiresVariant: true }
+  const configuredPrice =
+    checkoutEligibility.available && typeof selectedVariant?.price === 'number' && selectedVariant.price > 0
+      ? selectedVariant.price
+      : undefined
+  const canAddToCart = checkoutEnabled && checkoutEligibility.available && Boolean(selectedVariant) &&
+    configuredPrice !== undefined
+  const total = configuredPrice
 
   useGSAP(
     () => {
@@ -329,31 +334,39 @@ function KitBuilderInner({
 
   const handleAddToCart = () => {
     const cart = typeof window !== 'undefined' ? (window as any).modulivCart : null
-    if (!cart || typeof cart.add !== 'function') {
+    if (
+      isAdded ||
+      !canAddToCart ||
+      !currentProduct?.slug ||
+      !selectedVariant ||
+      configuredPrice === undefined ||
+      !cart ||
+      typeof cart.add !== 'function'
+    ) {
       setCartError(true)
       setTimeout(() => setCartError(false), 4000)
       return
     }
 
     const variantParts = [fabric, wood]
-    if (!isLiving) variantParts.push(bed === 'king' ? `${tKit('kingUpgradeTitle')} (+${formatCurrency(KING_UPGRADE_PRICE, { locale })})` : tKit('queen'))
-    if (!isLiving && hasMattress) variantParts.push(`${tKit('mattressTitle')} (+${formatCurrency(MATTRESS_PRICE, { locale })})`)
-
-    for (const addOn of addOns) {
-      cart.add(1, { id: addOn.id, name: addOn.name, price: addOn.price, qty: 1, variant: '' })
-    }
+    if (!isLiving) variantParts.push(bed === 'king' ? tKit('king') : tKit('queen'))
 
     cart.add(1, {
-      id: 'bundle-1bed',
-      name: bundleProduct?.title
-        ? `${bundleProduct.title} (${currentSpace.cta})`
-        : `The Flat Set 1-Bedroom (${currentSpace.cta})`,
-      price: currentSpace.price,
+      boxCount: currentSpace.boxes.length,
+      id: currentProduct.slug,
+      image: currentSpace.img,
+      // The CMS has no exact multi-option image association for this view.
+      imageIsRepresentative: true,
+      name: currentProduct.title || currentSpace.cta,
+      price: configuredPrice,
       qty: 1,
+      shippingWeightKg: currentProduct.shippingWeightKg || undefined,
       variant: variantParts.join(' · '),
+      variantId: selectedVariant.id,
     })
 
     setCartError(false)
+    isNavigatingRef.current = true
     setIsAdded(true)
     setTimeout(() => {
       router.push('/cart')
@@ -429,6 +442,11 @@ function KitBuilderInner({
                 })}
               </div>
             </div>
+            {selectedVariant && (
+              <p className="text-xs text-on-surface-variant" data-kit-image-disclosure="">
+                {tKit('representativeImage')}
+              </p>
+            )}
 
             {/* Boxes Strip */}
             <div className="flex flex-col gap-3">
@@ -478,8 +496,9 @@ function KitBuilderInner({
 
           {/* Right Column: Customizer Steps */}
           <div className="lg:col-span-5 flex flex-col gap-12 pt-8 lg:pt-0" data-kit-customizer="">
-            {/* Step 1: Fabric */}
-            <section className="border-b border-outline-variant pb-10">
+            {/* Fabric is relevant to the sofa and full-home bundle, never the bed-only set. */}
+            {space !== 'bedroom' && (
+              <section className="border-b border-outline-variant pb-10">
               <div className="flex justify-between items-end mb-6">
                 <div>
                   <span className="font-label-md text-[12px] text-primary uppercase tracking-widest mb-1 block">
@@ -518,14 +537,15 @@ function KitBuilderInner({
                   )
                 })}
               </div>
-            </section>
+              </section>
+            )}
 
-            {/* Step 2: Wood Finish */}
+            {/* Wood Finish */}
             <section className="border-b border-outline-variant pb-10">
               <div className="flex justify-between items-end mb-6">
                 <div>
                   <span className="font-label-md text-[12px] text-primary uppercase tracking-widest mb-1 block">
-                    {tKit('step2')}
+                    {tKit(space === 'bedroom' ? 'step1' : 'step2')}
                   </span>
                   <h2 className="font-headline-md text-[28px] text-on-surface">{tKit('woodFinish')}</h2>
                 </div>
@@ -571,7 +591,7 @@ function KitBuilderInner({
                 <div className="flex justify-between items-end mb-6">
                   <div>
                     <span className="font-label-md text-[12px] text-primary uppercase tracking-widest mb-1 block">
-                      {tKit('step3')}
+                      {tKit(space === 'bedroom' ? 'step2' : 'step3')}
                     </span>
                     <h2 className="font-headline-md text-[28px] text-on-surface">{tKit('bedFrameSize')}</h2>
                   </div>
@@ -601,85 +621,45 @@ function KitBuilderInner({
                     type="button"
                   >
                     <span className="font-medium text-lg">{tKit('king')}</span>
-                    <span className="text-[13px] text-on-surface-variant">{`+${formatCurrency(KING_UPGRADE_PRICE, { locale })}`}</span>
+                    <span className="text-[13px] text-on-surface-variant">{tKit('priceShownAfterSelection')}</span>
                   </button>
                 </div>
               </section>
             )}
 
-            {/* Step 4: Add-ons */}
             <section className="pb-4">
-              <div className="flex justify-between items-end mb-6">
-                <div>
-                  <span className="font-label-md text-[12px] text-primary uppercase tracking-widest mb-1 block">
-                    {tKit('step4')}
-                  </span>
-                  <h2 className="font-headline-md text-[28px] text-on-surface">{tKit('curatedAddons')}</h2>
+              <div className="flex items-start gap-4 p-5 rounded-xl border border-outline-variant bg-surface-container-low">
+                <div className="flex items-center h-6 pt-1">
+                  <Gift aria-hidden="true" className="text-primary" size={24} />
                 </div>
-              </div>
-              <div className="flex flex-col gap-4">
-                {!isLiving && (
-                  <label className="flex items-start gap-4 p-5 rounded-xl border border-outline-variant hover:border-outline cursor-pointer transition-all bg-surface hover:bg-surface-container-low group">
-                    <div className="flex items-center h-6">
-                      <input
-                        checked={hasMattress}
-                        className="w-5 h-5 text-primary bg-surface border-outline-variant rounded focus:ring-primary focus:ring-2 cursor-pointer"
-                        id="addon-mattress"
-                        onChange={(e) => setHasMattress(e.target.checked)}
-                        type="checkbox"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="font-body-md font-medium text-on-surface text-[16px]">
-                          {tKit('mattressTitle')}
-                        </span>
-                        <span className="font-body-md text-on-surface">{`+${formatCurrency(MATTRESS_PRICE, { locale })}`}</span>
-                      </div>
-                      <p className="font-body-md text-sm text-on-surface-variant pe-8">
-                        {tKit('mattressDesc')}
-                      </p>
-                    </div>
-                  </label>
-                )}
-
-                <div className="flex items-start gap-4 p-5 rounded-xl border border-outline-variant bg-surface-container-low">
-                  <div className="flex items-center h-6 pt-1">
-                    <Gift aria-hidden="true" className="text-primary" size={24} />
+                <div className="flex-1">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-body-md font-medium text-on-surface text-[16px]">
+                      {tKit('notReadyTitle')}
+                    </span>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="font-body-md font-medium text-on-surface text-[16px]">
-                        {tKit('notReadyTitle')}
-                      </span>
-                    </div>
-                    <p className="font-body-md text-sm text-on-surface-variant mb-3">
-                      {tKit('notReadyDesc')}
-                    </p>
-                    <Link
-                      className="font-label-md text-[13px] text-primary uppercase tracking-wider underline hover:text-on-surface transition-colors"
-                      href="/free-swatch-box-material-discovery"
-                    >
-                      {tKit('orderFreeSwatches')}
-                    </Link>
-                  </div>
+                  <p className="font-body-md text-sm text-on-surface-variant mb-3">
+                    {tKit('notReadyDesc')}
+                  </p>
+                  <Link
+                    className="font-label-md text-[13px] text-primary uppercase tracking-wider underline hover:text-on-surface transition-colors"
+                    href="/free-swatch-box-material-discovery"
+                  >
+                    {tKit('orderFreeSwatches')}
+                  </Link>
                 </div>
               </div>
             </section>
 
-            {/* Mini Trust Strip */}
+            {/* Quote and configuration facts only; delivery inclusions are not known until quote. */}
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2 pb-4 text-on-surface-variant">
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
                 <Wrench aria-hidden="true" className="text-primary" size={16} />
                 {tKit('zeroScrews')}
               </span>
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
-                <Moon aria-hidden="true" className="text-primary" size={16} />
-                {tKit('trial')}
-              </span>
-              <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
                 <Truck aria-hidden="true" className="text-primary" size={16} />
-                {tKit('dutiesIncluded')}
+                {tKit('destinationQuoteRequired')}
               </span>
             </div>
           </div>
@@ -687,36 +667,17 @@ function KitBuilderInner({
       </main>
 
       {/* Sticky Bottom Bar */}
-      <div className={`${showMobilePurchaseBar ? 'block' : 'hidden'} md:block fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-md border-t border-outline-variant shadow-[0_-4px_20px_rgba(26,28,29,0.04)] z-50 pb-[env(safe-area-inset-bottom)]`}>
+      <div className={`${showMobilePurchaseBar ? 'block' : 'hidden'} fixed bottom-0 left-0 right-0 z-50 bg-surface/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_rgba(26,28,29,0.04)] backdrop-blur-md border-t border-outline-variant md:static md:block md:bg-surface md:pb-0 md:shadow-none`}>
         <div className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-3 md:py-4 flex flex-row justify-between items-center gap-3 md:gap-4">
           <div aria-live="polite" className="flex flex-col items-start min-w-0 md:w-auto">
             <div className="flex items-end gap-3">
               <span data-kit-total="" className="font-headline-md text-xl md:text-3xl text-on-surface whitespace-nowrap" dir="ltr" id="kit-total">
-                {formatCurrency(total, { locale })}
+                {total === undefined ? tKit('priceUnavailable') : formatCurrency(total, { locale })}
               </span>
-              {space === 'full' && (
-                <>
-                  <span className="font-body-md text-sm text-on-surface-variant line-through mb-1 hidden sm:inline">
-                    {tKit('retailPrice')}
-                  </span>
-                  <Link
-                    href="/us-vs-ikea"
-                    className="hidden md:inline-flex font-label-md text-xs text-primary bg-primary/10 hover:bg-primary/20 px-2.5 py-0.5 rounded-full mb-1.5 ms-2 transition-colors items-center gap-1"
-                    title="Compare item-by-item with local US IKEA"
-                  >
-                    <span>
-                      {tKit('saveBadge')} <span dir="ltr">vs IKEA (-20.8%)</span>
-                    </span>
-                    <Info aria-hidden="true" size={13} />
-                  </Link>
-                </>
-              )}
             </div>
             <div className="hidden md:flex items-center gap-1.5 mt-1 text-on-surface-variant">
               <Truck aria-hidden="true" size={16} />
-              <span className="font-body-md text-[13px]">
-                {tKit('deliveryNotice', { count: currentSpace.boxes.length })}
-              </span>
+              <span className="font-body-md text-[13px]">{tKit('destinationQuoteRequired')}</span>
             </div>
             {cartError && (
               <p aria-live="assertive" className="font-body-md text-[13px] text-error mt-1" role="alert">
@@ -731,34 +692,42 @@ function KitBuilderInner({
             >
               {tKit('orderSwatchesFirst')}
             </Link>
-            <button
-              data-kit-add=""
-              className="px-4 md:px-8 py-3 md:py-4 rounded-full bg-on-surface text-on-primary font-label-md text-xs md:text-sm uppercase tracking-wider hover:bg-primary transition-colors flex justify-center items-center gap-2 cursor-pointer disabled:opacity-75 min-w-0"
-              disabled={isAdded}
-              id="kit-add"
-              onClick={handleAddToCart}
-              type="button"
-            >
-              <span>
+            {canAddToCart ? (
+              <button
+                data-kit-add=""
+                className="px-4 md:px-8 py-3 md:py-4 rounded-full bg-on-surface text-on-primary font-label-md text-xs md:text-sm uppercase tracking-wider hover:bg-primary transition-colors flex justify-center items-center gap-2 cursor-pointer disabled:opacity-75 min-w-0"
+                disabled={isAdded}
+                id="kit-add"
+                onClick={handleAddToCart}
+                type="button"
+              >
+                <span>
+                  {isAdded
+                    ? tKit('addedOpeningCart')
+                    : tKit('addToCartButton', { space: currentSpace.cta, count: currentSpace.boxes.length })}
+                </span>
                 {isAdded
-                  ? tKit('addedOpeningCart')
-                  : tKit('addToCartButton', { space: currentSpace.cta, count: currentSpace.boxes.length })}
-              </span>
-              {isAdded
-                ? <CircleCheck aria-hidden="true" size={18} />
-                : isRtl
-                  ? <ArrowLeft aria-hidden="true" size={18} />
-                  : <ShoppingCart aria-hidden="true" size={18} />}
-            </button>
+                  ? <CircleCheck aria-hidden="true" size={18} />
+                  : isRtl
+                    ? <ArrowLeft aria-hidden="true" size={18} />
+                    : <ShoppingCart aria-hidden="true" size={18} />}
+              </button>
+            ) : (
+              <p
+                aria-live="polite"
+                className="max-w-xs rounded-lg bg-surface-container px-4 py-3 text-sm text-on-surface-variant"
+                data-kit-purchase-unavailable=""
+                role="status"
+              >
+                {checkoutEnabled ? tKit('configurationUnavailable') : tKit('onlineCheckoutUnavailable')}
+              </p>
+            )}
           </div>
         </div>
       </div>
     </div>
   )
 }
-
-const KING_UPGRADE_PRICE = 15000
-const MATTRESS_PRICE = 39900
 
 export function KitBuilder(props: KitBuilderProps = {}) {
   return (

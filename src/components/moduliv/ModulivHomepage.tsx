@@ -38,7 +38,6 @@ export async function ModulivHomepage({
   bundleSubtitle,
   bundlePrice,
   comparisonMatrix,
-  testimonials,
 }: ModulivHomepageProps) {
   const tHome = await getTranslations('Pages.Home')
 
@@ -55,42 +54,30 @@ export async function ModulivHomepage({
     (typeof heroImage === 'object' && heroImage?.alt) ||
     'Six flat-pack The Flat Set boxes beside the same room fully furnished in warm minimalist style'
 
-  const fallbackTestimonials = [
-    { quote: tHome('quote1Text'), author: tHome('quote1Author'), location: '', apartmentType: '' },
-    { quote: tHome('quote2Text'), author: tHome('quote2Author'), location: '', apartmentType: '' },
-    { quote: tHome('quote3Text'), author: tHome('quote3Author'), location: '', apartmentType: '' },
+  // Pricing and delivery copy is release-controlled rather than CMS-editable so
+  // it cannot drift from the server quote contract.
+  const comparisonRows = [
+    {
+      label: tHome('rowAssemblyLabel'),
+      flatSetValue: tHome('rowAssemblyFlatSet'),
+      traditionalValue: tHome('rowAssemblyTraditional'),
+    },
+    {
+      label: tHome('rowLeadTimeLabel'),
+      flatSetValue: tHome('rowLeadTimeFlatSet'),
+      traditionalValue: tHome('rowLeadTimeTraditional'),
+    },
+    {
+      label: tHome('rowFreshnessLabel'),
+      flatSetValue: tHome('rowFreshnessFlatSet'),
+      traditionalValue: tHome('rowFreshnessTraditional'),
+    },
+    {
+      label: tHome('rowPriceLabel'),
+      flatSetValue: tHome('rowPriceFlatSet'),
+      traditionalValue: tHome('rowPriceTraditional'),
+    },
   ]
-  const resolvedTestimonials =
-    testimonials?.length === 3 &&
-    testimonials.every((item) => item.quote?.trim() && item.author?.trim())
-      ? testimonials
-      : fallbackTestimonials
-
-  const comparisonRows =
-    comparisonMatrix?.rows && comparisonMatrix.rows.length > 0
-      ? comparisonMatrix.rows
-      : [
-          {
-            label: tHome('rowAssemblyLabel'),
-            flatSetValue: tHome('rowAssemblyFlatSet'),
-            traditionalValue: tHome('rowAssemblyTraditional'),
-          },
-          {
-            label: tHome('rowLeadTimeLabel'),
-            flatSetValue: tHome('rowLeadTimeFlatSet'),
-            traditionalValue: tHome('rowLeadTimeTraditional'),
-          },
-          {
-            label: tHome('rowFreshnessLabel'),
-            flatSetValue: tHome('rowFreshnessFlatSet'),
-            traditionalValue: tHome('rowFreshnessTraditional'),
-          },
-          {
-            label: tHome('rowPriceLabel'),
-            flatSetValue: tHome('rowPriceFlatSet'),
-            traditionalValue: tHome('rowPriceTraditional'),
-          },
-        ]
 
   return (
     <HomeMotion>
@@ -117,7 +104,7 @@ export async function ModulivHomepage({
                 className="inline-block text-center bg-on-background text-on-primary py-4 px-8 font-label-md text-label-md uppercase rounded-full hover:bg-primary transition-colors duration-300"
                 href="/1-bedroom-kit-builder"
               >
-                {tHome('ctaExplore')} ({tHome('ctaSave')})
+                {tHome('ctaExplore')}
               </Link>
               <Link
                 className="inline-block text-center border border-on-background text-on-background py-4 px-8 font-label-md text-label-md uppercase rounded-full hover:bg-on-background hover:text-on-primary transition-colors duration-300"
@@ -179,18 +166,6 @@ export async function ModulivHomepage({
                 {tHome('statTrialLabel')}
               </span>
             </div>
-          </div>
-          <div className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop pb-12 pt-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-            {resolvedTestimonials.map((t, idx) => (
-              <figure key={idx} className="flex flex-col gap-3">
-                <blockquote className="font-headline-sm text-[20px] leading-snug text-on-surface">
-                  &ldquo;{t.quote}&rdquo;
-                </blockquote>
-                <figcaption className="font-label-md text-label-md uppercase tracking-wider text-surface-tint">
-                  {t.author} {t.location ? `· ${t.location}` : ''} {t.apartmentType ? `(${t.apartmentType})` : ''}
-                </figcaption>
-              </figure>
-            ))}
           </div>
         </section>
 

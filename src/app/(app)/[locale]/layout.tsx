@@ -15,7 +15,7 @@ import React from 'react'
 import { getCanonicalSiteURL } from '@/utilities/canonicalUrl'
 import { EcommerceRoot } from '@/components/moduliv/EcommerceRoot'
 import { PolicyModal } from '@/components/moduliv/PolicyModal'
-import { readStripeServerConfig } from '@/lib/commerce/stripeConfig'
+import { readCheckoutConfig } from '@/lib/commerce/checkoutConfig'
 
 const siteURL = getCanonicalSiteURL()
 
@@ -79,11 +79,10 @@ export default async function RootLayout({ children, params }: LayoutProps) {
     getTranslations({ locale, namespace: 'Common' }),
   ])
 
-  // Resolved server-side: the publishable key only reaches the client when the
-  // secret key and webhook secret are present and in the same mode.
-  const stripeConfig = readStripeServerConfig()
-  const stripePublishableKey =
-    stripeConfig.status === 'configured' ? stripeConfig.publishableKey : ''
+  // Checkout is deliberately opt-in. A complete Stripe configuration is not
+  // enough on its own: CHECKOUT_ENABLED=true is the release gate after quote
+  // and payment parity have been verified in the target environment.
+  const checkoutConfig = readCheckoutConfig()
 
   return (
     <html
@@ -128,7 +127,10 @@ export default async function RootLayout({ children, params }: LayoutProps) {
       </head>
       <body className="bg-background text-on-background font-body-md antialiased overflow-x-hidden">
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <EcommerceRoot publishableKey={stripePublishableKey}>
+          <EcommerceRoot
+            checkoutEnabled={checkoutConfig.enabled}
+            publishableKey={checkoutConfig.publishableKey}
+          >
             <a className="skip-link" href="#main">
               {tCommon('skipToContent')}
             </a>

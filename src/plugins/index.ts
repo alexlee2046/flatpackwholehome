@@ -14,6 +14,7 @@ import { customerOnlyFieldAccess } from '@/access/customerOnlyFieldAccess'
 import { isAdmin } from '@/access/isAdmin'
 import { isDocumentOwner } from '@/access/isDocumentOwner'
 import { stripeDDPAdapter } from '@/lib/commerce/stripeDDPAdapter'
+import { ODSAI_DESTINATIONS } from '@/lib/commerce/ddp'
 import { readStripeServerConfig } from '@/lib/commerce/stripeConfig'
 import { getLocalePathname } from '@/i18n/metadata'
 import { defaultLocale, locales, type AppLocale } from '@/i18n/routing'
@@ -61,50 +62,10 @@ const transactionShippingAddressField = () => ({
   ],
 })
 
-const payloadAddressCountries = [
-  { label: 'United States', value: 'US' },
-  { label: 'United Kingdom', value: 'GB' },
-  { label: 'Canada', value: 'CA' },
-  { label: 'Australia', value: 'AU' },
-  { label: 'Austria', value: 'AT' },
-  { label: 'Belgium', value: 'BE' },
-  { label: 'Brazil', value: 'BR' },
-  { label: 'Bulgaria', value: 'BG' },
-  { label: 'Cyprus', value: 'CY' },
-  { label: 'Czech Republic', value: 'CZ' },
-  { label: 'Denmark', value: 'DK' },
-  { label: 'Estonia', value: 'EE' },
-  { label: 'Finland', value: 'FI' },
-  { label: 'France', value: 'FR' },
-  { label: 'Germany', value: 'DE' },
-  { label: 'Greece', value: 'GR' },
-  { label: 'Hong Kong', value: 'HK' },
-  { label: 'Hungary', value: 'HU' },
-  { label: 'India', value: 'IN' },
-  { label: 'Ireland', value: 'IE' },
-  { label: 'Italy', value: 'IT' },
-  { label: 'Japan', value: 'JP' },
-  { label: 'Latvia', value: 'LV' },
-  { label: 'Lithuania', value: 'LT' },
-  { label: 'Luxembourg', value: 'LU' },
-  { label: 'Malaysia', value: 'MY' },
-  { label: 'Malta', value: 'MT' },
-  { label: 'Mexico', value: 'MX' },
-  { label: 'Netherlands', value: 'NL' },
-  { label: 'New Zealand', value: 'NZ' },
-  { label: 'Norway', value: 'NO' },
-  { label: 'Poland', value: 'PL' },
-  { label: 'Portugal', value: 'PT' },
-  { label: 'Romania', value: 'RO' },
-  { label: 'Singapore', value: 'SG' },
-  { label: 'Slovakia', value: 'SK' },
-  { label: 'Slovenia', value: 'SI' },
-  { label: 'Spain', value: 'ES' },
-  { label: 'Sweden', value: 'SE' },
-  { label: 'Switzerland', value: 'CH' },
-  { label: 'China', value: 'CN' },
-  { label: 'United Arab Emirates', value: 'AE' },
-]
+// Keep Payload's accepted address countries exactly aligned with the quote
+// endpoint and cart selector. An unsupported address must not get as far as a
+// payment route.
+const payloadAddressCountries = ODSAI_DESTINATIONS.map(({ label, value }) => ({ label, value }))
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | The Flat Set` : 'The Flat Set — Your Entire Home. Delivered in 6 Flat Boxes.'
@@ -174,6 +135,10 @@ export const plugins: Plugin[] = [
     },
   }),
   ecommercePlugin({
+    // Checkout creates and verifies a fresh guest cart immediately before
+    // payment. The cart secret is returned only on creation and is passed back
+    // to the plugin's guest-cart access checks.
+    carts: { allowGuestCarts: true },
     addresses: {
       // Preserve every previously accepted address while adding all ODSai checkout destinations.
       supportedCountries: payloadAddressCountries,
@@ -223,6 +188,10 @@ export const plugins: Plugin[] = [
       }),
     },
     payments: {
+      // Keep the Stripe transaction schema and routes deterministic even when
+      // checkout is disabled or credentials are absent. The adapter itself
+      // refuses to initialize Stripe until readStripeServerConfig is complete;
+      // this avoids a schema/type split while preserving fail-closed checkout.
       paymentMethods: [
         stripeDDPAdapter({
           groupOverrides: {

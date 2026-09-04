@@ -140,7 +140,7 @@ export function GeoSuggestionBanner({ currentLocale }: GeoBannerProps) {
     <aside
       aria-label="Language and regional preference"
       aria-live="polite"
-      className="fixed z-[70] top-3 inset-x-3 sm:inset-x-auto sm:end-4 sm:w-[520px] bg-on-background text-on-primary py-3 px-4 text-xs font-label-md rounded-xl shadow-xl border border-outline/20"
+      className="relative z-[70] w-full border-b border-outline/20 bg-on-background px-margin-mobile py-3 text-xs font-label-md text-on-primary md:px-margin-desktop"
     >
       {prompt && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-start">

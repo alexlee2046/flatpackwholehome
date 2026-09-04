@@ -19,6 +19,7 @@
     "seed:flatpack": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/seed-flatpack.ts",
     "seed:media": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/seed-media.ts",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
+    "test:commerce": "tsx --test tests/commerce-contract.test.ts",
     "test:e2e": "node tests/e2e-storefront.mjs",
     "test:e2e:motion": "node tests/e2e-motion.mjs",
     "test:e2e:journey": "node tests/e2e-journey.mjs",

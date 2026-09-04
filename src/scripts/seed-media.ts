@@ -220,7 +220,7 @@ export async function seedMedia(payload: Payload): Promise<Map<string, number>> 
     '1-bedroom-kit': {
       specifications: [
         { label: 'Coverage', value: 'Living, Bedroom, & Dining essentials' },
-        { label: 'Total Boxes', value: '6 Boxes (DDP Delivered to Room of Choice)' },
+        { label: 'Total Boxes', value: '6 flat boxes; destination DDP is quoted in cart' },
         { label: 'Bundle Savings', value: '$350 vs buying pieces separately' },
       ],
       boxBreakdown: [

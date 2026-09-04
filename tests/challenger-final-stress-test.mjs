@@ -277,13 +277,8 @@ for (const locale of LOCALES) {
         `Offer itemCondition must be NewCondition in ${relPath}, got: ${offer.itemCondition}`
       )
 
-      // shippingDetails: doesNotApply: false
-      assert(offer.shippingDetails, `Offer shippingDetails missing in ${relPath}`)
-      assert.strictEqual(
-        offer.shippingDetails.doesNotApply,
-        false,
-        `shippingDetails.doesNotApply must be false in ${relPath}, got: ${offer.shippingDetails.doesNotApply}`
-      )
+      // Shipping is quoted by destination at cart; no fabricated zero rate.
+      assert.strictEqual(offer.shippingDetails, undefined, `Offer must not advertise a static shipping rate in ${relPath}`)
 
       // seller referencing Organization
       assert(offer.seller, `Offer seller missing in ${relPath}`)

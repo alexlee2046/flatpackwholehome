@@ -23,8 +23,8 @@ const SECONDARY_PAGES = [
 
 const EXPECTED_PRICES = {
   modusofa: 699,
-  snapbed: 899,
-  '1-bedroom-kit': 1598,
+  snapbed: 800,
+  '1-bedroom-kit': 1499,
 }
 
 const EXPECTED_CATEGORIES_ZH_CN = {
@@ -200,22 +200,13 @@ for (const locale of LOCALES) {
     assert.strictEqual(offer.seller['@type'], 'Organization')
     assert.strictEqual(offer.seller['@id'], 'https://theflatset.com/#organization')
 
-    // shippingDetails.doesNotApply: false
-    assert(offer.shippingDetails, `Missing shippingDetails in ${locale}/products/${slug}`)
-    assert.strictEqual(
-      offer.shippingDetails.doesNotApply,
-      false,
-      `shippingDetails.doesNotApply must be boolean false`
-    )
+    // Shipping is destination-quoted; never advertise a fabricated zero rate.
+    assert.equal(offer.shippingDetails, undefined)
 
-    // AggregateRating check (ratingValue: 4.9)
-    const rating = productBlock.aggregateRating
-    assert(rating, `Missing aggregateRating in ${locale}/products/${slug}`)
-    assert.strictEqual(rating['@type'], 'AggregateRating')
-    assert.strictEqual(rating.ratingValue, '4.9')
-    assert(rating.reviewCount && Number(rating.reviewCount) > 0)
+    // Do not emit aggregate ratings until reviews have a verifiable CMS source.
+    assert.equal(productBlock.aggregateRating, undefined)
 
-    pass(`PDP [${locale}/products/${slug}]: 3 Breadcrumbs ("${items[1].name}"), Offer ($${offer.price} USD, InStock, NewCondition, seller #org, doesNotApply:false), AggregateRating (${rating.ratingValue})`)
+    pass(`PDP [${locale}/products/${slug}]: 3 Breadcrumbs ("${items[1].name}"), Offer ($${offer.price} USD, InStock, NewCondition, seller #org), no unsupported shipping rate or AggregateRating`)
   }
 }
 

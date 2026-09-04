@@ -33,7 +33,7 @@ export const HowItWorks: GlobalConfig = {
           type: 'textarea',
           localized: true,
           defaultValue:
-            'Every piece is made-to-order, compressed fresh, and shipped carbon-offset directly to your door with zero middleman markups and guaranteed DDP delivery.',
+            'Production and delivery details are confirmed for supported destinations in a destination-specific quote.',
         },
       ],
     },

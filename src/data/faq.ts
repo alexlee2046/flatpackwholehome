@@ -5,11 +5,11 @@ export type FaqItem = {
 
 export const FAQ_ITEMS: FaqItem[] = [
   {
-    a: 'Your pieces are crafted within 48 hours of ordering, then travel by carbon-offset ocean express: 14–18 days, door to door. You get tracking at every stage and a delivery window — not a “sometime Tuesday.”',
+    a: 'Delivery timing depends on the destination and current freight zone. Choose your country in the cart to see the current delivery estimate before checkout, then receive tracking updates by email.',
     q: 'How long does delivery take?',
   },
   {
-    a: 'Delivered Duty Paid: customs, duties and taxes are included in the price you see. Our broker clears your boxes and pays every fee — nothing is owed at the door, ever, and no surprise invoice arrives from a shipping agent two weeks later.',
+    a: 'Delivered Duty Paid means the confirmed landed total includes freight and estimated import charges for the selected destination. The cart shows the server-verified breakdown before payment.',
     q: 'What exactly does “DDP” mean?',
   },
   {
@@ -29,11 +29,11 @@ export const FAQ_ITEMS: FaqItem[] = [
     q: 'What are the pieces made of?',
   },
   {
-    a: 'Order the free Curated Swatch Box — four full-weave fabrics, two foam slices, oak and walnut chips. The box is free ($5 expedited airmail). Inside the lid is your $50 voucher, single-use, valid 60 days from delivery, redeemable on any sofa, bed or bundle — and it stacks on top of Move-In Bundle pricing.',
-    q: 'How does the free swatch box and $50 voucher work?',
+    a: 'The online swatch-box and voucher-redemption flow is temporarily unavailable while fulfillment and one-time redemption safeguards are completed. Contact the concierge for current options.',
+    q: 'How does the swatch box and voucher work?',
   },
   {
-    a: 'Standard ocean freight: 14–18 days, fully carbon-offset, DDP included. Need it sooner? Expedited air-cargo is available at checkout for certain metro areas (5–7 days, +$220).',
+    a: 'Delivery timing depends on the destination and current freight zone. Choose your country in the cart to see the current DDP landed total and delivery estimate before checkout.',
     q: 'What shipping options do you offer?',
   },
 ]

@@ -4,6 +4,7 @@ import { Link } from '@/i18n/navigation'
 import { localeDetails, type AppLocale } from '@/i18n/routing'
 import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
 import { useLocale, useTranslations } from 'next-intl'
+import { calculateDDPQuote } from '@/lib/commerce/ddp'
 import React, { useState } from 'react'
 import { StorefrontIcon } from './StorefrontIcon'
 
@@ -40,8 +41,13 @@ export function IkeaComparisonView() {
 
   const ikeaTax = ikeaSubtotal * currentCity.taxRate
   const ikeaLandedTotal = ikeaSubtotal + ikeaTax + currentTransport.cost
-  const totalLandedSavings = ikeaLandedTotal - flatSetSubtotal
-  const landedSavingsPercent = ((totalLandedSavings / ikeaLandedTotal) * 100).toFixed(1)
+  const flatSetQuote = calculateDDPQuote({
+    countryCode: 'US',
+    packedCbm: 1.2,
+    subtotalInUSD: flatSetSubtotal * 100,
+  })
+  const flatSetLandedTotal = flatSetQuote.landedTotalInUSD / 100
+  const scenarioDifference = flatSetLandedTotal - ikeaLandedTotal
   const taxRatePercent = (currentCity.taxRate * 100).toFixed(2)
 
   return (
@@ -187,11 +193,11 @@ export function IkeaComparisonView() {
                 </div>
                 <div className="flex justify-between text-tertiary">
                   <span>{t('flatSetLineDuty')}</span>
-                  <span className="font-bold">{t('flatSetLineDutyValue')}</span>
+                  <span className="font-bold" dir="ltr">+{formatCurrency(flatSetQuote.importChargesInUSD, { locale })}</span>
                 </div>
                 <div className="flex justify-between text-tertiary">
                   <span>{t('flatSetLineShipping')}</span>
-                  <span className="font-bold">{t('flatSetLineShippingValue')}</span>
+                  <span className="font-bold" dir="ltr">+{formatCurrency(flatSetQuote.freightInUSD, { locale })}</span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant text-xs">
                   <span>{t('flatSetLineAssembly')}</span>
@@ -202,18 +208,12 @@ export function IkeaComparisonView() {
                 <span className="text-sm font-bold text-primary">{t('flatSetPayLabel')}</span>
                 <div className="text-end">
                   <span dir="ltr" className="text-3xl font-extrabold text-primary">
-                    {formatCurrency(flatSetSubtotal * 100, { locale })}
+                    {formatCurrency(flatSetQuote.landedTotalInUSD, { locale })}
                   </span>
                   <div className="text-xs font-bold text-tertiary mt-1">
-                    {t('flatSetSavingsLine', {
-                      // flatSetSavingsLine's message text carries a hardcoded "$" prefix
-                      // (messages/ is out of scope here), so this is a plain locale-formatted
-                      // decimal, not a currency string.
-                      amount: new Intl.NumberFormat(locale, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).format(totalLandedSavings),
-                      percent: landedSavingsPercent,
+                    {t('scenarioDifference', {
+                      amount: formatCurrency(Math.abs(scenarioDifference) * 100, { locale }),
+                      direction: scenarioDifference >= 0 ? t('differenceHigher') : t('differenceLower'),
                     })}
                   </div>
                 </div>
@@ -234,7 +234,7 @@ export function IkeaComparisonView() {
             </div>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-tertiary/10 border border-tertiary/20 text-tertiary text-xs font-bold">
               <span className="w-2 h-2 rounded-full bg-tertiary"></span>
-              {t('breakdownSavingsBadge')}
+              {t('breakdownProductBadge')}
             </div>
           </div>
 
@@ -381,16 +381,7 @@ export function IkeaComparisonView() {
                 {t('ctaCardTitle')}
               </div>
               <p>
-                {t('ctaCardBody', {
-                  // ctaCardBody's message text carries a hardcoded "$" prefix (messages/ is
-                  // out of scope here), so this is a plain locale-formatted decimal, not a
-                  // currency string.
-                  amount: new Intl.NumberFormat(locale, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }).format(totalLandedSavings),
-                  percent: landedSavingsPercent,
-                })}
+                {t('ctaCardBodyAccurate')}
               </p>
               <div className="pt-3">
                 <Link

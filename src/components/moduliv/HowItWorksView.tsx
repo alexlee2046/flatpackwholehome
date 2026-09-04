@@ -20,13 +20,14 @@ type HowItWorksProps = {
   }> | null
 }
 
-export async function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
+export async function HowItWorksView({ hero }: HowItWorksProps = {}) {
   const [t, locale] = await Promise.all([getTranslations('Pages.HowItWorks'), getLocale()])
   const isRtl = localeDetails[locale as AppLocale].dir === 'rtl'
 
   const eyebrow = hero?.eyebrow || t('heroEyebrow')
   const title = hero?.title || t('title')
-  const subtitle = hero?.subtitle || t('subtitle')
+  // Timing and DDP language are checkout-controlled, not editable CMS claims.
+  const subtitle = t('subtitle')
 
   return (
     <main id="main" tabIndex={-1}>
@@ -136,46 +137,38 @@ export async function HowItWorksView({ hero, steps }: HowItWorksProps = {}) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {((steps && steps.length > 0)
-              ? steps.map((s) => ({
-                  desc: s.description,
-                  icon: s.icon || 'precision_manufacturing',
-                  stage: s.metric || s.badge || s.stepNumber,
-                  title: s.title,
-                }))
-              : [
-                  {
-                    desc: t('step1Desc'),
-                    icon: 'handyman',
-                    stage: t('step1Stage'),
-                    title: t('step1Title'),
-                  },
-                  {
-                    desc: t('step2Desc'),
-                    icon: 'compress',
-                    stage: t('step2Stage'),
-                    title: t('step2Title'),
-                  },
-                  {
-                    desc: t('step3Desc'),
-                    icon: 'directions_boat',
-                    stage: t('step3Stage'),
-                    title: t('step3Title'),
-                  },
-                  {
-                    desc: t('step4Desc'),
-                    icon: 'task_alt',
-                    stage: t('step4Stage'),
-                    title: t('step4Title'),
-                  },
-                  {
-                    desc: t('step5Desc'),
-                    icon: 'home_pin',
-                    stage: t('step5Stage'),
-                    title: t('step5Title'),
-                  },
-                ]
-            ).map((step) => (
+            {[
+              {
+                desc: t('step1Desc'),
+                icon: 'handyman',
+                stage: t('step1Stage'),
+                title: t('step1Title'),
+              },
+              {
+                desc: t('step2Desc'),
+                icon: 'compress',
+                stage: t('step2Stage'),
+                title: t('step2Title'),
+              },
+              {
+                desc: t('step3Desc'),
+                icon: 'directions_boat',
+                stage: t('step3Stage'),
+                title: t('step3Title'),
+              },
+              {
+                desc: t('step4Desc'),
+                icon: 'task_alt',
+                stage: t('step4Stage'),
+                title: t('step4Title'),
+              },
+              {
+                desc: t('step5Desc'),
+                icon: 'home_pin',
+                stage: t('step5Stage'),
+                title: t('step5Title'),
+              },
+            ].map((step) => (
               <div
                 className="flex flex-col items-center text-center p-6 bg-surface rounded-xl border border-outline-variant/30 shadow-sm"
                 key={step.title}

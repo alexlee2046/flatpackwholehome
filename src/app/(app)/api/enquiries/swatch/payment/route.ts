@@ -7,8 +7,8 @@ import {
 export const dynamic = 'force-dynamic'
 
 /**
- * This route intentionally does not accept, store, or fulfill a paid swatch
- * request. Generic contact enquiries remain separate from paid fulfillment.
+ * Fail closed: do not create a Stripe PaymentIntent until fulfillment and a
+ * durable voucher entitlement can be recorded atomically after payment.
  */
 export async function POST(_req: Request) {
   return NextResponse.json(

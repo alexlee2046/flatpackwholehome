@@ -4,17 +4,28 @@ import { Link, useRouter } from '@/i18n/navigation'
 import { localeDetails } from '@/i18n/routing'
 import { AnimatedImageSwap } from '@/components/motion/AnimatedImageSwap'
 import { resolveStorefrontMedia } from '@/utilities/storefrontMedia'
+import {
+  findStorefrontVariant,
+  MAX_CART_ITEM_QUANTITY,
+  type StorefrontVariant,
+} from '@/lib/commerce/storefrontCart'
+import {
+  expectedOptionTypesForProduct,
+  getStorefrontCheckoutEligibility,
+  type StorefrontCheckoutProduct,
+} from '@/lib/commerce/catalogEligibility'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import Image from 'next/image'
 import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
-import { ArrowLeft, ArrowRight, CircleCheck, Moon, Palette, ShoppingCart, Star, Truck, Wrench, Zap } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CircleCheck, Palette, ShoppingCart, Truck, Wrench, Zap } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 gsap.registerPlugin(useGSAP)
 
 type ProductDetailProps = {
+  checkoutEnabled?: boolean
   product?: {
     assemblyMinutes?: number | null
     boxBreakdown?: Array<{
@@ -25,9 +36,12 @@ type ProductDetailProps = {
       weight?: string | null
     }> | null
     boxCount?: number | null
+    checkout?: StorefrontCheckoutProduct
     gallery?: Array<{
       id?: string | null
       image: number | string | { alt?: string | null; url?: string | null }
+      /** A single option does not prove that an image matches a full SKU. */
+      variantOption?: number | string | { id?: number | string } | null
     }> | null
     id?: string | number
     joineryType?: string | null
@@ -36,6 +50,7 @@ type ProductDetailProps = {
     } | null
     price?: number
     slug?: string
+    shippingWeightKg?: number | null
     specifications?: Array<{
       id?: string | null
       label?: string | null
@@ -43,6 +58,7 @@ type ProductDetailProps = {
     }> | null
     subtitle?: string | null
     title?: string
+    variants?: StorefrontVariant[]
   }
   materials?: Array<{
     id: string | number
@@ -70,18 +86,36 @@ const FABRICS = [
   { id: 'techGrey', img: '/assets/1-bedroom-kit-builder/13266a8714.png', name: 'Tech Grey', tag: 'Cool Touch' },
 ]
 
-export function ProductDetail({ product, materials }: ProductDetailProps) {
+export function ProductDetail({ checkoutEnabled = false, product, materials }: ProductDetailProps) {
   const router = useRouter()
   const locale = useLocale()
   const isRtl = localeDetails[locale as keyof typeof localeDetails]?.dir === 'rtl'
   const t = useTranslations('PDP')
   const tCommon = useTranslations('Common')
+  const tSwatch = useTranslations('Swatch')
   const { formatCurrency } = useCurrency()
-  const isSofa = !product?.slug || product.slug === 'modusofa'
+  const isSofa = product?.slug === 'modusofa'
+  const isBundle = product?.slug === '1-bedroom-kit'
+  const optionTypes = new Set(expectedOptionTypesForProduct({
+    slug: product?.slug,
+    variantTypes: product?.checkout?.variantTypes || [],
+  }))
+  const supportsUpholstery = optionTypes.has('upholstery')
+  const supportsWoodFinish = optionTypes.has('wood-finish')
+  const supportsBedSize = optionTypes.has('bed-size')
+  const visibleOptionCount = [supportsUpholstery, supportsWoodFinish, supportsBedSize].filter(Boolean).length
+  const hasConfigurationOptions = visibleOptionCount > 0
+
+  const fabricLabels: Record<string, string> = {
+    boucle: t('fabrics.boucle'),
+    chenille: t('fabrics.chenille'),
+    corduroy: t('fabrics.corduroy'),
+    techGrey: t('fabrics.techGrey'),
+  }
 
   // The CMS collection contains both timber and upholstery. Keep the four
-  // fabric choices stable and only use matching CMS records to enrich them;
-  // never surface oak or walnut as a "Fabric Upholstery" option.
+  // fabric choices stable, use CMS only for their imagery, and keep storefront
+  // labels localized instead of leaking the CMS editing locale into the UI.
   const activeFabrics = FABRICS.map((fabric) => {
     const material = materials?.find((candidate) => materialMatchesFabric(candidate, fabric.id))
     const cmsImage =
@@ -91,33 +125,89 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
     return {
       ...fabric,
       img: cmsImage || fabric.img,
-      name: material?.title || fabric.name,
+      name: fabricLabels[fabric.id] || fabric.name,
     }
   })
 
-  const [selectedFabric, setSelectedFabric] = useState(activeFabrics[0]?.name || 'Caramel Corduroy')
-  const [selectedLeg, setSelectedLeg] = useState(isSofa ? 'Natural Oak' : 'Queen')
+  const [selectedFabric, setSelectedFabric] = useState(activeFabrics[0]?.id || 'corduroy')
+  const [selectedWood, setSelectedWood] = useState<'oak' | 'walnut'>('oak')
+  const [selectedBedSize, setSelectedBedSize] = useState<'queen' | 'king'>('queen')
   const [qty, setQty] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
   const [cartError, setCartError] = useState(false)
+  const [hasReachedConfigurator, setHasReachedConfigurator] = useState(false)
+  const [isInlineAddVisible, setIsInlineAddVisible] = useState(false)
   const rootRef = useRef<HTMLElement>(null)
+  const configuratorRef = useRef<HTMLDivElement>(null)
+  const inlineAddRef = useRef<HTMLButtonElement>(null)
 
-  const title = product?.title || (isSofa ? t('defaultTitle') : 'SnapBed Frame')
-  const price = product?.price || 69900
-  const boxCount = product?.boxCount || (isSofa ? 2 : 3)
-  const assemblyMinutes = product?.assemblyMinutes || 15
+  useEffect(() => {
+    const mobileQuery = window.matchMedia('(max-width: 767px)')
+    if (!mobileQuery.matches || !configuratorRef.current || !inlineAddRef.current) return
 
-  // Resolve Payload gallery images or static fallbacks
-  const galleryUrls = (product?.gallery || [])
-    .map((item) => {
-      if (!item) return null
-      if (typeof item.image === 'string') return resolveStorefrontMedia(item.image)
-      if (typeof item.image === 'object' && item.image && 'url' in item.image && item.image.url) {
-        return resolveStorefrontMedia(item.image.url)
-      }
-      return null
+    const configuratorObserver = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return
+      setHasReachedConfigurator(true)
+      configuratorObserver.disconnect()
     })
-    .filter((url): url is string => Boolean(url))
+    const addButtonObserver = new IntersectionObserver(
+      ([entry]) => setIsInlineAddVisible(Boolean(entry?.isIntersecting)),
+      { threshold: 0.2 },
+    )
+
+    configuratorObserver.observe(configuratorRef.current)
+    addButtonObserver.observe(inlineAddRef.current)
+    return () => {
+      configuratorObserver.disconnect()
+      addButtonObserver.disconnect()
+    }
+  }, [])
+
+  const title = product?.title || (isSofa ? t('defaultTitle') : t('productFallbackTitle'))
+  const boxCount = typeof product?.boxCount === 'number' && product.boxCount > 0 ? product.boxCount : undefined
+  const assemblyMinutes =
+    typeof product?.assemblyMinutes === 'number' && product.assemblyMinutes > 0
+      ? product.assemblyMinutes
+      : undefined
+  const selectedFabricDetails = activeFabrics.find((fabric) => fabric.id === selectedFabric)
+  const selectedFabricName = selectedFabricDetails?.name || fabricLabels.corduroy
+  const selectedWoodName = selectedWood === 'oak' ? t('finishNaturalOak') : t('finishWalnut')
+  const selection = {
+    ...(supportsUpholstery ? { upholstery: selectedFabric } : {}),
+    ...(supportsWoodFinish ? { 'wood-finish': selectedWood } : {}),
+    ...(supportsBedSize ? { 'bed-size': selectedBedSize } : {}),
+  }
+  const selectedVariant = findStorefrontVariant(product?.variants, selection)
+  const checkoutEligibility = product?.checkout
+    ? getStorefrontCheckoutEligibility(product.checkout, product.variants, selection)
+    : { available: false, code: 'CATALOG_UNAVAILABLE', requiresVariant: true }
+  const configuredUnitPrice =
+    checkoutEligibility.available &&
+    typeof (selectedVariant?.price ?? product?.price) === 'number' &&
+    (selectedVariant?.price ?? product?.price)! > 0
+      ? (selectedVariant?.price ?? product?.price)!
+      : undefined
+  const canAddToCart =
+    checkoutEnabled &&
+    checkoutEligibility.available &&
+    (!checkoutEligibility.requiresVariant || Boolean(selectedVariant)) &&
+    configuredUnitPrice !== undefined
+  const configuredTotal = configuredUnitPrice === undefined ? undefined : configuredUnitPrice * qty
+  const showMobilePurchaseBar = canAddToCart && hasReachedConfigurator && !isInlineAddVisible
+
+  // The CMS only records an optional single variant option for a gallery
+  // image. That does not establish an exact multi-option SKU match, so every
+  // chosen configuration uses the gallery as a representative image.
+  const galleryUrls = (product?.gallery || []).flatMap((item) => {
+    if (!item) return []
+    const url =
+      typeof item.image === 'string'
+        ? resolveStorefrontMedia(item.image)
+        : typeof item.image === 'object' && item.image && 'url' in item.image && item.image.url
+          ? resolveStorefrontMedia(item.image.url)
+          : ''
+    return url ? [url] : []
+  })
 
   const defaultMainImage = isSofa
     ? '/assets/modusofa-product-detail-page/e38c85e68d.png'
@@ -138,40 +228,71 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
   const availableImages = galleryUrls.length > 0 ? galleryUrls : [defaultMainImage, ...defaultThumbs]
   const [selectedImage, setSelectedImage] = useState<string>(availableImages[0])
 
-  const activeMainImage = availableImages.includes(selectedImage) ? selectedImage : availableImages[0]
+  const validSelectedImage = availableImages.includes(selectedImage)
+    ? selectedImage
+    : availableImages[0]
+  const activeMainImage = validSelectedImage
+  // Gallery rows are not linked to an exact multi-option SKU. Keep the
+  // disclosure visible even when a product is unavailable or still loading.
+  const imageIsRepresentative = true
   const thumbImages = availableImages.length > 1 ? availableImages.slice(1, 4) : defaultThumbs
 
-  const categoryName = isSofa ? t('categorySeating') : t('categoryBedroom')
+  const categoryName = isSofa
+    ? t('categorySeating')
+    : isBundle
+      ? t('categoryWholeHome')
+      : t('categoryBedroom')
   const eyebrowText = isSofa
     ? t('eyebrowSofa')
     : (product?.joineryType ? t('eyebrowOtherWithJoinery', { joinery: product.joineryType }) : t('eyebrowOther'))
 
-  const handleAddToCart = () => {
+  const addConfiguredItem = (intent: 'add' | 'buy-now') => {
     const cart = typeof window !== 'undefined' ? (window as any).modulivCart : null
-    if (!cart || typeof cart.add !== 'function') {
+    const writeCart = intent === 'buy-now' ? cart?.upsert : cart?.add
+    if (
+      isAdded ||
+      !canAddToCart ||
+      configuredUnitPrice === undefined ||
+      typeof writeCart !== 'function'
+    ) {
       setCartError(true)
       setTimeout(() => setCartError(false), 4000)
       return false
     }
-    cart.add(qty, {
+
+    const configuration = [
+      ...(supportsUpholstery ? [selectedFabricName] : []),
+      ...(supportsWoodFinish ? [selectedWoodName] : []),
+      ...(supportsBedSize ? [selectedBedSize === 'queen' ? t('finishQueen') : t('finishKing')] : []),
+    ]
+    const variantOptions = {
+      ...(supportsUpholstery ? { upholstery: selectedFabric } : {}),
+      ...(supportsWoodFinish ? { woodFinish: selectedWood } : {}),
+      ...(supportsBedSize ? { bedSize: selectedBedSize } : {}),
+    }
+    writeCart(qty, {
+      boxCount,
       id: product?.slug || 'modusofa',
+      image: activeMainImage,
+      imageIsRepresentative,
       name: title,
-      price,
+      price: configuredUnitPrice,
       qty,
-      variant: `${selectedFabric} · ${selectedLeg}`,
+      shippingWeightKg: product?.shippingWeightKg || undefined,
+      ...(configuration.length > 0 ? { variant: configuration.join(' · ') } : {}),
+      ...(Object.keys(variantOptions).length > 0 ? { variantOptions } : {}),
+      ...(selectedVariant ? { variantId: selectedVariant.id } : {}),
     })
     setCartError(false)
     setIsAdded(true)
-    setTimeout(() => {
-      setIsAdded(false)
-    }, 2000)
+    setTimeout(() => setIsAdded(false), 2000)
     return true
   }
 
+  const handleAddToCart = () => addConfiguredItem('add')
+
   const handleBuyNow = () => {
-    if (handleAddToCart()) {
-      router.push('/cart')
-    }
+    if (addConfiguredItem('buy-now')) router.push('/cart')
   }
 
   useGSAP(
@@ -188,13 +309,13 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
 
   return (
     <main
-      className="max-w-[1440px] mx-auto w-full px-margin-mobile md:px-margin-desktop pt-8 pb-section-gap"
+      className="max-w-[1440px] mx-auto w-full px-margin-mobile md:px-margin-desktop pt-5 pb-32 md:pb-section-gap"
       id="main"
       ref={rootRef}
       tabIndex={-1}
     >
       {/* Breadcrumbs */}
-      <nav className="flex items-center text-sm font-label-md text-on-surface-variant mb-8 gap-2">
+      <nav className="flex items-center overflow-x-auto whitespace-nowrap text-sm font-label-md text-on-surface-variant mb-5 gap-2">
         <Link className="hover:text-primary transition-colors" href="/">
           {tCommon('home')}
         </Link>
@@ -209,23 +330,53 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
       {/* Main PDP Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-section-gap items-start">
         {/* Left Column: Visuals */}
-        <div className="lg:col-span-7 flex flex-col gap-4">
-          <AnimatedImageSwap
+        <div className="lg:col-span-6 flex flex-col gap-3 lg:sticky lg:top-28">
+          <div className="relative">
+            <AnimatedImageSwap
               alt={title}
-              className="aspect-[4/3] w-full bg-surface-container rounded-xl shadow-sm"
+              className="aspect-[4/3] lg:aspect-[3/2] w-full bg-surface-container rounded-xl shadow-sm"
               imageClassName="object-cover"
               priority
-              sizes="(max-width: 1024px) 100vw, 55vw"
+              sizes="(max-width: 1024px) 100vw, 50vw"
               src={activeMainImage}
             />
-          <div className="grid grid-cols-3 gap-4">
+            {isSofa && selectedFabricDetails && (
+              <div
+                aria-live="polite"
+                className="absolute inset-x-3 bottom-3 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-white/50 bg-surface/90 px-3 py-2 shadow-sm backdrop-blur"
+                data-product-visual-configuration=""
+              >
+                <span className="flex min-w-0 items-center gap-2 text-xs text-on-surface">
+                  <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full border border-outline-variant">
+                    <Image alt="" className="object-cover" fill sizes="32px" src={selectedFabricDetails.img} />
+                  </span>
+                  <span className="truncate">{selectedFabricName}</span>
+                </span>
+                <span className="flex min-w-0 items-center gap-2 text-xs text-on-surface">
+                  <span
+                    aria-hidden="true"
+                    className={`h-5 w-5 shrink-0 rounded-full border border-black/15 ${
+                      selectedWood === 'oak' ? 'bg-[#d6b98c]' : 'bg-[#5a382b]'
+                    }`}
+                  />
+                  <span className="truncate">{selectedWoodName}</span>
+                </span>
+              </div>
+            )}
+          </div>
+          {imageIsRepresentative && (
+            <p className="text-xs text-on-surface-variant" data-product-image-disclosure="">
+              {t('representativeImage')}
+            </p>
+          )}
+          <div className="grid grid-cols-3 gap-3">
             {thumbImages.map((thumb, idx) => {
               const isSelected = activeMainImage === thumb
               return (
                 <button
                   aria-label={t('viewAngle', { number: idx + 1 })}
                   aria-pressed={isSelected}
-                  className={`relative aspect-square bg-surface-container rounded-lg overflow-hidden border-2 transition-all cursor-pointer text-start ${
+                  className={`relative aspect-[4/3] bg-surface-container rounded-lg overflow-hidden border-2 transition-all cursor-pointer text-start ${
                     isSelected
                       ? 'border-primary ring-2 ring-primary/40'
                       : 'border-transparent hover:border-outline-variant'
@@ -248,115 +399,181 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
         </div>
 
         {/* Right Column: Details & Customizer */}
-        <div className="lg:col-span-5 flex flex-col lg:ps-6">
+        <div className="lg:col-span-6 flex flex-col xl:ps-6">
           <span className="font-label-md text-label-md uppercase tracking-wider text-primary mb-2 block">
             {eyebrowText}
           </span>
-          <h1 className="font-display-lg text-headline-md md:text-headline-lg text-on-surface mb-3">
+          <h1 className="font-display-lg text-headline-md md:text-headline-lg text-on-surface mb-2">
             {title}
           </h1>
           {product?.subtitle && (
-            <p className="font-body-md text-base text-on-surface-variant mb-4">
+            <p className="font-body-md text-base text-on-surface-variant mb-3">
               {product.subtitle}
             </p>
           )}
 
-          <div className="flex items-center gap-4 mb-6">
-            <a
-              className="flex items-center gap-1.5 font-label-md text-sm text-primary hover:underline"
-              href="#reviews"
-            >
-              <Star aria-hidden="true" className="fill-amber-500 text-amber-500" size={18} />
-              <span className="font-medium text-on-surface">4.9</span>
-              <span className="text-on-surface-variant">{t('reviewsCount', { count: 348 })}</span>
-            </a>
-            <span className="text-outline-variant">·</span>
-            <span className="font-label-md text-xs uppercase tracking-wider text-primary bg-primary-fixed/30 px-2 py-0.5 rounded-full">
-              {t('boxesAndAssembly', { count: boxCount, minutes: assemblyMinutes })}
-            </span>
-          </div>
+          {(boxCount !== undefined || assemblyMinutes !== undefined) && (
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <span className="font-label-md text-xs uppercase tracking-wider text-primary bg-primary-fixed/30 px-2 py-0.5 rounded-full">
+                {t('boxesAndAssembly', {
+                  count: boxCount ?? '—',
+                  minutes: assemblyMinutes ?? '—',
+                })}
+              </span>
+            </div>
+          )}
 
-          <div className="flex items-baseline gap-3 mb-8">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-4">
             <span className="font-headline-lg text-[36px] text-on-surface" data-product-price="" dir="ltr">
-              {formatCurrency(price, { locale })}
+              {configuredUnitPrice === undefined
+                ? t('priceUnavailable')
+                : formatCurrency(configuredUnitPrice, { locale })}
             </span>
             <span className="font-body-md text-sm text-on-surface-variant">{t('deliveryIncluded')}</span>
           </div>
 
-          {/* Fabric Selector */}
-          <div className="mb-8 border-t border-b border-outline-variant/30 py-6">
-            <div className="flex justify-between items-center mb-3">
-              <span className="font-label-md text-label-md uppercase tracking-wider text-on-surface">
-                {t('fabricUpholstery')}
-              </span>
-              <span className="font-body-md text-sm text-on-surface-variant">{selectedFabric}</span>
-            </div>
-            <div className="grid grid-cols-4 gap-3">
-              {activeFabrics.map((fab) => {
-                const sel = selectedFabric === fab.name
-                const fabLabel = fab.name === 'Caramel Corduroy' ? t('fabrics.corduroy')
-                  : fab.name === 'Cream Bouclé' ? t('fabrics.boucle')
-                  : fab.name === 'Olive Chenille' ? t('fabrics.chenille')
-                  : fab.name === 'Tech Grey' ? t('fabrics.techGrey')
-                  : fab.name
-                return (
-                  <button
-                    aria-label={t('selectFabric', { name: fab.name })}
-                    aria-pressed={sel}
-                    className={`flex flex-col items-center gap-1.5 p-2 rounded-lg border transition-all cursor-pointer ${
-                      sel ? 'border-primary ring-1 ring-primary bg-primary-fixed/10' : 'border-outline-variant/50'
-                    }`}
-                    key={fab.name}
-                    onClick={() => setSelectedFabric(fab.name)}
-                    type="button"
-                  >
-                    <div className="relative w-12 h-12 rounded-full overflow-hidden border border-outline-variant/30">
-                      <Image alt={fabLabel} className="object-cover" fill sizes="48px" src={fab.img} />
-                    </div>
-                    <span className="font-body-md text-[11px] text-center leading-tight text-on-surface mt-1">
-                      {fabLabel}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
+          <div
+            aria-hidden="true"
+            className="h-px scroll-mt-24"
+            data-pdp-configurator-start=""
+            ref={configuratorRef}
+          />
 
-          {/* Leg Finish Selector */}
-          <div className="mb-8">
+          {/* Fabric Selector */}
+          {supportsUpholstery && (
+            <div className="mb-4 border-t border-b border-outline-variant/30 py-3">
+              <div className="flex justify-between items-center mb-3">
+                <span className="font-label-md text-label-md uppercase tracking-wider text-on-surface">
+                  {t('fabricUpholstery')}
+                </span>
+                <span className="font-body-md text-sm text-on-surface-variant">{selectedFabricName}</span>
+              </div>
+              <div className="grid grid-cols-4 gap-2 sm:gap-3">
+                {activeFabrics.map((fab) => {
+                  const selected = selectedFabric === fab.id
+                  return (
+                    <button
+                      aria-label={t('selectFabric', { name: fab.name })}
+                      aria-pressed={selected}
+                      className={`flex min-w-0 flex-col items-center gap-1.5 rounded-lg border p-2 transition-all cursor-pointer ${
+                        selected
+                          ? 'border-primary ring-1 ring-primary bg-primary-fixed/10'
+                          : 'border-outline-variant/50 hover:border-outline'
+                      }`}
+                      key={fab.id}
+                      onClick={() => setSelectedFabric(fab.id)}
+                      type="button"
+                    >
+                      <div className="relative w-12 h-12 rounded-full overflow-hidden border border-outline-variant/30">
+                        <Image alt="" className="object-cover" fill sizes="48px" src={fab.img} />
+                      </div>
+                      <span className="font-body-md text-[11px] text-center leading-tight text-on-surface mt-1">
+                        {fab.name}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Wood Finish Selector */}
+          {supportsWoodFinish && (
+          <div className="mb-4">
             <span className="font-label-md text-label-md uppercase tracking-wider text-on-surface block mb-3">
-              {t('legFinish')}
+              {t('woodFinish')}
             </span>
             <div className="flex gap-3">
-              {(isSofa
-                ? [
-                    { key: 'Natural Oak', label: t('finishNaturalOak') },
-                    { key: 'Matte Black Steel', label: t('finishMatteBlackSteel') },
-                  ]
-                : [
-                    { key: 'Queen', label: t('finishQueen') },
-                    { key: 'King', label: t('finishKing') },
-                  ]
-              ).map((leg) => {
-                const sel = selectedLeg === leg.key
+              {([
+                { key: 'oak', label: t('finishNaturalOak') },
+                { key: 'walnut', label: t('finishWalnut') },
+              ] as const).map((finish) => {
+                const selected = selectedWood === finish.key
                 return (
                   <button
-                    aria-pressed={sel}
-                    className={`flex-1 py-3 rounded-lg font-label-md text-sm transition-all cursor-pointer border ${
-                      sel
-                        ? 'bg-on-surface text-on-primary border-on-surface'
-                        : 'border-outline-variant text-on-surface hover:border-on-surface'
+                    aria-pressed={selected}
+                    className={`flex flex-1 items-center justify-center gap-2 rounded-lg border py-3 font-label-md text-sm text-on-surface transition-all cursor-pointer ${
+                      selected
+                        ? 'border-primary bg-primary-fixed/20 ring-1 ring-primary'
+                        : 'border-outline-variant bg-surface hover:border-on-surface'
                     }`}
-                    key={leg.key}
-                    onClick={() => setSelectedLeg(leg.key)}
+                    key={finish.key}
+                    onClick={() => setSelectedWood(finish.key)}
                     type="button"
                   >
-                    {leg.label}
+                    {selected && <CircleCheck aria-hidden="true" className="text-primary" size={16} />}
+                    {finish.label}
                   </button>
                 )
               })}
             </div>
           </div>
+          )}
+
+          {supportsBedSize && (
+            <div className="mb-8">
+              <span className="font-label-md text-label-md uppercase tracking-wider text-on-surface block mb-3">
+                {t('bedSize')}
+              </span>
+              <div className="flex gap-3">
+                {(['queen', 'king'] as const).map((size) => {
+                  const selected = selectedBedSize === size
+                  return (
+                    <button
+                      aria-pressed={selected}
+                      className={`flex-1 py-3 rounded-lg font-label-md text-sm transition-all cursor-pointer border ${
+                        selected
+                          ? 'bg-on-surface text-on-primary border-on-surface'
+                          : 'border-outline-variant text-on-surface hover:border-on-surface'
+                      }`}
+                      key={size}
+                      onClick={() => setSelectedBedSize(size)}
+                      type="button"
+                    >
+                      {size === 'queen' ? t('finishQueen') : t('finishKing')}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {hasConfigurationOptions && (
+          <div
+            aria-live="polite"
+            className={`mb-3 grid gap-x-4 gap-y-2 rounded-lg bg-surface-container-low px-4 py-2 text-sm ${
+              visibleOptionCount > 1 ? 'grid-cols-2' : 'grid-cols-1'
+            }`}
+            data-pdp-configuration-summary=""
+          >
+            {supportsUpholstery && (
+              <div className="min-w-0">
+                <p className="text-[10px] font-label-md uppercase tracking-wider text-on-surface-variant">
+                  {t('fabricUpholstery')}
+                </p>
+                <p className="truncate font-medium text-on-surface">{selectedFabricName}</p>
+              </div>
+            )}
+            {supportsWoodFinish && (
+              <div className="min-w-0">
+                <p className="text-[10px] font-label-md uppercase tracking-wider text-on-surface-variant">
+                  {t('woodFinish')}
+                </p>
+                <p className="truncate font-medium text-on-surface">{selectedWoodName}</p>
+              </div>
+            )}
+            {supportsBedSize && (
+              <div className="min-w-0">
+                <p className="text-[10px] font-label-md uppercase tracking-wider text-on-surface-variant">
+                  {t('bedSize')}
+                </p>
+                <p className="truncate font-medium text-on-surface">
+                  {selectedBedSize === 'queen' ? t('finishQueen') : t('finishKing')}
+                </p>
+              </div>
+            )}
+          </div>
+          )}
 
           {/* Quantity & CTA */}
           <div className="flex flex-col gap-3 mb-6">
@@ -367,45 +584,83 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
               <div className="flex items-center border border-outline-variant rounded">
                 <button
                   aria-label={t('decreaseQuantity')}
-                  className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
-                  onClick={() => setQty(Math.max(1, qty - 1))}
+                  className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-45"
+                  disabled={qty <= 1}
+                  onClick={() => setQty((current) => Math.max(1, current - 1))}
                   type="button"
                 >
                   −
                 </button>
-                <span aria-live="polite" className="w-10 text-center font-body-md text-sm">
+                <output aria-live="polite" className="w-10 text-center font-body-md text-sm">
                   {qty}
-                </span>
+                </output>
                 <button
                   aria-label={t('increaseQuantity')}
-                  className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
-                  onClick={() => setQty(qty + 1)}
+                  className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-45"
+                  disabled={qty >= MAX_CART_ITEM_QUANTITY}
+                  onClick={() => setQty((current) => Math.min(MAX_CART_ITEM_QUANTITY, current + 1))}
                   type="button"
                 >
                   +
                 </button>
               </div>
             </div>
+            {qty >= MAX_CART_ITEM_QUANTITY && (
+              <p className="text-xs text-on-surface-variant">{t('quantityLimitReached')}</p>
+            )}
 
-            <button
-              data-pdp-add=""
-              className="w-full bg-on-background text-on-primary py-4 rounded-full uppercase tracking-wider text-label-md font-label-md hover:bg-primary transition-colors flex justify-center items-center gap-2 cursor-pointer disabled:opacity-75"
-              disabled={isAdded}
-              id="pdp-add"
-              onClick={handleAddToCart}
-              type="button"
-            >
-              <span>
-                {isAdded
-                  ? t('addedToCart')
-                  : t('addToCartWithPrice', { price: formatCurrency(price * qty, { locale }) })}
-              </span>
-              {isAdded
-                ? <CircleCheck aria-hidden="true" size={18} />
-                : isRtl
-                  ? <ArrowLeft aria-hidden="true" size={18} />
-                  : <ShoppingCart aria-hidden="true" size={18} />}
-            </button>
+            {canAddToCart ? (
+              <>
+                <button
+                  data-pdp-add=""
+                  className="w-full bg-on-background text-on-primary py-4 rounded-full uppercase tracking-wider text-label-md font-label-md hover:bg-primary transition-colors flex justify-center items-center gap-2 cursor-pointer disabled:opacity-75"
+                  disabled={isAdded}
+                  id="pdp-add"
+                  onClick={handleAddToCart}
+                  ref={inlineAddRef}
+                  type="button"
+                >
+                  <span>
+                    {isAdded
+                      ? t('addedToCart')
+                      : t('addToCartWithPrice', {
+                          price: formatCurrency(configuredTotal as number, { locale }),
+                        })}
+                  </span>
+                  {isAdded
+                    ? <CircleCheck aria-hidden="true" size={18} />
+                    : isRtl
+                      ? <ArrowLeft aria-hidden="true" size={18} />
+                      : <ShoppingCart aria-hidden="true" size={18} />}
+                </button>
+
+                <button
+                  className="w-full rounded-full border border-on-background text-on-background hover:bg-on-background hover:text-on-primary transition-colors py-3 font-label-md flex justify-center items-center gap-2 cursor-pointer disabled:opacity-75"
+                  disabled={isAdded}
+                  id="pdp-buy-now"
+                  onClick={handleBuyNow}
+                  type="button"
+                >
+                  {t('buyNow')}
+                  <Zap aria-hidden="true" size={18} />
+                </button>
+              </>
+            ) : (
+              <div
+                aria-live="polite"
+                className="rounded-lg bg-surface-container px-4 py-3 text-sm text-on-surface-variant"
+                data-pdp-purchase-unavailable=""
+                role="status"
+              >
+                <p>{checkoutEnabled ? t('configurationUnavailable') : t('onlineCheckoutUnavailable')}</p>
+                <a
+                  className="mt-2 inline-flex font-label-md text-xs uppercase tracking-wider text-primary underline underline-offset-4"
+                  href="mailto:concierge@theflatset.com?subject=Product%20quote%20request"
+                >
+                  {t('contactConcierge')}
+                </a>
+              </div>
+            )}
 
             {cartError && (
               <p aria-live="assertive" className="text-sm text-error text-center" role="alert">
@@ -413,48 +668,33 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
               </p>
             )}
 
-            <button
-              className="w-full rounded-full border border-on-background text-on-background hover:bg-on-background hover:text-on-primary transition-colors py-3 font-label-md flex justify-center items-center gap-2 cursor-pointer"
-              id="pdp-buy-now"
-              onClick={handleBuyNow}
-              type="button"
-            >
-              {t('buyNow')}
-              <Zap aria-hidden="true" size={18} />
-            </button>
-
-            {/* Mini Trust Strip */}
+            {/* Quote and configuration facts only; delivery inclusions are not known until quote. */}
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-1 pt-2 text-on-surface-variant">
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
                 <Wrench aria-hidden="true" className="text-primary" size={16} />
                 {t('zeroScrews')}
               </span>
               <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
-                <Moon aria-hidden="true" className="text-primary" size={16} />
-                {t('trial')}
-              </span>
-              <span className="flex items-center gap-1.5 font-label-md text-[12px] uppercase tracking-wider">
                 <Truck aria-hidden="true" className="text-primary" size={16} />
-                {t('dutiesIncluded')}
+                {t('destinationQuoteRequired')}
               </span>
             </div>
           </div>
 
-          {/* Swatch Promo Card */}
-          <div className="bg-surface-container rounded-xl p-4 flex items-start gap-4 mb-8">
+          {/* Do not advertise a purchasable swatch or voucher while its
+              fulfillment entitlement remains deliberately disabled. */}
+          <aside className="bg-surface-container rounded-xl p-4 flex items-start gap-4 mb-8" role="status">
             <Palette aria-hidden="true" className="mt-1 text-primary" size={24} />
             <div>
-              <Link
-                className="font-label-md text-sm underline hover:text-primary transition-colors block mb-1 text-on-surface"
-                href="/free-swatch-box-material-discovery"
+              <p className="text-sm text-on-surface-variant">{tSwatch('checkoutUnavailable')}</p>
+              <a
+                className="mt-2 inline-flex font-label-md text-xs uppercase tracking-wider text-primary underline underline-offset-4"
+                href="mailto:concierge@theflatset.com?subject=Material%20swatch%20options"
               >
-                {t('orderFreeSwatchBox')}
-              </Link>
-              <p className="text-sm text-on-surface-variant">
-                {t('swatchBoxCardDesc')}
-              </p>
+                {tSwatch('contactConcierge')}
+              </a>
             </div>
-          </div>
+          </aside>
 
           {/* Packaging Breakdown */}
           {product?.boxBreakdown && product.boxBreakdown.length > 0 && (
@@ -509,41 +749,31 @@ export function ProductDetail({ product, materials }: ProductDetailProps) {
         </div>
       </div>
 
-      {/* Reviews Section */}
-      <section className="pt-12 border-t border-outline-variant/40" id="reviews">
-        <h2 className="font-headline-md text-headline-md text-on-surface mb-6">
-          {t('verifiedReviewsHeader')}
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              author: t('review1Author'),
-              date: t('review1Date'),
-              text: t('review1Text'),
-            },
-            {
-              author: t('review2Author'),
-              date: t('review2Date'),
-              text: t('review2Text'),
-            },
-            {
-              author: t('review3Author'),
-              date: t('review3Date'),
-              text: t('review3Text'),
-            },
-          ].map((rev) => (
-            <div className="bg-surface-container-low p-6 rounded-xl border border-outline-variant/30 flex flex-col justify-between" key={rev.author}>
-              <div>
-                <div className="flex text-amber-500 mb-2">★★★★★</div>
-                <p className="font-body-md text-sm text-on-surface mb-4">“{rev.text}”</p>
-              </div>
-              <div className="text-xs font-label-md text-on-surface-variant">
-                <span className="font-medium text-on-surface">{rev.author}</span> · {rev.date}
-              </div>
+      {showMobilePurchaseBar && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-50 border-t border-outline-variant bg-surface/95 p-3 shadow-[0_-8px_24px_rgba(0,0,0,0.08)] backdrop-blur md:hidden"
+          data-mobile-purchase-bar=""
+        >
+          <div className="mx-auto flex max-w-[1440px] items-center gap-3">
+            <div className="min-w-24">
+              <p className="font-label-md text-[11px] uppercase tracking-wider text-on-surface-variant">
+                {t('configuredTotal')}
+              </p>
+              <p className="font-headline-md text-xl text-on-surface" dir="ltr">
+                {formatCurrency(configuredTotal as number, { locale })}
+              </p>
             </div>
-          ))}
+            <button
+              className="flex min-h-12 flex-1 items-center justify-center rounded-lg bg-primary px-4 font-label-md text-sm text-on-primary disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={isAdded}
+              onClick={handleAddToCart}
+              type="button"
+            >
+              {isAdded ? t('addedToCart') : t('addToCart')}
+            </button>
+          </div>
         </div>
-      </section>
+      )}
     </main>
   )
 }

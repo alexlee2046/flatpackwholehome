@@ -10,7 +10,7 @@ export const SiteSettings: GlobalConfig = {
       name: 'descriptor',
       type: 'text',
       localized: true,
-      defaultValue: 'Whole-home flat-pack Japandi furniture delivered in 6 flat boxes worldwide.',
+      defaultValue: 'Whole-home flat-pack Japandi furniture in 6 boxes with destination-specific DDP delivery.',
       required: true,
     },
     {

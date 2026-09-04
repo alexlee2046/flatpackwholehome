@@ -13,7 +13,7 @@ export const Footer: GlobalConfig = {
       name: 'brandSlogan',
       type: 'text',
       localized: true,
-      defaultValue: '6 Boxes · 60 Minutes · 0 Screws · DDP Duties Included',
+      defaultValue: 'Flat-pack furniture · Tool-free assembly · Delivery details confirmed in a destination quote.',
     },
     {
       name: 'copyrightText',

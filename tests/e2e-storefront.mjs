@@ -17,44 +17,91 @@ async function testPlaywright() {
     const heading = await page.textContent('h1');
     console.log('   Heading:', heading?.trim());
 
-    // 2. Click Add to Cart
-    console.log('2. Clicking Add to Cart...');
+    // 2. Add when the operational catalog is ready; otherwise verify the
+    // fail-closed purchase gate without mutating catalog data in E2E.
     const addButton = page.locator('#kit-add');
-    await addButton.click();
-    await page.waitForURL(/\/cart$/);
+    const purchaseAvailable = (await addButton.count()) === 1;
+    if (purchaseAvailable) {
+      console.log('2. Clicking Add to Cart...');
+      await addButton.click();
+      await page.waitForURL(/\/cart$/);
 
-    // 3. Verify on Cart page, including a hard reload so persisted cart state hydrates cleanly.
-    console.log('3. Verifying Cart page and persisted state...');
-    await page.goto(`${BASE_URL}/en/cart`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(300);
-    const cartItemCount = await page.locator('#cart-items, article').count();
-    console.log('   Cart articles count:', cartItemCount);
-    if (cartItemCount < 1) {
-      throw new Error('Added bundle did not persist on the cart page');
+      // 3. Verify on Cart page, including a hard reload so persisted cart state hydrates cleanly.
+      console.log('3. Verifying Cart page and persisted state...');
+      await page.goto(`${BASE_URL}/en/cart`, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(300);
+      const cartItemCount = await page.locator('#cart-items, article').count();
+      console.log('   Cart articles count:', cartItemCount);
+      if (cartItemCount < 1) {
+        throw new Error('Added bundle did not persist on the cart page');
+      }
+
+      // 4. Public/static voucher strings must not be accepted without a paid swatch order.
+      console.log('4. Testing unsigned promo code rejection...');
+      const promoInput = page.locator('#promo-code-input');
+      if (await promoInput.isVisible()) {
+        await promoInput.fill('SWATCH50');
+        await page.locator('#promo-code-submit').click();
+        await page.waitForTimeout(500);
+        const feedback = await page.locator('#promo-feedback').textContent();
+        console.log('   Promo feedback:', feedback?.trim());
+        if (!/invalid|not recognised|not recognized/i.test(feedback || '')) {
+          throw new Error('Unsigned SWATCH50 code was not rejected');
+        }
+      }
+    } else {
+      console.log('2–4. Catalog checkout unavailable; verifying fail-closed state...');
+      await page.locator('[data-kit-customizer]').scrollIntoViewIfNeeded();
+      await page.waitForFunction(() => {
+        const unavailable = document.querySelector('[data-kit-purchase-unavailable]');
+        return unavailable instanceof HTMLElement && unavailable.offsetParent !== null;
+      });
+      if (!(await page.locator('[data-kit-purchase-unavailable]').isVisible())) {
+        throw new Error('Unavailable catalog must expose a purchase status instead of Add to Cart');
+      }
+      await page.goto(`${BASE_URL}/en/cart`, { waitUntil: 'domcontentloaded' });
+      if (!(await page.getByText('Your Cart is Empty').isVisible())) {
+        throw new Error('Fail-closed catalog must not create a cart line');
+      }
     }
 
-    // 4. Test Promo Code
-    console.log('4. Testing Promo Code SWATCH50...');
-    const promoInput = page.locator('#promo-code-input');
-    if (await promoInput.isVisible()) {
-      await promoInput.fill('SWATCH50');
-      await page.locator('#promo-code-submit').click();
-      await page.waitForTimeout(500);
-      const feedback = await page.locator('#promo-feedback').textContent();
-      console.log('   Promo feedback:', feedback?.trim());
+    // 5. A malformed v3 value must not hide a recoverable canonical v2 cart.
+    console.log('5. Testing corrupt-cart recovery...');
+    await page.goto(`${BASE_URL}/en`, { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+      localStorage.setItem('moduliv-cart-items-v3', '{malformed');
+      localStorage.setItem('moduliv-cart-items-v2', JSON.stringify([{
+        id: 'modusofa',
+        name: 'Legacy ModuSofa',
+        price: 69900,
+        qty: 2,
+        variantId: 11,
+      }]));
+    });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => typeof window.modulivCart?.items === 'function');
+    const recoveredItems = await page.evaluate(() => window.modulivCart.items());
+    if (recoveredItems.length !== 1 || recoveredItems[0].variantId !== 11 || recoveredItems[0].qty !== 2) {
+      throw new Error(`Corrupt v3 cart did not recover canonical legacy items: ${JSON.stringify(recoveredItems)}`);
     }
+    await page.evaluate(() => {
+      localStorage.removeItem('moduliv-cart-items-v3');
+      localStorage.removeItem('moduliv-cart-items-v2');
+      localStorage.removeItem('moduliv-cart-count');
+    });
 
-    // 5. Test FAQ Live Search
-    console.log('5. Testing FAQ search...');
+    // 6. Test FAQ Live Search
+    console.log('6. Testing FAQ search...');
     await page.goto(`${BASE_URL}/en/faq`, { waitUntil: 'domcontentloaded' });
     const faqInput = page.locator('input[placeholder*="Filter questions"]');
-    await faqInput.fill('duties');
+    await faqInput.fill('DDP');
     await page.waitForTimeout(300);
     const visibleDetails = await page.locator('details[open]').count();
     console.log('   Visible matching FAQ items:', visibleDetails);
+    if (visibleDetails < 1) throw new Error('FAQ search did not return a DDP result');
 
-    // 6. Test Language Switcher
-    console.log('6. Testing Language Switcher to zh-CN...');
+    // 7. Test Language Switcher
+    console.log('7. Testing Language Switcher to zh-CN...');
     await page.goto(`${BASE_URL}/en`, { waitUntil: 'domcontentloaded' });
     const langSelect = page.locator('header select[aria-label="Language selector"]');
     if (await langSelect.isVisible()) {
@@ -65,13 +112,13 @@ async function testPlaywright() {
       console.log('   Chinese Hero Heading:', zhHero?.trim());
     }
 
-    // 7. Test The Flat Set Brand Identity
-    console.log('7. Verifying The Flat Set Brand Identity in Header...');
+    // 8. Test The Flat Set Brand Identity
+    console.log('8. Verifying The Flat Set Brand Identity in Header...');
     const brandHeading = await page.locator('header a[aria-label="The Flat Set — Home"]').textContent();
     console.log('   Header Brand:', brandHeading?.replace(/\s+/g, ' ').trim());
 
-    // 8. Test Visual Styles (Tailwind compilation & Fonts)
-    console.log('8. Verifying Desktop Visual Styles & Tailwind compilation...');
+    // 9. Test Visual Styles (Tailwind compilation & Fonts)
+    console.log('9. Verifying Desktop Visual Styles & Tailwind compilation...');
     const styleAudit = await page.evaluate(() => {
       const h1 = document.querySelector('h1');
       const btn = document.querySelector('.bg-on-background');
@@ -85,8 +132,8 @@ async function testPlaywright() {
       throw new Error(`Visual styles failed to compile: ${JSON.stringify(styleAudit)}`);
     }
 
-    // 9. Test Mobile Drawer UX (390x844 viewport)
-    console.log('9. Testing Mobile Drawer Navigation (390x844 viewport)...');
+    // 10. Test Mobile Drawer UX (390x844 viewport)
+    console.log('10. Testing Mobile Drawer Navigation (390x844 viewport)...');
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${BASE_URL}/en`, { waitUntil: 'domcontentloaded' });
 

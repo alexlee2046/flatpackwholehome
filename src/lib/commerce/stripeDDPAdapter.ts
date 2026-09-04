@@ -6,13 +6,22 @@ import { createHash } from 'node:crypto'
 import Stripe from 'stripe'
 
 import { defaultLocale, locales, type AppLocale } from '@/i18n/routing'
+import { isCheckoutReleaseEnabled } from './checkoutRelease'
 import { readStripeServerConfig } from './stripeConfig'
 import { getShippingDestination, normalizeCheckoutAddress } from './checkoutValidation'
-import { normalizeVoucherCode, voucherDiscountInUSD } from '@/lib/commerce/vouchers'
+import { normalizeVoucherCode } from '@/lib/commerce/vouchers'
+import { voucherDiscountInUSD } from '@/lib/commerce/voucherServer'
 import { calculateDDPQuote, MAX_ITEM_QUANTITY, type ODSaiDestinationCode } from './ddp'
+import {
+  aggregateCanonicalCheckoutItems,
+  CheckoutItemUnavailableError,
+  DDP_PRICING_VERSION,
+  MAX_CART_LINES,
+  resolveSellableItems,
+  type CanonicalCheckoutItem,
+} from './checkoutQuote'
 
 const MAX_PAYMENT_AMOUNT_IN_USD = 99_999_999
-const DDP_PRICING_VERSION = 'provisional-cbm-v1'
 
 type CheckoutCartItem = {
   product?: unknown
@@ -27,7 +36,7 @@ type CheckoutCart = {
   subtotal?: unknown
 }
 
-type CanonicalItem = { product: number; quantity: number; variant?: number }
+type CanonicalItem = CanonicalCheckoutItem
 type StripeClient = Pick<Stripe, 'customers' | 'paymentIntents' | 'refunds'>
 type TransactionDatabase = {
   execute: (statement: unknown) => Promise<{ rows: Record<string, unknown>[] }>
@@ -36,13 +45,6 @@ type TransactionDatabase = {
 export type StripeDDPDependencies = {
   now?: () => Date
   stripe?: StripeClient
-}
-
-class CheckoutItemUnavailableError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'CheckoutItemUnavailableError'
-  }
 }
 
 class RefundedPaymentError extends Error {
@@ -79,8 +81,9 @@ function canonicalItemsFingerprint(items: CanonicalItem[]): string {
 
 function canonicalizeItems(items: CheckoutCartItem[] | null | undefined): CanonicalItem[] {
   if (!items?.length) throw new Error('Your cart is empty.')
+  if (items.length > MAX_CART_LINES) throw new Error(`A cart can contain at most ${MAX_CART_LINES} lines.`)
 
-  return items.map((item) => {
+  return aggregateCanonicalCheckoutItems(items.map((item) => {
     const product = relationshipID(item.product)
     const variant = relationshipID(item.variant)
     const quantity = item.quantity
@@ -102,114 +105,7 @@ function canonicalizeItems(items: CheckoutCartItem[] | null | undefined): Canoni
       quantity: quantity as number,
       ...(variant ? { variant } : {}),
     }
-  })
-}
-
-async function resolveSellableItems({
-  checkInventory,
-  items,
-  req,
-}: {
-  checkInventory: boolean
-  items: CanonicalItem[]
-  req: PayloadRequest
-}) {
-  let packedCbm = 0
-  let subtotalInUSD = 0
-  const requestedInventory = new Map<string, { available: number; quantity: number }>()
-
-  for (const item of items) {
-    const product = await req.payload.findByID({
-      collection: 'products',
-      depth: 0,
-      id: item.product,
-      overrideAccess: true,
-      req,
-      select: {
-        _status: true,
-        enableVariants: true,
-        inventory: true,
-        packedVolumeCbm: true,
-        priceInUSD: true,
-        priceInUSDEnabled: true,
-      },
-    })
-
-    if (!product || product._status !== 'published') {
-      throw new CheckoutItemUnavailableError('A cart product is no longer available.')
-    }
-    if (product.priceInUSDEnabled !== true) {
-      throw new CheckoutItemUnavailableError('A cart product is not enabled for USD checkout.')
-    }
-    if (!Number.isFinite(product.packedVolumeCbm) || (product.packedVolumeCbm ?? 0) <= 0) {
-      throw new CheckoutItemUnavailableError('A cart product is missing delivery dimensions.')
-    }
-
-    let unitPrice = product.priceInUSD
-    let available = product.inventory
-
-    if (product.enableVariants) {
-      if (!item.variant) {
-        throw new CheckoutItemUnavailableError('Choose a product variant before checkout.')
-      }
-
-      const variant = await req.payload.findByID({
-        collection: 'variants',
-        depth: 0,
-        id: item.variant,
-        overrideAccess: true,
-        req,
-        select: {
-          _status: true,
-          inventory: true,
-          priceInUSD: true,
-          priceInUSDEnabled: true,
-          product: true,
-        },
-      })
-      const variantProductID = relationshipID(variant?.product)
-
-      if (!variant || variant._status !== 'published' || variantProductID !== item.product) {
-        throw new CheckoutItemUnavailableError('A selected product variant is no longer available.')
-      }
-      if (variant.priceInUSDEnabled !== true) {
-        throw new CheckoutItemUnavailableError(
-          'A selected product variant is not enabled for USD checkout.',
-        )
-      }
-
-      unitPrice = variant.priceInUSD
-      available = variant.inventory
-    } else if (item.variant) {
-      throw new CheckoutItemUnavailableError('This product does not accept a variant selection.')
-    }
-
-    if (typeof unitPrice !== 'number' || !Number.isInteger(unitPrice) || unitPrice <= 0) {
-      throw new CheckoutItemUnavailableError('A cart item is missing a valid USD price.')
-    }
-    if (checkInventory) {
-      if (typeof available !== 'number' || !Number.isInteger(available)) {
-        throw new CheckoutItemUnavailableError('A cart item has invalid inventory.')
-      }
-      const inventoryKey = item.variant ? `variant:${item.variant}` : `product:${item.product}`
-      const current = requestedInventory.get(inventoryKey)
-      requestedInventory.set(inventoryKey, {
-        available,
-        quantity: (current?.quantity ?? 0) + item.quantity,
-      })
-    }
-
-    subtotalInUSD += unitPrice * item.quantity
-    packedCbm += (product.packedVolumeCbm as number) * item.quantity
-  }
-
-  if ([...requestedInventory.values()].some((stock) => stock.quantity > stock.available)) {
-    throw new CheckoutItemUnavailableError(
-      'A cart item is not available in the requested quantity.',
-    )
-  }
-
-  return { packedCbm, subtotalInUSD }
+  }))
 }
 
 export async function priceCart({
@@ -227,6 +123,7 @@ export async function priceCart({
   const { packedCbm, subtotalInUSD } = await resolveSellableItems({
     checkInventory: true,
     items,
+    payload: req.payload,
     req,
   })
 
@@ -492,6 +389,12 @@ export function stripeDDPAdapter(
     req,
     transactionsSlug,
   }) => {
+    // Payment routes remain registered for deterministic Payload schema/types,
+    // but no Stripe customer, intent, or transaction may be created until the
+    // explicit operational release gate is enabled.
+    if (!isCheckoutReleaseEnabled()) {
+      throw new Error('Online checkout is unavailable.')
+    }
     if (transactionsSlug !== 'transactions') {
       throw new Error('ODSai payment collection configuration is invalid.')
     }
@@ -651,9 +554,13 @@ export function stripeDDPAdapter(
     }
 
     return {
+      amountInUSD: amountToChargeInUSD,
       clientSecret: paymentIntent.client_secret || '',
+      deliveryDays: quote.deliveryDays,
       message: 'Payment initiated successfully',
       paymentIntentID: paymentIntent.id,
+      pricingVersion: DDP_PRICING_VERSION,
+      shippingAmountInUSD: quote.shippingAndImportInUSD,
     }
   }
 
@@ -857,7 +764,12 @@ export function stripeDDPAdapter(
 
       try {
         await lockInventoryRows(database, items)
-        const currentPricing = await resolveSellableItems({ checkInventory: true, items, req })
+        const currentPricing = await resolveSellableItems({
+          checkInventory: true,
+          items,
+          payload: req.payload,
+          req,
+        })
         const currentQuote = calculateDDPQuote({
           countryCode: getShippingDestination(shippingAddress),
           packedCbm: currentPricing.packedCbm,

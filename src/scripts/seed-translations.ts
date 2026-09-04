@@ -142,7 +142,7 @@ export const seedTranslations: Record<string, LocaleSeedData> = {
         description: 'Your entire apartment furnished in one delivery. Includes the 3-seater ModuSofa, Oak Coffee Table, SnapBed frame with nightstands, and dining bench. All engineered to assemble in 60 minutes tool-free.',
         specifications: [
           { label: 'Coverage', value: 'Living, Bedroom, & Dining essentials' },
-          { label: 'Total Boxes', value: '6 Boxes (DDP Delivered to Room of Choice)' },
+          { label: 'Total Boxes', value: '6 flat boxes; destination DDP is quoted in cart' },
           { label: 'Bundle Savings', value: '$350 vs buying pieces separately' },
         ],
         boxBreakdown: [
@@ -157,7 +157,7 @@ export const seedTranslations: Record<string, LocaleSeedData> = {
     },
     globals: {
       announcement: {
-        message: 'Free Swatch Box with $50 Voucher — Worldwide DDP Delivery & Duties Included',
+        message: 'Material swatch checkout is currently unavailable. Contact our concierge for options.',
         linkLabel: 'Explore 1-Bedroom Kit',
       },
       homepage: {
@@ -168,7 +168,7 @@ export const seedTranslations: Record<string, LocaleSeedData> = {
         },
       },
       siteSettings: {
-        descriptor: 'Whole-home flat-pack Japandi furniture delivered in 6 flat boxes worldwide.',
+        descriptor: 'Whole-home flat-pack Japandi furniture in 6 boxes with destination-specific DDP delivery.',
         tagline: 'Your entire home. Delivered in 6 flat boxes.',
       },
     },
