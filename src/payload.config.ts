@@ -98,7 +98,14 @@ export default buildConfig({
       idleTimeoutMillis: 30000,
       max: process.env.DB_POOL_MAX ? parseInt(process.env.DB_POOL_MAX, 10) : 15,
     },
-    prodMigrations: migrations,
+    // Payload runs these at boot in production. The bundled migration is a
+    // baseline — it CREATEs the whole schema — so it only applies to a database
+    // that is empty. Pointing it at an existing deployment would fail on the
+    // first CREATE TABLE and take the boot down with it, so it is opt-in per
+    // environment: set PAYLOAD_RUN_MIGRATIONS=true on a fresh database, and
+    // leave it unset for one that was built by dev push and still needs
+    // baselining by hand.
+    ...(process.env.PAYLOAD_RUN_MIGRATIONS === 'true' ? { prodMigrations: migrations } : {}),
   }),
   editor: lexicalEditor({
     features: () => {
