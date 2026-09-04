@@ -35,6 +35,7 @@ import { Header } from '@/globals/Header'
 import { Homepage } from '@/globals/Homepage'
 import { HowItWorks } from '@/globals/HowItWorks'
 import { SiteSettings } from '@/globals/SiteSettings'
+import { seedFlatpack } from '@/scripts/seed-flatpack'
 import { seedInitialContent } from '@/utilities/seedContent'
 import { seedI18nContent } from '@/utilities/seedI18nContent'
 import { migrations } from './migrations'
@@ -211,6 +212,21 @@ export default buildConfig({
 
       // Automatically seed initial CMS content (FAQs, HowItWorks, Homepage blocks, Navigation)
       await seedInitialContent(payload)
+
+      // The catalogue lives in a separate script because it also copies media,
+      // which made it too heavy to run on every boot. On a database that has no
+      // products at all it has to run, though: without it the storefront falls
+      // back to static copy and checkout cannot resolve a single line item. This
+      // is what makes pointing DATABASE_URL at an empty database a complete
+      // provisioning step rather than one that leaves the store unsellable.
+      const { totalDocs: productCount } = await payload.count({
+        collection: 'products',
+        overrideAccess: true,
+      })
+      if (productCount === 0) {
+        payload.logger.info('[onInit] No products found — seeding the catalogue.')
+        await seedFlatpack(payload)
+      }
 
       // Automatically seed professional multilingual translations (zh-CN, zh-TW, de, ja, ar, ru)
       await seedI18nContent(payload)
