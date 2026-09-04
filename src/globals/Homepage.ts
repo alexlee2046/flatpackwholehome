@@ -33,15 +33,6 @@ export const Homepage: GlobalConfig = {
       ],
     },
     {
-      name: 'trustPillars',
-      type: 'array',
-      fields: [
-        { name: 'metric', type: 'text', required: true },
-        { name: 'label', type: 'text', localized: true, required: true },
-        { name: 'icon', type: 'text', defaultValue: 'check_circle' },
-      ],
-    },
-    {
       name: 'comparisonMatrix',
       type: 'group',
       fields: [

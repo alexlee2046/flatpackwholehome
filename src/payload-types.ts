@@ -2590,14 +2590,6 @@ export interface Homepage {
     body?: string | null;
     image?: (number | null) | Media;
   };
-  trustPillars?:
-    | {
-        metric: string;
-        label: string;
-        icon?: string | null;
-        id?: string | null;
-      }[]
-    | null;
   comparisonMatrix?: {
     eyebrow?: string | null;
     title?: string | null;
@@ -2764,14 +2756,6 @@ export interface HomepageSelect<T extends boolean = true> {
         headline?: T;
         body?: T;
         image?: T;
-      };
-  trustPillars?:
-    | T
-    | {
-        metric?: T;
-        label?: T;
-        icon?: T;
-        id?: T;
       };
   comparisonMatrix?:
     | T

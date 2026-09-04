@@ -134,17 +134,11 @@ export async function seedInitialContent(payload: Payload): Promise<void> {
       overrideAccess: true,
     })
 
-    if (!currentHome?.trustPillars || currentHome.trustPillars.length === 0) {
-      p.logger.info('[seedContent] Seeding Homepage trust pillars, comparison matrix, and testimonials...')
+    if (!currentHome?.comparisonMatrix) {
+      p.logger.info('[seedContent] Seeding Homepage comparison matrix and testimonials...')
       await p.updateGlobal({
         slug: 'homepage',
         data: {
-          trustPillars: [
-            { metric: '6 Flat Boxes', label: 'Whole Apartment Suite', icon: 'package_2' },
-            { metric: '60 Minutes', label: 'Tool-Free Solo Build', icon: 'timer' },
-            { metric: '0 Screws', label: 'Mechanical Snap-Lock', icon: 'handyman' },
-            { metric: 'DDP Included', label: 'Duties & Taxes Prepaid', icon: 'local_shipping' },
-          ],
           comparisonMatrix: {
             eyebrow: 'THE DIFFERENCE',
             title: 'Flat Set Engineering vs. Traditional Retail',

@@ -25,7 +25,6 @@ export interface LocaleContent {
     }>
   }
   homepage: {
-    trustPillars: Array<{ metric: string; label: string; icon: string }>
     comparisonMatrix: {
       eyebrow: string
       title: string
@@ -161,12 +160,6 @@ export const I18N_DICTIONARY: Record<string, LocaleContent> = {
       ],
     },
     homepage: {
-      trustPillars: [
-        { metric: '6 个扁平包装箱', label: '装下一居室全套家具', icon: 'package_2' },
-        { metric: '60 分钟', label: '单人徒手免工具拼装', icon: 'timer' },
-        { metric: '0 颗螺丝', label: '不锈钢暗榫机械自锁', icon: 'handyman' },
-        { metric: 'DDP 全包', label: '国际关税与税费已预付', icon: 'local_shipping' },
-      ],
       comparisonMatrix: {
         eyebrow: '核心差异',
         title: 'The Flat Set 极简工程 vs. 传统家具卖场',
@@ -351,12 +344,6 @@ export const I18N_DICTIONARY: Record<string, LocaleContent> = {
       ],
     },
     homepage: {
-      trustPillars: [
-        { metric: '6 個扁平包裝箱', label: '裝下一居室全套家具', icon: 'package_2' },
-        { metric: '60 分鐘', label: '單人徒手免工具拼裝', icon: 'timer' },
-        { metric: '0 顆螺絲', label: '不銹鋼暗榫機械自鎖', icon: 'handyman' },
-        { metric: 'DDP 全包', label: '國際關稅與稅費已預付', icon: 'local_shipping' },
-      ],
       comparisonMatrix: {
         eyebrow: '核心差異',
         title: 'The Flat Set 極簡工程 vs. 傳統家具賣場',
@@ -541,12 +528,6 @@ export const I18N_DICTIONARY: Record<string, LocaleContent> = {
       ],
     },
     homepage: {
-      trustPillars: [
-        { metric: '6 Flachboxen', label: 'Komplette Wohnungsausstattung', icon: 'package_2' },
-        { metric: '60 Minuten', label: 'Werkzeuglose Solomontage', icon: 'timer' },
-        { metric: '0 Schrauben', label: 'Mechanischer Snap-Lock-Verschluss', icon: 'handyman' },
-        { metric: 'DDP Inklusive', label: 'Zölle und Steuern vorbezahlt', icon: 'local_shipping' },
-      ],
       comparisonMatrix: {
         eyebrow: 'DER UNTERSCHIED',
         title: 'The Flat Set Ingenieurskunst vs. Traditioneller Möbelhandel',
@@ -731,12 +712,6 @@ export const I18N_DICTIONARY: Record<string, LocaleContent> = {
       ],
     },
     homepage: {
-      trustPillars: [
-        { metric: '6つの薄型箱', label: '1LDK全室の家具を完全収納', icon: 'package_2' },
-        { metric: '60分組立て', label: '1人でできる完全工具不要組立', icon: 'timer' },
-        { metric: 'ネジ0本', label: '精密ステンレス自鎖スナップロック', icon: 'handyman' },
-        { metric: 'DDP関税込み', label: '輸入関税・消費税すべて元払済', icon: 'local_shipping' },
-      ],
       comparisonMatrix: {
         eyebrow: '決定的な違い',
         title: 'The Flat Set の精密設計 vs 従来の家具店',
@@ -921,12 +896,6 @@ export const I18N_DICTIONARY: Record<string, LocaleContent> = {
       ],
     },
     homepage: {
-      trustPillars: [
-        { metric: '6 صناديق مسطحة', label: 'تتسع لشقة كاملة بغرفة نوم', icon: 'package_2' },
-        { metric: '60 دقيقة', label: 'تجميع فردي بدون أدوات', icon: 'timer' },
-        { metric: '0 براغي', label: 'إغلاق ميكانيكي بالكبس Snap-Lock', icon: 'handyman' },
-        { metric: 'DDP شامل', label: 'الرسوم الجمركية والضرائب مدفوعة مسبقاً', icon: 'local_shipping' },
-      ],
       comparisonMatrix: {
         eyebrow: 'الفارق الجوهري',
         title: 'هندسة The Flat Set مقابل معارض الأثاث التقليدية',
@@ -1111,12 +1080,6 @@ export const I18N_DICTIONARY: Record<string, LocaleContent> = {
       ],
     },
     homepage: {
-      trustPillars: [
-        { metric: '6 плоских коробок', label: 'Мебель для всей 1-комнатной квартиры', icon: 'package_2' },
-        { metric: '60 минут', label: 'Сборка в одиночку без инструмента', icon: 'timer' },
-        { metric: '0 винтов', label: 'Механический самозажимной замок', icon: 'handyman' },
-        { metric: 'DDP включено', label: 'Пошлины и сборы полностью оплачены', icon: 'local_shipping' },
-      ],
       comparisonMatrix: {
         eyebrow: 'ГЛАВНОЕ ОТЛИЧИЕ',
         title: 'Инженерия The Flat Set против традиционных мебельных салонов',
