@@ -11,7 +11,7 @@ export const Announcement: GlobalConfig = {
       name: 'message',
       type: 'text',
       localized: true,
-      defaultValue: 'Free Swatch Box with $50 Voucher — Worldwide DDP Delivery & Duties Included',
+      defaultValue: 'Material swatch checkout is currently unavailable. Contact our concierge for options.',
       required: true,
     },
     { name: 'linkLabel', type: 'text', localized: true, defaultValue: 'Explore 1-Bedroom Kit' },

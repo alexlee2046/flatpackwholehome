@@ -3,6 +3,7 @@
 import { Link } from '@/i18n/navigation'
 import type { SearchIndexProduct } from '@/lib/data/storefront'
 import { useTranslations } from 'next-intl'
+import { ArrowRight, Search, X } from 'lucide-react'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 /**
@@ -103,6 +104,15 @@ export function SearchModal({
   }, [onClose])
 
   const handleArrowNav = (e: React.KeyboardEvent<HTMLDialogElement>) => {
+    // Browsers may consume the first Escape on <input type="search"> to clear
+    // its value. Handle it at the dialog boundary so Escape always closes.
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      e.stopPropagation()
+      dialogRef.current?.close()
+      return
+    }
+
     if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
     const focusables = Array.from(
       e.currentTarget.querySelectorAll<HTMLElement>('input[type="search"], a[data-search-result]'),
@@ -129,9 +139,7 @@ export function SearchModal({
       >
         <div className="flex max-h-[70vh] flex-col">
           <div className="flex items-center gap-3 border-b border-outline-variant/40 bg-surface-container-lowest p-4 md:p-6">
-            <span aria-hidden="true" className="material-symbols-outlined text-2xl text-primary">
-              search
-            </span>
+            <Search aria-hidden="true" className="text-primary" size={24} />
             <input
               autoComplete="off"
               className="w-full bg-transparent font-body-md text-lg text-on-surface outline-none placeholder:text-on-surface-variant/60 md:text-xl"
@@ -147,9 +155,7 @@ export function SearchModal({
               onClick={() => dialogRef.current?.close()}
               type="button"
             >
-              <span aria-hidden="true" className="material-symbols-outlined text-xl">
-                close
-              </span>
+              <X aria-hidden="true" size={20} />
             </button>
           </div>
 
@@ -175,9 +181,7 @@ export function SearchModal({
                   >
                     <div className="mb-1 flex items-center justify-between font-label-md text-xs uppercase tracking-wider text-primary">
                       <span>{item.category}</span>
-                      <span aria-hidden="true" className="material-symbols-outlined text-sm opacity-0 transition-opacity group-hover:opacity-100">
-                        arrow_forward
-                      </span>
+                      <ArrowRight aria-hidden="true" className="opacity-0 transition-opacity group-hover:opacity-100" size={14} />
                     </div>
                     <h4 className="font-headline-sm text-base font-medium text-on-surface group-hover:text-primary">
                       {item.title}

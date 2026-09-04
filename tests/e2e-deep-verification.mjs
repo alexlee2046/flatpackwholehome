@@ -85,36 +85,26 @@ async function runDeepE2E() {
     // 3. Kit Builder 6-Box Verification
     console.log('\n3. Testing Kit Builder 6-Box Cards...');
     await page.goto(`${BASE_URL}/en/1-bedroom-kit-builder`, { waitUntil: 'networkidle' });
-    const boxCards = page.locator('div[class*="border"] h4');
+    const boxCards = page.locator('[data-box-included]');
     const boxCount = await boxCards.count();
-    console.log(`   Found box headings count: ${boxCount}`);
+    console.log(`   Found box card count: ${boxCount}`);
+    if (boxCount !== 6) failures++;
 
-    // 4. Free Swatch Box Form Submission (Live Lead API)
-    console.log('\n4. Testing Free Swatch Box Lead Submission Form...');
-    await page.goto(`${BASE_URL}/en/free-swatch-box-material-discovery`, { waitUntil: 'networkidle' });
-    const nameInput = page.locator('#sf-name');
-    const emailInput = page.locator('#sf-email');
-    const addressInput = page.locator('#sf-address');
-    const cityInput = page.locator('#sf-city');
-    const postalInput = page.locator('#sf-zip');
+    // 4. Paid swatch flow safety gate. Never create a live PaymentIntent in this suite.
+    console.log('\n4. Testing Paid Swatch Box Checkout Gate...');
+    await page.goto(`${BASE_URL}/en/free-swatch-box-material-discovery`, { waitUntil: 'domcontentloaded' });
+    const emailInput = page.locator('input[type="email"]');
     const submitBtn = page.locator('button[type="submit"]');
-
-    if (await nameInput.isVisible() && await emailInput.isVisible()) {
-      await nameInput.fill('E2E Verification Bot');
-      await emailInput.fill(`e2e-test-${Date.now()}@theflatset.com`);
-      if (await addressInput.isVisible()) await addressInput.fill('100 Test Blvd, Suite 200');
-      if (await cityInput.isVisible()) await cityInput.fill('San Francisco');
-      if (await postalInput.isVisible()) await postalInput.fill('94107');
-
-      await submitBtn.click();
-      await page.waitForTimeout(1500);
-
-      const hasSuccess = (await page.locator('body').textContent()).includes('Order Confirmed') || (await page.locator('body').textContent()).includes('Your swatch box is reserved');
-      console.log('   Form submitted successfully:', hasSuccess);
-      if (!hasSuccess) failures++;
-    } else {
-      console.log('   Swatch form inputs visible:', false);
-      failures++;
+    const hasForm = (await emailInput.count()) > 0 && (await submitBtn.count()) > 0;
+    const hasConciergeFallback = await page.locator('a[href^="mailto:concierge@theflatset.com"]').first().isVisible();
+    console.log('   Paid swatch address form visible:', hasForm);
+    if (hasForm && await submitBtn.isDisabled()) {
+      console.log('   Disabled checkout has concierge fallback:', hasConciergeFallback);
+      if (!hasConciergeFallback) failures++;
+    }
+    if (!hasForm) {
+      console.log('   Fulfillment-disabled page has concierge fallback:', hasConciergeFallback);
+      if (!hasConciergeFallback || (await page.locator('form').count()) !== 0) failures++;
     }
 
     // 5. Multi-Language Verification Across 7 Locales
@@ -154,6 +144,7 @@ async function runDeepE2E() {
       console.log(' DEEP E2E VERIFICATION PASSED: ALL SCENARIOS 100% HEALTHY!');
     } else {
       console.error(` DEEP E2E COMPLETED WITH ${failures} WARNINGS/FAILURES`);
+      process.exitCode = 1;
     }
     console.log('==============================================\n');
   } catch (err) {

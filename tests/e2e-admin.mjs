@@ -82,7 +82,7 @@ async function runAdminE2E() {
     await page.goto(`${BASE_URL}/admin/collections/products`, { waitUntil: 'networkidle' });
     await page.waitForTimeout(1000);
 
-    const productRows = page.locator('table tbody tr, .cell-title, tr td a');
+    const productRows = page.locator('table tbody tr');
     const rowCount = await productRows.count();
     console.log(`   Products table items found: ${rowCount}`);
 
@@ -93,7 +93,12 @@ async function runAdminE2E() {
 
     // Inspect ModuSofa product document detail
     console.log('\n5. Inspecting ModuSofa Product Document...');
-    const moduSofaLink = page.locator('a[href*="/admin/collections/products/"]').first();
+    const moduSofaLink = page
+      .locator('table tbody tr')
+      .filter({ hasText: /ModuSofa/i })
+      .first()
+      .locator('a[href*="/admin/collections/products/"]')
+      .first();
     if (await moduSofaLink.isVisible()) {
       await moduSofaLink.click();
       await page.waitForTimeout(2000);
@@ -140,6 +145,7 @@ async function runAdminE2E() {
       console.log(' ADMIN E2E VERIFICATION PASSED: 100% OPERATIONAL & BRANDED!');
     } else {
       console.error(` ADMIN E2E COMPLETED WITH ${failures} WARNINGS/FAILURES`);
+      process.exitCode = 1;
     }
     console.log('==============================================\n');
   } catch (err) {

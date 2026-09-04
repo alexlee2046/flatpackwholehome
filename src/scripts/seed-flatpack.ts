@@ -206,6 +206,184 @@ export async function seedFlatpack(payload: Payload) {
     }, 'en'),
   ])
 
+  // Build real sellable variants. Storefront labels can be localized separately,
+  // while these stable values are the contract used to resolve a selection to a
+  // Payload variant ID.
+  const upsertVariantType = async (name: string, label: string) => {
+    const existing = await payload.find({
+      collection: 'variantTypes',
+      depth: 0,
+      limit: 1,
+      overrideAccess: true,
+      where: { name: { equals: name } },
+    })
+    if (existing.docs[0]) {
+      return payload.update({
+        collection: 'variantTypes',
+        data: { label, name },
+        id: existing.docs[0].id,
+        overrideAccess: true,
+      })
+    }
+    return payload.create({
+      collection: 'variantTypes',
+      data: { label, name },
+      overrideAccess: true,
+    })
+  }
+
+  const upsertVariantOption = async (
+    variantType: number,
+    value: string,
+    label: string,
+  ) => {
+    const existing = await payload.find({
+      collection: 'variantOptions',
+      depth: 0,
+      limit: 1,
+      overrideAccess: true,
+      where: {
+        and: [
+          { variantType: { equals: variantType } },
+          { value: { equals: value } },
+        ],
+      },
+    })
+    if (existing.docs[0]) {
+      return payload.update({
+        collection: 'variantOptions',
+        data: { label, value, variantType },
+        id: existing.docs[0].id,
+        overrideAccess: true,
+      })
+    }
+    return payload.create({
+      collection: 'variantOptions',
+      data: { label, value, variantType },
+      overrideAccess: true,
+    })
+  }
+
+  const [upholsteryType, woodType, bedSizeType] = await Promise.all([
+    upsertVariantType('upholstery', 'Upholstery'),
+    upsertVariantType('wood-finish', 'Wood Finish'),
+    upsertVariantType('bed-size', 'Bed Size'),
+  ])
+  const [corduroy, boucle, chenille, techGrey, oak, walnut, queen, king] = await Promise.all([
+    upsertVariantOption(upholsteryType.id, 'corduroy', 'Caramel Corduroy'),
+    upsertVariantOption(upholsteryType.id, 'boucle', 'Cream Bouclé'),
+    upsertVariantOption(upholsteryType.id, 'chenille', 'Olive Chenille'),
+    upsertVariantOption(upholsteryType.id, 'techGrey', 'Tech Grey'),
+    upsertVariantOption(woodType.id, 'oak', 'Natural White Oak'),
+    upsertVariantOption(woodType.id, 'walnut', 'Smoked Walnut'),
+    upsertVariantOption(bedSizeType.id, 'queen', 'Queen'),
+    upsertVariantOption(bedSizeType.id, 'king', 'King'),
+  ])
+
+  await Promise.all([
+    payload.update({
+      collection: 'products',
+      data: {
+        enableVariants: true,
+        variantTypes: [upholsteryType.id, woodType.id],
+      },
+      id: productSofa.id,
+      overrideAccess: true,
+    }),
+    payload.update({
+      collection: 'products',
+      data: {
+        enableVariants: true,
+        variantTypes: [woodType.id, bedSizeType.id],
+      },
+      id: productBed.id,
+      overrideAccess: true,
+    }),
+    payload.update({
+      collection: 'products',
+      data: {
+        enableVariants: true,
+        variantTypes: [upholsteryType.id, woodType.id, bedSizeType.id],
+      },
+      id: productKit.id,
+      overrideAccess: true,
+    }),
+  ])
+
+  const optionID = (value: { id: number | string }) => Number(value.id)
+  const upsertVariants = async (
+    product: { id: number | string },
+    optionSets: Array<Array<{ id: number | string }>>,
+    priceInUSD: number,
+  ) => {
+    const existing = await payload.find({
+      collection: 'variants',
+      depth: 1,
+      limit: 100,
+      overrideAccess: true,
+      where: { product: { equals: product.id } },
+    })
+    const byOptions = new Map(
+      existing.docs.map((variant) => [
+        (variant.options || [])
+          .map((option) => Number(typeof option === 'object' ? option.id : option))
+          .sort((a, b) => a - b)
+          .join(':'),
+        variant,
+      ]),
+    )
+
+    for (const options of optionSets) {
+      const ids = options.map(optionID)
+      const key = [...ids].sort((a, b) => a - b).join(':')
+      const current = byOptions.get(key)
+      const data = {
+        _status: 'published' as const,
+        inventory: 100,
+        options: ids,
+        priceInUSD,
+        priceInUSDEnabled: true,
+        product: Number(product.id),
+      }
+      if (current) {
+        await payload.update({
+          collection: 'variants',
+          data,
+          id: current.id,
+          overrideAccess: true,
+        })
+      } else {
+        await payload.create({
+          collection: 'variants',
+          data,
+          overrideAccess: true,
+        })
+      }
+    }
+  }
+
+  await upsertVariants(
+    productSofa,
+    [corduroy, boucle, chenille, techGrey].flatMap((fabric) =>
+      [oak, walnut].map((finish) => [fabric, finish]),
+    ),
+    69900,
+  )
+  await upsertVariants(
+    productBed,
+    [oak, walnut].flatMap((finish) => [queen, king].map((size) => [finish, size])),
+    80000,
+  )
+  await upsertVariants(
+    productKit,
+    [corduroy, boucle, chenille, techGrey].flatMap((fabric) =>
+      [oak, walnut].flatMap((finish) =>
+        [queen, king].map((size) => [fabric, finish, size]),
+      ),
+    ),
+    149900,
+  )
+
   // Add-ons the KitBuilder can put in a cart. They exist as products because the
   // checkout prices every line from the catalog — a surcharge that only lives in
   // the browser is displayed to the shopper but never charged.

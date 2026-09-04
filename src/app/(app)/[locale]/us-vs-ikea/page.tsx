@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     image: '/assets/homepage/hero-split.png',
     locale,
     pathname: '/us-vs-ikea',
-    title: `${tNav('usVsIkea')} | The Flat Set`,
+    title: tNav('usVsIkea'),
   })
 }
 

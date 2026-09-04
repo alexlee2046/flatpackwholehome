@@ -2,6 +2,21 @@ import { adminOnly } from '@/access/adminOnly'
 import { APIError } from 'payload'
 import type { CollectionConfig } from 'payload'
 
+const RESERVED_COMMERCE_ENQUIRY_SUBJECT_PREFIXES = [
+  '[Paid Swatch Box]',
+  '[Swatch Box]',
+  '[Swatch Fulfillment]',
+] as const
+
+/** Generic public enquiries must never impersonate a paid fulfillment record. */
+export function isReservedCommerceEnquirySubject(value: unknown): boolean {
+  if (typeof value !== 'string') return false
+  const subject = value.trimStart().toLowerCase()
+  return RESERVED_COMMERCE_ENQUIRY_SUBJECT_PREFIXES.some((prefix) =>
+    subject.startsWith(prefix.toLowerCase()),
+  )
+}
+
 export const ContactEnquiries: CollectionConfig = {
   slug: 'contact-enquiries',
   access: {
@@ -14,7 +29,8 @@ export const ContactEnquiries: CollectionConfig = {
   hooks: {
     beforeValidate: [
       ({ data, operation }) => {
-        if (operation === 'create' && data?.website) {
+        if (operation !== 'create') return
+        if (data?.website || isReservedCommerceEnquirySubject(data?.subject)) {
           throw new APIError('Invalid submission.', 400)
         }
       },

@@ -4,7 +4,9 @@ import { Link } from '@/i18n/navigation'
 import { localeDetails, type AppLocale } from '@/i18n/routing'
 import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
 import { useLocale, useTranslations } from 'next-intl'
+import { calculateDDPQuote } from '@/lib/commerce/ddp'
 import React, { useState } from 'react'
+import { StorefrontIcon } from './StorefrontIcon'
 
 const CITY_DATA = [
   { id: 'la', taxRate: 0.1025 },
@@ -39,21 +41,24 @@ export function IkeaComparisonView() {
 
   const ikeaTax = ikeaSubtotal * currentCity.taxRate
   const ikeaLandedTotal = ikeaSubtotal + ikeaTax + currentTransport.cost
-  const totalLandedSavings = ikeaLandedTotal - flatSetSubtotal
-  const landedSavingsPercent = ((totalLandedSavings / ikeaLandedTotal) * 100).toFixed(1)
+  const flatSetQuote = calculateDDPQuote({
+    countryCode: 'US',
+    packedCbm: 1.2,
+    subtotalInUSD: flatSetSubtotal * 100,
+  })
+  const flatSetLandedTotal = flatSetQuote.landedTotalInUSD / 100
+  const scenarioDifference = flatSetLandedTotal - ikeaLandedTotal
   const taxRatePercent = (currentCity.taxRate * 100).toFixed(2)
 
   return (
-    <div className="w-full bg-background text-on-surface pb-24">
+    <main className="w-full bg-background text-on-surface pb-24" id="main" tabIndex={-1}>
       {/* Header Breadcrumbs */}
       <div className="max-w-[1440px] mx-auto px-5 sm:px-12 pt-8">
         <nav className="flex items-center text-sm font-label-md text-on-surface-variant mb-6 gap-2">
           <Link className="hover:text-primary transition-colors" href="/">
             {tCommon('home')}
           </Link>
-          <span className={`material-symbols-outlined text-[16px] ${isRtl ? 'scale-x-[-1]' : ''}`}>
-            chevron_right
-          </span>
+          <StorefrontIcon name={isRtl ? 'chevron_left' : 'chevron_right'} size={16} />
           <span className="text-on-surface font-medium">{t('breadcrumbCurrent')}</span>
         </nav>
 
@@ -188,11 +193,11 @@ export function IkeaComparisonView() {
                 </div>
                 <div className="flex justify-between text-tertiary">
                   <span>{t('flatSetLineDuty')}</span>
-                  <span className="font-bold">{t('flatSetLineDutyValue')}</span>
+                  <span className="font-bold" dir="ltr">+{formatCurrency(flatSetQuote.importChargesInUSD, { locale })}</span>
                 </div>
                 <div className="flex justify-between text-tertiary">
                   <span>{t('flatSetLineShipping')}</span>
-                  <span className="font-bold">{t('flatSetLineShippingValue')}</span>
+                  <span className="font-bold" dir="ltr">+{formatCurrency(flatSetQuote.freightInUSD, { locale })}</span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant text-xs">
                   <span>{t('flatSetLineAssembly')}</span>
@@ -203,18 +208,12 @@ export function IkeaComparisonView() {
                 <span className="text-sm font-bold text-primary">{t('flatSetPayLabel')}</span>
                 <div className="text-end">
                   <span dir="ltr" className="text-3xl font-extrabold text-primary">
-                    {formatCurrency(flatSetSubtotal * 100, { locale })}
+                    {formatCurrency(flatSetQuote.landedTotalInUSD, { locale })}
                   </span>
                   <div className="text-xs font-bold text-tertiary mt-1">
-                    {t('flatSetSavingsLine', {
-                      // flatSetSavingsLine's message text carries a hardcoded "$" prefix
-                      // (messages/ is out of scope here), so this is a plain locale-formatted
-                      // decimal, not a currency string.
-                      amount: new Intl.NumberFormat(locale, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).format(totalLandedSavings),
-                      percent: landedSavingsPercent,
+                    {t('scenarioDifference', {
+                      amount: formatCurrency(Math.abs(scenarioDifference) * 100, { locale }),
+                      direction: scenarioDifference >= 0 ? t('differenceHigher') : t('differenceLower'),
                     })}
                   </div>
                 </div>
@@ -235,7 +234,7 @@ export function IkeaComparisonView() {
             </div>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-tertiary/10 border border-tertiary/20 text-tertiary text-xs font-bold">
               <span className="w-2 h-2 rounded-full bg-tertiary"></span>
-              {t('breakdownSavingsBadge')}
+              {t('breakdownProductBadge')}
             </div>
           </div>
 
@@ -360,17 +359,17 @@ export function IkeaComparisonView() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-7 grid sm:grid-cols-3 gap-5">
               <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/80">
-                <span className="material-symbols-outlined text-primary mb-2 block">compress</span>
+                <StorefrontIcon className="mb-2 text-primary" name="compress" />
                 <h3 className="font-bold text-on-surface text-sm mb-1">{t('reasonCompactTitle')}</h3>
                 <p className="text-xs text-on-surface-variant leading-relaxed">{t('reasonCompactBody')}</p>
               </div>
               <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/80">
-                <span className="material-symbols-outlined text-primary mb-2 block">local_shipping</span>
+                <StorefrontIcon className="mb-2 text-primary" name="local_shipping" />
                 <h3 className="font-bold text-on-surface text-sm mb-1">{t('reasonDdpTitle')}</h3>
                 <p className="text-xs text-on-surface-variant leading-relaxed">{t('reasonDdpBody')}</p>
               </div>
               <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/80">
-                <span className="material-symbols-outlined text-primary mb-2 block">storefront</span>
+                <StorefrontIcon className="mb-2 text-primary" name="storefront" />
                 <h3 className="font-bold text-on-surface text-sm mb-1">{t('reasonDirectTitle')}</h3>
                 <p className="text-xs text-on-surface-variant leading-relaxed">{t('reasonDirectBody')}</p>
               </div>
@@ -378,20 +377,11 @@ export function IkeaComparisonView() {
 
             <div className="lg:col-span-5 bg-surface-container-low p-6 rounded-xl border border-outline-variant text-on-surface-variant text-sm leading-relaxed space-y-3">
               <div className="flex items-center gap-2 font-bold text-on-surface">
-                <span className="material-symbols-outlined text-primary">lightbulb</span>
+                <StorefrontIcon className="text-primary" name="lightbulb" />
                 {t('ctaCardTitle')}
               </div>
               <p>
-                {t('ctaCardBody', {
-                  // ctaCardBody's message text carries a hardcoded "$" prefix (messages/ is
-                  // out of scope here), so this is a plain locale-formatted decimal, not a
-                  // currency string.
-                  amount: new Intl.NumberFormat(locale, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }).format(totalLandedSavings),
-                  percent: landedSavingsPercent,
-                })}
+                {t('ctaCardBodyAccurate')}
               </p>
               <div className="pt-3">
                 <Link
@@ -399,15 +389,13 @@ export function IkeaComparisonView() {
                   className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 rounded-full bg-primary text-white font-label-md text-sm uppercase tracking-wider hover:bg-primary/90 transition-colors"
                 >
                   <span>{t('ctaButton')}</span>
-                  <span className={`material-symbols-outlined text-[18px] ${isRtl ? 'scale-x-[-1]' : ''}`}>
-                    arrow_forward
-                  </span>
+                  <StorefrontIcon name={isRtl ? 'arrow_back' : 'arrow_forward'} size={18} />
                 </Link>
               </div>
             </div>
           </div>
         </section>
       </div>
-    </div>
+    </main>
   )
 }

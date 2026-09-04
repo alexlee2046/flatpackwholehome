@@ -15,19 +15,22 @@ import React from 'react'
  */
 export function EcommerceRoot({
   children,
+  checkoutEnabled,
   publishableKey,
 }: {
+  checkoutEnabled: boolean
   children: React.ReactNode
   publishableKey: string
 }) {
   const paymentMethods = React.useMemo(
-    () => (publishableKey ? [stripeAdapterClient({ publishableKey })] : []),
-    [publishableKey],
+    () => (checkoutEnabled && publishableKey ? [stripeAdapterClient({ publishableKey })] : []),
+    [checkoutEnabled, publishableKey],
   )
 
   return (
     <EcommerceProvider
       currenciesConfig={{ defaultCurrency: 'USD', supportedCurrencies: [USD] }}
+      enableVariants
       paymentMethods={paymentMethods}
     >
       {children}

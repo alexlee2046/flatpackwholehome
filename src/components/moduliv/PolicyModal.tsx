@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { X } from 'lucide-react'
 import React, { useEffect, useRef } from 'react'
 
 /**
@@ -58,9 +59,7 @@ function PolicyDialog({
             onClick={() => dialogRef.current?.close()}
             type="button"
           >
-            <span aria-hidden="true" className="material-symbols-outlined text-xl">
-              close
-            </span>
+            <X aria-hidden="true" size={20} />
           </button>
         </div>
         <div className="flex-1 overflow-y-auto px-6 py-6 md:px-8">

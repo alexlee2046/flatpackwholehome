@@ -4,6 +4,7 @@ import { Link } from '@/i18n/navigation'
 import { localeDetails, type AppLocale } from '@/i18n/routing'
 import { useLocale, useTranslations } from 'next-intl'
 import React, { useState } from 'react'
+import { StorefrontIcon } from './StorefrontIcon'
 
 export { FAQ_ITEMS }
 
@@ -31,9 +32,7 @@ export function FaqView({ items = FAQ_ITEMS }: { items?: FaqItem[] }) {
         <Link className="hover:text-primary transition-colors" href="/">
           {tCommon('home')}
         </Link>
-        <span className={`material-symbols-outlined text-[16px]${isRtl ? ' scale-x-[-1]' : ''}`}>
-          chevron_right
-        </span>
+        <StorefrontIcon name={isRtl ? 'chevron_left' : 'chevron_right'} size={16} />
         <span className="text-on-surface font-medium">{tNav('faq')}</span>
       </nav>
 
@@ -47,9 +46,7 @@ export function FaqView({ items = FAQ_ITEMS }: { items?: FaqItem[] }) {
 
       <div className="max-w-md mb-8">
         <div className="relative">
-          <span className="material-symbols-outlined absolute start-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60 text-[20px]">
-            search
-          </span>
+          <StorefrontIcon className="absolute start-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60" name="search" size={20} />
           <input
             aria-label={t('searchPlaceholder')}
             className="w-full ps-10 pe-4 py-2.5 border border-outline-variant/60 bg-surface-container-low text-on-surface text-sm rounded focus:outline-none focus:border-primary"
@@ -70,9 +67,7 @@ export function FaqView({ items = FAQ_ITEMS }: { items?: FaqItem[] }) {
           >
             <summary className="flex justify-between items-center py-6 cursor-pointer list-none gap-6">
               <span className="font-headline-sm text-[20px] text-on-surface">{item.q}</span>
-              <span className="material-symbols-outlined text-primary transition-transform duration-300 group-open:rotate-180">
-                arrow_downward
-              </span>
+              <StorefrontIcon className="text-primary transition-transform duration-300 group-open:rotate-180" name="arrow_downward" size={20} />
             </summary>
             <p className="font-body-md text-body-md text-on-surface-variant pb-6 pe-8">{item.a}</p>
           </details>

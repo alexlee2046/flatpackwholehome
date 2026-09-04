@@ -1,4 +1,5 @@
 import { FAQ_ITEMS, type FaqItem } from '@/data/faq'
+import { FAQ_SAFE_ANSWERS } from '@/data/faqSafeAnswers'
 import { I18N_DICTIONARY } from '@/utilities/i18nDictionary'
 import configPromise from '@payload-config'
 import { unstable_cache } from 'next/cache'
@@ -19,6 +20,30 @@ function stripInternalFields<T>(doc: T): T {
   const out = { ...(doc as Record<string, unknown>) }
   for (const field of INTERNAL_PRODUCT_FIELDS) delete out[field]
   return out as T
+}
+
+// Payload join fields default to ten records and the product `variants` join is
+// capped before option type relationships are fully populated. Query the SKU
+// collection directly instead: depth 2 resolves options and their type, while
+// the explicit limit lets us fail closed rather than price a truncated set.
+const STOREFRONT_VARIANT_LIMIT = 100
+
+async function getCompleteProductVariants(payload: any, productID: number, locale: string) {
+  try {
+    const result = await payload.find({
+      collection: 'variants',
+      depth: 2,
+      limit: STOREFRONT_VARIANT_LIMIT,
+      locale: locale as any,
+      overrideAccess: true,
+      where: { product: { equals: productID } },
+    })
+
+    return result.hasNextPage ? [] : result.docs || []
+  } catch (error) {
+    console.error('[storefront:getCompleteProductVariants]', error)
+    return []
+  }
 }
 
 /**
@@ -120,7 +145,11 @@ export const getProductData = cache(async (slug: string, locale: string) => {
             slug: { equals: slug },
           },
         })
-        return stripInternalFields(productResult?.docs?.[0] || null)
+        const product = productResult?.docs?.[0]
+        if (!product) return null
+
+        const variants = await getCompleteProductVariants(payload, product.id, locale)
+        return stripInternalFields({ ...product, variants })
       } catch (err) {
         console.error('[storefront:getProductData]', err)
         return null
@@ -142,7 +171,7 @@ export const getKitBuilderData = cache(async (locale: string) => {
         const [productsRes, spacesRes, materialsRes] = await Promise.all([
           payload.find({
             collection: 'products',
-            depth: 1,
+            depth: 3,
             limit: 10,
             locale: locale as any,
             overrideAccess: true,
@@ -166,10 +195,26 @@ export const getKitBuilderData = cache(async (locale: string) => {
           }),
         ])
 
+        const products = productsRes?.docs || []
+        const variantsByProduct = new Map(
+          await Promise.all(
+            products.map(async (product) => [
+              product.id,
+              await getCompleteProductVariants(payload, product.id, locale),
+            ] as const),
+          ),
+        )
+        const productWithVariants = (slug: string) => {
+          const product = products.find((candidate) => candidate.slug === slug)
+          return product
+            ? stripInternalFields({ ...product, variants: variantsByProduct.get(product.id) || [] })
+            : null
+        }
+
         return {
-          bedProduct: stripInternalFields(productsRes?.docs?.find((p) => p.slug === 'snapbed') || null),
-          bundleProduct: stripInternalFields(productsRes?.docs?.find((p) => p.slug === '1-bedroom-kit') || null),
-          livingProduct: stripInternalFields(productsRes?.docs?.find((p) => p.slug === 'modusofa') || null),
+          bedProduct: productWithVariants('snapbed'),
+          bundleProduct: productWithVariants('1-bedroom-kit'),
+          livingProduct: productWithVariants('modusofa'),
           materials: materialsRes?.docs || [],
           spaces: spacesRes?.docs || [],
         }
@@ -203,6 +248,7 @@ const normalizeFaqKey = (text?: string | null) =>
     .replace(/\s+/g, ' ')
 
 const FAQ_INDEX_BY_KEY = new Map(FAQ_ITEMS.map((item, idx) => [normalizeFaqKey(item.q), idx]))
+const safeFaqAnswers = (locale: string) => FAQ_SAFE_ANSWERS[locale] || FAQ_SAFE_ANSWERS.en
 
 /**
  * Retrieve FAQ dataset from CMS with fallback to default questions.
@@ -230,7 +276,12 @@ export const getFaqData = cache(async (locale: string) => {
             const defaults = idx !== undefined ? FAQ_ITEMS[idx] : undefined
             return {
               q: isEnglishFallback && localized ? localized.q : doc.question || localized?.q || defaults?.q,
-              a: isEnglishFallback && localized ? localized.a : doc.answer || localized?.a || defaults?.a,
+              a:
+                idx === 0 || idx === 1
+                  ? safeFaqAnswers(locale)[idx]
+                  : isEnglishFallback && localized
+                    ? localized.a
+                    : doc.answer || localized?.a || defaults?.a,
             }
           })
           return { faqs: items }
@@ -238,7 +289,13 @@ export const getFaqData = cache(async (locale: string) => {
       } catch (err) {
         console.error('[storefront:getFaqData]', err)
       }
-      return { faqs: dict?.faqs || FAQ_ITEMS }
+      const fallbackFaqs = dict?.faqs || FAQ_ITEMS
+      return {
+        faqs: fallbackFaqs.map((item, index) => ({
+          ...item,
+          ...(index === 0 || index === 1 ? { a: safeFaqAnswers(locale)[index] } : {}),
+        })),
+      }
     },
     ['storefront-faqs', locale],
     { revalidate: 300, tags: ['faqs', `faqs-${locale}`] },

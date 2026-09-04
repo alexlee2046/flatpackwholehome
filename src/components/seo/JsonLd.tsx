@@ -35,14 +35,13 @@ export function OrganizationJsonLd({ locale = 'en' }: { locale?: string }) {
     logo: `${baseUrl}/assets/brand/lockup.svg`,
     image: `${baseUrl}/assets/homepage/hero-split.png`,
     inLanguage: locale,
-    description:
-      'The Flat Set furnishes your whole home from 6 flat boxes — 100% tool-free 60-minute assembly, fresh-pressed made-to-order craft, free swatch box, DDP duties included, and 100-night trial.',
-    slogan: 'Your entire home. Delivered in 6 flat boxes.',
+    description: 'The Flat Set furniture collection.',
+    slogan: 'The Flat Set furniture collection.',
     brand: {
       '@type': 'Brand',
       name: 'The Flat Set',
       logo: `${baseUrl}/assets/brand/mark.svg`,
-      slogan: '6 Boxes · 60 Minutes · 0 Screws · DDP Included',
+      slogan: 'The Flat Set furniture collection.',
     },
     sameAs: [
       'https://instagram.com/theflatset',
@@ -195,19 +194,22 @@ export function ProductJsonLd({
   sku,
   url,
   currency = 'USD',
+  includeOffer = true,
   inStock = true,
   locale = 'en',
   category,
-  ratingValue = '4.9',
-  reviewCount = '348',
+  ratingValue,
+  reviewCount,
 }: {
   name: string
   description: string
   image: string | string[]
-  price: number
+  price?: number
   sku: string
   url: string
   currency?: string
+  /** Omit purchasable markup when catalog eligibility is incomplete. */
+  includeOffer?: boolean
   inStock?: boolean
   locale?: string
   category?: string
@@ -249,58 +251,24 @@ export function ProductJsonLd({
           },
         }
       : {}),
-    offers: {
-      '@type': 'Offer',
-      price,
-      priceCurrency: currency,
-      availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      url: fullUrl,
-      priceValidUntil: '2027-12-31',
-      itemCondition: 'https://schema.org/NewCondition',
-      seller: {
-        '@type': 'Organization',
-        '@id': `${baseUrl}/#organization`,
-        name: 'The Flat Set',
-        url: baseUrl,
-      },
-      shippingDetails: {
-        '@type': 'OfferShippingDetails',
-        doesNotApply: false,
-        shippingRate: {
-          '@type': 'MonetaryAmount',
-          value: 0,
-          currency,
-        },
-        shippingDestination: {
-          '@type': 'DefinedRegion',
-          addressCountry: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'JP', 'AE'],
-        },
-        deliveryTime: {
-          '@type': 'ShippingDeliveryTime',
-          handlingTime: {
-            '@type': 'QuantitativeValue',
-            minValue: 1,
-            maxValue: 2,
-            unitCode: 'd',
+    ...(includeOffer && Number.isFinite(price) && (price ?? 0) > 0
+      ? {
+          offers: {
+            '@type': 'Offer',
+            price,
+            priceCurrency: currency,
+            availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            url: fullUrl,
+            itemCondition: 'https://schema.org/NewCondition',
+            seller: {
+              '@type': 'Organization',
+              '@id': `${baseUrl}/#organization`,
+              name: 'The Flat Set',
+              url: baseUrl,
+            },
           },
-          transitTime: {
-            '@type': 'QuantitativeValue',
-            minValue: 14,
-            maxValue: 18,
-            unitCode: 'd',
-          },
-        },
-      },
-      hasMerchantReturnPolicy: {
-        '@type': 'MerchantReturnPolicy',
-        applicableCountry: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'JP', 'AE'],
-        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
-        merchantReturnDays: 100,
-        returnMethod: 'https://schema.org/ReturnByMail',
-        returnFees: 'https://schema.org/FreeReturn',
-        refundType: 'https://schema.org/FullRefund',
-      },
-    },
+        }
+      : {}),
   }
 
   return <JsonLdScript data={data} />

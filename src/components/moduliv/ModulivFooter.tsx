@@ -12,7 +12,6 @@ export type FooterProps = {
 }
 
 export function ModulivFooter({
-  brandSlogan,
   copyrightText,
   navItems,
   socialLinks,
@@ -20,7 +19,9 @@ export function ModulivFooter({
   const tNav = useTranslations('Navigation')
   const tFooter = useTranslations('Footer')
 
-  const resolvedSlogan = brandSlogan || '6 Boxes · 60 Minutes · 0 Screws · 20% Below IKEA · DDP Duties Included'
+  // CMS legacy slogans can imply DDP coverage or a price comparison before a
+  // destination quote exists. Keep the storefront footer operationally neutral.
+  const resolvedSlogan = tFooter('tagline')
   const resolvedCopyright = copyrightText || tFooter('copyright')
 
   const openPolicy = (modalId: string) => {
@@ -54,6 +55,7 @@ export function ModulivFooter({
           className="group flex items-baseline gap-1.5 shrink-0 text-on-surface hover:opacity-85 transition-opacity"
           href="/"
           aria-label="The Flat Set — Home"
+          dir="ltr"
         >
           <span className="font-headline-md italic font-normal text-[17px] tracking-wider text-on-surface/80">
             The
@@ -65,7 +67,7 @@ export function ModulivFooter({
         <p className="font-body-md text-body-md text-on-surface-variant">
           {resolvedCopyright}
         </p>
-        <p className="font-label-md text-[12px] tracking-widest uppercase text-outline mt-2">
+        <p className="font-label-md text-[12px] tracking-widest uppercase text-on-surface-variant mt-2">
           {resolvedSlogan}
         </p>
         {socialLinks && socialLinks.length > 0 && (
@@ -86,7 +88,7 @@ export function ModulivFooter({
       </div>
 
       <div className="flex flex-col gap-3">
-        <span className="font-label-md text-xs uppercase tracking-widest text-outline font-semibold">
+        <span className="font-label-md text-xs uppercase tracking-widest text-on-surface-variant font-semibold">
           {tFooter('furnitureSystemHeading')}
         </span>
         <nav aria-label="Furniture System Navigation" className="flex flex-wrap gap-x-8 gap-y-4 items-center font-label-md text-label-md">
@@ -130,7 +132,7 @@ export function ModulivFooter({
             className="text-primary font-semibold hover:underline transition-all duration-200"
             href="/us-vs-ikea"
           >
-            {tNav('usVsIkea')} (-20%)
+            {tNav('usVsIkea')}
           </Link>
           <Link
             className="text-on-surface-variant hover:text-primary hover:underline transition-all duration-200"

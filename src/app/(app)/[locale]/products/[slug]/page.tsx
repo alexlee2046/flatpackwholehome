@@ -5,6 +5,13 @@ import { ProductDetail } from '@/components/moduliv/ProductDetail'
 import { defaultLocale, locales, type AppLocale } from '@/i18n/routing'
 import { buildPageMetadata } from '@/i18n/pageMetadata'
 import { getMaterialsData, getProductData } from '@/lib/data/storefront'
+import {
+  getStorefrontOfferPrice,
+  normalizeStorefrontCheckoutProduct,
+} from '@/lib/commerce/catalogEligibility'
+import { readCheckoutConfig } from '@/lib/commerce/checkoutConfig'
+import { normalizeStorefrontVariants } from '@/lib/commerce/storefrontCart'
+import { resolveStorefrontMedia } from '@/utilities/storefrontMedia'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { hasLocale } from 'next-intl'
@@ -172,7 +179,7 @@ const FALLBACK_PRODUCTS: Record<
     slug: '1-bedroom-kit',
     specifications: [
       { label: 'Coverage', value: 'Living, Bedroom, & Dining essentials' },
-      { label: 'Total Boxes', value: '6 Boxes (DDP Delivered to Room of Choice)' },
+      { label: 'Total Boxes', value: '6 flat boxes; destination DDP is quoted in cart' },
       { label: 'Bundle Savings', value: '$350 vs buying pieces separately' },
       { label: 'Assembly Time', value: '60 minutes total (Zero tools required)' },
     ],
@@ -205,7 +212,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ? '/assets/1-bedroom-kit-builder/b4e5f4d8a0.png'
       : '/assets/modusofa-product-detail-page/e38c85e68d.png'
 
-  const productImage = (product?.gallery as any)?.[0]?.image?.url || (fallback?.gallery as any)?.[0]?.image?.url || defaultProductImage
+  const productImage =
+    resolveStorefrontMedia((product?.gallery as any)?.[0]?.image?.url) ||
+    resolveStorefrontMedia((fallback?.gallery as any)?.[0]?.image?.url) ||
+    defaultProductImage
 
   return buildPageMetadata({
     description,
@@ -232,22 +242,39 @@ export default async function ProductPage({ params }: Props) {
     notFound()
   }
 
+  const variants = doc ? normalizeStorefrontVariants(doc.variants) : []
+  const checkout = doc ? normalizeStorefrontCheckoutProduct(doc, 'catalog') : undefined
+  const offerPrice = checkout ? getStorefrontOfferPrice(checkout, variants) : undefined
+  const checkoutConfig = readCheckoutConfig()
+  // A catalog price alone is not a live offer. Keep merchant markup absent
+  // until the operational checkout release gate is on as well.
+  const includeOffer = checkoutConfig.enabled && offerPrice !== undefined
   const productData = doc
     ? {
         assemblyMinutes: doc.assemblyMinutes,
         boxBreakdown: doc.boxBreakdown as any,
         boxCount: doc.boxCount,
+        checkout,
         gallery: doc.gallery as any,
         id: doc.id,
         joineryType: doc.joineryType,
         meta: doc.meta as any,
-        price: doc.priceInUSD || fallback?.price || 69900,
+        // Never substitute a static price for incomplete catalog data. This is
+        // an eligible SKU price before destination delivery, not a DDP total.
+        price: offerPrice,
         slug: doc.slug,
+        shippingWeightKg: doc.shippingWeightKg,
         specifications: doc.specifications || fallback?.specifications,
         subtitle: doc.subtitle || fallback?.subtitle,
         title: doc.title || fallback?.title,
+        variants,
       }
-    : fallback
+    : {
+        ...fallback,
+        checkout: normalizeStorefrontCheckoutProduct(undefined, 'fallback'),
+        price: undefined,
+        variants: [],
+      }
 
   const categoryName = slug === 'modusofa'
     ? tPdp('categorySeating')
@@ -261,22 +288,20 @@ export default async function ProductPage({ params }: Props) {
       ? '/assets/1-bedroom-kit-builder/b4e5f4d8a0.png'
       : '/assets/modusofa-product-detail-page/e38c85e68d.png'
 
-  const productImage = (productData.gallery as any)?.[0]?.image?.url || defaultProductImage
-  const reviewCount = slug === 'modusofa' ? '348' : slug === 'snapbed' ? '214' : '156'
-
+  const productImage =
+    resolveStorefrontMedia((productData.gallery as any)?.[0]?.image?.url) || defaultProductImage
   return (
     <>
       <ProductJsonLd
         category={`Furniture > ${categoryName}`}
         currency="USD"
-        description={productData.subtitle || 'Whole-home flat-pack furniture piece engineered for tool-free assembly.'}
+        description={productData.subtitle || productData.title}
         image={productImage}
-        inStock={true}
+        includeOffer={includeOffer}
+        inStock={includeOffer}
         locale={locale}
         name={productData.title}
-        price={productData.price}
-        ratingValue="4.9"
-        reviewCount={reviewCount}
+        price={includeOffer ? offerPrice / 100 : undefined}
         sku={`TFS-${slug.toUpperCase()}`}
         url={`/products/${slug}`}
       />
@@ -289,7 +314,11 @@ export default async function ProductPage({ params }: Props) {
         ]}
       />
       <SiteHeader locale={locale} />
-      <ProductDetail materials={materials as any} product={productData} />
+      <ProductDetail
+        checkoutEnabled={checkoutConfig.enabled}
+        materials={materials as any}
+        product={productData}
+      />
       <SiteFooter locale={locale} />
     </>
   )
