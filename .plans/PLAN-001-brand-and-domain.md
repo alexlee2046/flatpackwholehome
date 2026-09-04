@@ -17,7 +17,7 @@
 - [x] 已注册 `theflatset.com` / `myflatset.com` / `getflatset.com`（2026-09-02，GoDaddy，有效期至 2027-09-02）
 - [ ] 律师做 USPTO / EUIPO Class 20 正式检索（顺带看 Flat by Artis 的 FLAT SET）
 - [ ] 锁定 Instagram / TikTok / YouTube `@theflatset`
-- [ ] 将 `my` / `get` 301 到 `theflatset.com`，邮箱用 `hello@theflatset.com`
+- [x] 已将 `my` / `get` 通过 Cloudflare 边缘 301 到 `theflatset.com`（2026-09-03）；品牌邮箱待单独配置
 - [ ] 批准 Act 后：把文档与 Stitch 项目中的 MODULIV 换成 The Flat Set
 
 ## 核心结论（先看这个）
