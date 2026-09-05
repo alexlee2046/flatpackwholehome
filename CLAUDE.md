@@ -29,7 +29,7 @@ CI runs exactly `tsc --noEmit`, `eslint --max-warnings=-1`, `pnpm build`. Existi
 - Canonical host is always `https://theflatset.com`; `canonicalUrl.ts` deliberately ignores `localhost`/`canbee.cn` in `NEXT_PUBLIC_SITE_URL`. `robots.ts` / `sitemap.ts` / `llms.txt` are route handlers, not static files.
 - `pnpm build` must succeed without a reachable database (Dockerfile builds with dummy env). Never add build-time code that queries Postgres. Production: `https://flatpack.dev.canbee.cn` behind `theflatset.com`; `redirects.ts` maps legacy Stitch `*.html` URLs, keep it in sync when renaming a top-level page.
 - `payload.config.ts` `onInit` self-provisions on boot: verifies an existing admin, creates one only when `INITIAL_ADMIN_PASSWORD` is set (otherwise just logs an error), seeds content, and runs the full catalogue seed only when `products` is empty. Errors inside `onInit` are logged as warnings, never thrown. `PAYLOAD_RUN_MIGRATIONS=true` is only safe on an empty database.
-- On Supabase, `DATABASE_URL` must use the session-mode pooler or direct 5432. The transaction pooler (6543) breaks Payload's prepared statements and shows up as intermittent 500s (see `.env.example`).
+- Database is Lane D (devops `docs/platform-stack.md`): database `flatpackwholehome` on the shared Postgres `pg-shared-01`, credentials only in Infisical (`DATABASE_URI` for the tailnet, `DATABASE_URI_INTERNAL` for the Coolify container, `DATABASE_URI_RO` read-only). The old self-hosted Supabase stack was stopped on 2026-09-05 and is deleted two weeks later. Never point `DATABASE_URL` at a transaction pooler: it breaks Payload's prepared statements and shows up as intermittent 500s.
 
 ## Reference docs
 
