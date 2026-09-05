@@ -4,6 +4,7 @@ import { Plugin } from 'payload'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { ecommercePlugin } from '@payloadcms/plugin-ecommerce'
+import { s3Storage } from '@payloadcms/storage-s3'
 
 import { Page, Product } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -238,4 +239,24 @@ export const plugins: Plugin[] = [
       }),
     },
   }),
+  // S3-backed media storage (workspace-minio bucket flatpackwholehome). Only
+  // enabled when S3_BUCKET is set, so local dev and the Dockerfile's
+  // no-env build keep writing to public/media on local disk.
+  ...(process.env.S3_BUCKET
+    ? [
+        s3Storage({
+          collections: { media: true },
+          bucket: process.env.S3_BUCKET,
+          config: {
+            endpoint: process.env.S3_ENDPOINT,
+            region: process.env.S3_REGION || 'us-east-1',
+            forcePathStyle: process.env.S3_FORCE_PATH_STYLE !== 'false',
+            credentials: {
+              accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+              secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+            },
+          },
+        }),
+      ]
+    : []),
 ]
