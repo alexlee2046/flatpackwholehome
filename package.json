@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
-    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "dev": "infisical run --env dev -- cross-env NODE_OPTIONS=--no-deprecation next dev",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "i18n:cms": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/i18n/translate-payload.mjs",
@@ -24,7 +24,8 @@
     "test:e2e:motion": "node tests/e2e-motion.mjs",
     "test:e2e:journey": "node tests/e2e-journey.mjs",
     "test:e2e:admin": "node tests/e2e-admin.mjs",
-    "test:e2e:deep": "node tests/e2e-deep-verification.mjs"
+    "test:e2e:deep": "node tests/e2e-deep-verification.mjs",
+    "dev:raw": "cross-env NODE_OPTIONS=--no-deprecation next dev"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
