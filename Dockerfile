@@ -16,6 +16,10 @@ ENV DATABASE_URL=postgresql://build:build@127.0.0.1:5432/build
 ENV NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ENV NEXT_PUBLIC_SERVER_URL=http://localhost:3000
 ENV PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000
+ENV S3_BUCKET=build-dummy
+ENV S3_ENDPOINT=http://127.0.0.1:9000
+ENV S3_ACCESS_KEY_ID=build
+ENV S3_SECRET_ACCESS_KEY=build
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm generate:importmap && pnpm build
