@@ -107,6 +107,15 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: '/api/media/file/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=2592000, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      {
         source: '/vendor/:path*',
         headers: [
           {
@@ -128,14 +137,6 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   redirects,
-  async rewrites() {
-    return [
-      {
-        source: '/api/media/file/:path*',
-        destination: '/media/:path*',
-      },
-    ]
-  },
   turbopack: {
     root: path.resolve(dirname),
   },
